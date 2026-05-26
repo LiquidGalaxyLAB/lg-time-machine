@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'screens/main_screen.dart';
+import 'services/language_manager.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await LanguageManager.instance.init();
   runApp(const MyApp());
 }
 

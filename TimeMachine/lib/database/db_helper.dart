@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/country.dart';
+import '../models/poi.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -20,9 +21,26 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _onUpgrade,
     );
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('''
+        CREATE TABLE pois (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          countryId INTEGER NOT NULL,
+          name TEXT NOT NULL,
+          description TEXT NOT NULL,
+          imageUrl TEXT NOT NULL,
+          FOREIGN KEY (countryId) REFERENCES countries (id) ON DELETE CASCADE
+        )
+      ''');
+      await _seedPOIs(db);
+    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -31,6 +49,24 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         flag TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE pois (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        countryId INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        imageUrl TEXT NOT NULL,
+        FOREIGN KEY (countryId) REFERENCES countries (id) ON DELETE CASCADE
       )
     ''');
 
@@ -49,6 +85,69 @@ class DatabaseHelper {
     for (var country in initialCountries) {
       await db.insert('countries', country.toMap());
     }
+
+    await db.insert('settings', {'key': 'language', 'value': 'en'});
+    await _seedPOIs(db);
+  }
+
+  Future _seedPOIs(Database db) async {
+    // Find Spain ID
+    final spainResult = await db.query('countries', where: 'name = ?', whereArgs: ['Spain']);
+    if (spainResult.isNotEmpty) {
+      final spainId = spainResult.first['id'] as int;
+      
+      List<POI> spainPOIs = [
+        POI(
+          countryId: spainId,
+          name: 'Plaza Mayor de Salamanca',
+          description: 'Plaza Square',
+          imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Plaza_Mayor_de_Salamanca_01.jpg/800px-Plaza_Mayor_de_Salamanca_01.jpg',
+        ),
+        POI(
+          countryId: spainId,
+          name: 'Sagrada Familia',
+          description: 'Catholic Basilica',
+          imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Sagrada_Familia_01.jpg/800px-Sagrada_Familia_01.jpg',
+        ),
+      ];
+
+      for (var poi in spainPOIs) {
+        await db.insert('pois', poi.toMap());
+      }
+    }
+  }
+
+  Future<List<POI>> getPOIsByCountry(int countryId) async {
+    final db = await instance.database;
+    final result = await db.query(
+      'pois',
+      where: 'countryId = ?',
+      whereArgs: [countryId],
+    );
+    return result.map((json) => POI.fromMap(json)).toList();
+  }
+
+  Future<void> saveSetting(String key, String value) async {
+    final db = await instance.database;
+    await db.insert(
+      'settings',
+      {'key': key, 'value': value},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<String?> getSetting(String key) async {
+    final db = await instance.database;
+    final maps = await db.query(
+      'settings',
+      columns: ['value'],
+      where: 'key = ?',
+      whereArgs: [key],
+    );
+    if (maps.isNotEmpty) {
+      return maps.first['value'] as String;
+    }
+    return null;
   }
 
   Future<List<Country>> getAllCountries() async {
