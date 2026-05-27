@@ -21,24 +21,16 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 4, // Incrementado para asegurar la actualización de columnas
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      await db.execute('''
-        CREATE TABLE pois (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          countryId INTEGER NOT NULL,
-          name TEXT NOT NULL,
-          description TEXT NOT NULL,
-          imageUrl TEXT NOT NULL,
-          FOREIGN KEY (countryId) REFERENCES countries (id) ON DELETE CASCADE
-        )
-      ''');
+    if (oldVersion < 4) {
+      await db.execute('DROP TABLE IF EXISTS pois');
+      await _createPOIsTable(db);
       await _seedPOIs(db);
     }
   }
@@ -59,6 +51,11 @@ class DatabaseHelper {
       )
     ''');
 
+    await _createPOIsTable(db);
+    await _seedData(db);
+  }
+
+  Future _createPOIsTable(Database db) async {
     await db.execute('''
       CREATE TABLE pois (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,12 +63,16 @@ class DatabaseHelper {
         name TEXT NOT NULL,
         description TEXT NOT NULL,
         imageUrl TEXT NOT NULL,
+        latitude REAL NOT NULL,
+        longitude REAL NOT NULL,
+        altitude REAL NOT NULL,
+        heading REAL NOT NULL,
+        tilt REAL NOT NULL,
+        range REAL NOT NULL,
+        altitudeMode TEXT NOT NULL,
         FOREIGN KEY (countryId) REFERENCES countries (id) ON DELETE CASCADE
       )
     ''');
-
-    // Seeding initial data
-    await _seedData(db);
   }
 
   Future _seedData(Database db) async {
@@ -91,7 +92,6 @@ class DatabaseHelper {
   }
 
   Future _seedPOIs(Database db) async {
-    // Find Spain ID
     final spainResult = await db.query('countries', where: 'name = ?', whereArgs: ['Spain']);
     if (spainResult.isNotEmpty) {
       final spainId = spainResult.first['id'] as int;
@@ -102,12 +102,26 @@ class DatabaseHelper {
           name: 'Plaza Mayor de Salamanca',
           description: 'Plaza Square',
           imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Plaza_Mayor_de_Salamanca_01.jpg/800px-Plaza_Mayor_de_Salamanca_01.jpg',
+          latitude: 40.9648929,
+          longitude: -5.6637844,
+          altitude: 797.4306626,
+          heading: 111.8158031,
+          tilt: 60.6970201,
+          range: 191.8245802,
+          altitudeMode: 'relativeToGround',
         ),
         POI(
           countryId: spainId,
           name: 'Sagrada Familia',
           description: 'Catholic Basilica',
           imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Sagrada_Familia_01.jpg/800px-Sagrada_Familia_01.jpg',
+          latitude: 41.4034299,
+          longitude: 2.1739006,
+          altitude: 95.6508464,
+          heading: 9.5377605,
+          tilt: 59.4242461,
+          range: 551.3130864,
+          altitudeMode: 'relativeToGround',
         ),
       ];
 

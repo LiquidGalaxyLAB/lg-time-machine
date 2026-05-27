@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../services/language_manager.dart';
 import '../services/lg_service.dart';
+import '../services/kml_service.dart';
 import '../utils/notifications.dart';
 
 class ConnectScreen extends StatefulWidget {
@@ -39,6 +40,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
 
   Future<void> _handleConnect() async {
     if (widget.isConnected) {
+      await LGService.instance.clearKML();
       await LGService.instance.disconnect();
       widget.onConnectToggle();
       AppNotifications.show(context, LanguageManager.instance.translate('disconnected'), isError: true);
@@ -62,6 +64,8 @@ class _ConnectScreenState extends State<ConnectScreen> {
       return;
     }
 
+    final screens = int.tryParse(screensStr) ?? 3;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -73,11 +77,19 @@ class _ConnectScreenState extends State<ConnectScreen> {
       port: port,
       username: user,
       password: pass,
+      screens: screens,
     );
 
     if (mounted) Navigator.pop(context); // Close loading
 
     if (success) {
+      // Clear previous KMLs and send logos panel immediately after connection
+      await LGService.instance.clearKML();
+      await LGService.instance.clearLogos();
+      
+      final logosKml = KMLService.getLogosKML();
+      await LGService.instance.sendLogoKML(logosKml);
+
       widget.onConnectToggle();
       AppNotifications.show(context, LanguageManager.instance.translate('connected'));
     } else {
@@ -169,18 +181,25 @@ class _ConnectScreenState extends State<ConnectScreen> {
         padding: const EdgeInsets.symmetric(vertical: 15),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Colors.blue.withOpacity(0.6),
-              Colors.blue.withOpacity(0.3),
-            ],
+            colors: widget.isConnected
+                ? [
+                    const Color(0xFFFF8A8A).withOpacity(0.6),
+                    const Color(0xFFFF8A8A).withOpacity(0.3),
+                  ]
+                : [
+                    Colors.blue.withOpacity(0.6),
+                    Colors.blue.withOpacity(0.3),
+                  ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.white.withOpacity(0.4)),
+          border: Border.all(
+            color: widget.isConnected ? const Color(0xFFFF8A8A).withOpacity(0.4) : Colors.white.withOpacity(0.4),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.blue.withOpacity(0.3),
+              color: widget.isConnected ? const Color(0xFFFF8A8A).withOpacity(0.3) : Colors.blue.withOpacity(0.3),
               blurRadius: 15,
               spreadRadius: 2,
             ),
@@ -188,7 +207,9 @@ class _ConnectScreenState extends State<ConnectScreen> {
         ),
         child: Center(
           child: Text(
-            LanguageManager.instance.translate('connect_button').toUpperCase(),
+            LanguageManager.instance
+                .translate(widget.isConnected ? 'disconnect_button' : 'connect_button')
+                .toUpperCase(),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,

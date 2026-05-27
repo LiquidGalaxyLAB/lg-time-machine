@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../services/language_manager.dart';
+import '../services/lg_service.dart';
+import '../services/kml_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   final bool isConnected;
@@ -168,17 +170,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Row(
             children: [
-              Expanded(child: _buildToolButton(LanguageManager.instance.translate('relaunch'))),
+              Expanded(
+                child: _buildToolButton(LanguageManager.instance.translate('relaunch'), () async {
+                  if (widget.isConnected) {
+                    await LGService.instance.relaunch();
+                  }
+                }),
+              ),
               const SizedBox(width: 10),
-              Expanded(child: _buildToolButton(LanguageManager.instance.translate('shutdown'))),
+              Expanded(
+                child: _buildToolButton(LanguageManager.instance.translate('shutdown'), () async {
+                  if (widget.isConnected) {
+                    await LGService.instance.shutdown();
+                  }
+                }),
+              ),
             ],
           ),
           const SizedBox(height: 10),
           Row(
             children: [
-              Expanded(child: _buildToolButton(LanguageManager.instance.translate('clean_kmls'))),
+              Expanded(
+                child: _buildToolButton(LanguageManager.instance.translate('clean_kmls'), () async {
+                  if (widget.isConnected) {
+                    await LGService.instance.clearKML();
+                  }
+                }),
+              ),
               const SizedBox(width: 10),
-              Expanded(child: _buildToolButton(LanguageManager.instance.translate('reboot_lg'))),
+              Expanded(
+                child: _buildToolButton(LanguageManager.instance.translate('clean_logos'), () async {
+                  if (widget.isConnected) {
+                    await LGService.instance.clearLogos();
+                  }
+                }),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _buildToolButton(LanguageManager.instance.translate('reboot_lg'), () async {
+                  if (widget.isConnected) {
+                    await LGService.instance.reboot();
+                  }
+                }),
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -189,8 +227,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 LanguageManager.instance.translate('show_hide_logos').toUpperCase(),
                 style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
               ),
-              _buildCustomCheckbox(_showLogos, (val) {
+              _buildCustomCheckbox(_showLogos, (val) async {
                 setState(() => _showLogos = val);
+                if (widget.isConnected) {
+                  if (val) {
+                    await LGService.instance.sendKML(KMLService.getLogosKML());
+                  } else {
+                    await LGService.instance.clearKML();
+                  }
+                }
               }),
             ],
           ),
@@ -199,9 +244,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildToolButton(String label) {
+  Widget _buildToolButton(String label, VoidCallback? onTap) {
     return InkWell(
-      onTap: () {}, // Click animation only
+      onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),

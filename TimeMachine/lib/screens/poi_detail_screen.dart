@@ -3,6 +3,9 @@ import 'dart:ui';
 import '../models/poi.dart';
 import '../services/language_manager.dart';
 import '../services/time_manager.dart';
+import '../services/lg_service.dart';
+import '../services/kml_service.dart';
+import '../widgets/logo_panel.dart';
 
 class POIDetailScreen extends StatefulWidget {
   final POI poi;
@@ -22,33 +25,37 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/Timeline/GalaxyBackground.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildHeader(context),
-              _buildTitle(),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _buildPOIImage(),
-                      const SizedBox(height: 20),
-                      _buildToolButtons(),
-                    ],
-                  ),
-                ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/Timeline/GalaxyBackground.png'),
+                fit: BoxFit.cover,
               ),
-              _buildTimelineSlider(),
-            ],
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  _buildHeader(context),
+                  _buildTitle(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          _buildPOIImage(),
+                          const SizedBox(height: 20),
+                          _buildToolButtons(),
+                        ],
+                      ),
+                    ),
+                  ),
+                  _buildTimelineSlider(),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -168,6 +175,39 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
         children: [
           Row(
             children: [
+              Expanded(
+                child: _buildButton(
+                  LanguageManager.instance.translate('travel_lg').toUpperCase(),
+                  icon: Icons.rocket_launch,
+                  onTap: () async {
+                    if (widget.isConnected) {
+                      // 1. Ensure logos are still there (optional, but good practice)
+                      final logosKml = KMLService.getLogosKML();
+                      await LGService.instance.sendKML(logosKml);
+                      
+                      // 2. Fly to the POI using the precise coordinates from Google Sheets
+                      final lookAt = KMLService.lookAt(widget.poi);
+                      await LGService.instance.sendQuery('flytoview=$lookAt');
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Traveling to ${widget.poi.name}...'),
+                          backgroundColor: Colors.blue.withOpacity(0.8),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please connect to Liquid Galaxy first')),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 15),
+          Row(
+            children: [
               Expanded(child: _buildButton('COMPARE WITH PRESENT')),
               const SizedBox(width: 15),
               Expanded(child: _buildButton('AI NARRATION')),
@@ -180,6 +220,24 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                 child: _buildButton(
                   'ORBIT AROUND',
                   icon: Icons.public,
+                  onTap: () async {
+                    if (widget.isConnected) {
+                      final orbitKml = KMLService.buildKML(widget.poi, KMLService.orbit(widget.poi));
+                      await LGService.instance.sendKML(orbitKml);
+                      await LGService.instance.sendQuery('playtour=Orbit');
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Starting orbit around ${widget.poi.name}...'),
+                          backgroundColor: Colors.blue.withOpacity(0.8),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please connect to Liquid Galaxy first')),
+                      );
+                    }
+                  },
                 ),
               ),
               const SizedBox(width: 15),
@@ -191,49 +249,52 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     );
   }
 
-  Widget _buildButton(String label, {IconData? icon}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.blue.withOpacity(0.5),
-            Colors.blue.withOpacity(0.2),
+  Widget _buildButton(String label, {IconData? icon, VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.blue.withOpacity(0.5),
+              Colors.blue.withOpacity(0.2),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(color: Colors.blue.withOpacity(0.4)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blue.withOpacity(0.2),
+              blurRadius: 8,
+              spreadRadius: 1,
+            ),
           ],
         ),
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: Colors.blue.withOpacity(0.4)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withOpacity(0.2),
-            blurRadius: 8,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, color: Colors.white, size: 16),
-            const SizedBox(width: 4),
-          ],
-          Flexible(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.3,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, color: Colors.white, size: 16),
+              const SizedBox(width: 4),
+            ],
+            Flexible(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.3,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.visible,
+                softWrap: false,
               ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.visible,
-              softWrap: false,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
