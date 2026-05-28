@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../services/language_manager.dart';
 import '../services/lg_service.dart';
-import '../services/kml_service.dart';
+import '../kmls/logo_kml.dart';
 import '../utils/notifications.dart';
+import '../database/db_helper.dart';
 
 class ConnectScreen extends StatefulWidget {
   final bool isConnected;
@@ -27,6 +28,36 @@ class _ConnectScreenState extends State<ConnectScreen> {
   final TextEditingController _ipController = TextEditingController();
   final TextEditingController _portController = TextEditingController();
   final TextEditingController _screensController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final user = await DatabaseHelper.instance.getSetting('lg_user');
+    final pass = await DatabaseHelper.instance.getSetting('lg_pass');
+    final ip = await DatabaseHelper.instance.getSetting('lg_ip');
+    final port = await DatabaseHelper.instance.getSetting('lg_port');
+    final screens = await DatabaseHelper.instance.getSetting('lg_screens');
+
+    setState(() {
+      if (user != null) _userController.text = user;
+      if (pass != null) _passwordController.text = pass;
+      if (ip != null) _ipController.text = ip;
+      if (port != null) _portController.text = port;
+      if (screens != null) _screensController.text = screens;
+    });
+  }
+
+  Future<void> _saveSettings() async {
+    await DatabaseHelper.instance.saveSetting('lg_user', _userController.text.trim());
+    await DatabaseHelper.instance.saveSetting('lg_pass', _passwordController.text.trim());
+    await DatabaseHelper.instance.saveSetting('lg_ip', _ipController.text.trim());
+    await DatabaseHelper.instance.saveSetting('lg_port', _portController.text.trim());
+    await DatabaseHelper.instance.saveSetting('lg_screens', _screensController.text.trim());
+  }
 
   @override
   void dispose() {
@@ -83,12 +114,13 @@ class _ConnectScreenState extends State<ConnectScreen> {
     if (mounted) Navigator.pop(context); // Close loading
 
     if (success) {
-      // Clear previous KMLs and send logos panel immediately after connection
+      await _saveSettings();
+      // Upload logo assets to LG
+      await LGService.instance.uploadAssets();
+
+      // Clear previous KMLs and logos to ensure a clean slate after connection
       await LGService.instance.clearKML();
       await LGService.instance.clearLogos();
-      
-      final logosKml = KMLService.getLogosKML();
-      await LGService.instance.sendLogoKML(logosKml);
 
       widget.onConnectToggle();
       AppNotifications.show(context, LanguageManager.instance.translate('connected'));

@@ -4,7 +4,9 @@ import '../models/poi.dart';
 import '../services/language_manager.dart';
 import '../services/time_manager.dart';
 import '../services/lg_service.dart';
-import '../services/kml_service.dart';
+import '../kmls/logo_kml.dart';
+import '../kmls/look_at_kml.dart';
+import '../kmls/orbit_kml.dart';
 import '../widgets/logo_panel.dart';
 
 class POIDetailScreen extends StatefulWidget {
@@ -181,12 +183,12 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                   icon: Icons.rocket_launch,
                   onTap: () async {
                     if (widget.isConnected) {
-                      // 1. Ensure logos are still there (optional, but good practice)
-                      final logosKml = KMLService.getLogosKML();
-                      await LGService.instance.sendKML(logosKml);
+                      // 1. Ensure logos are still there
+                      final logosKml = LogoKML.generate();
+                      await LGService.instance.sendLogoKML(logosKml);
                       
-                      // 2. Fly to the POI using the precise coordinates from Google Sheets
-                      final lookAt = KMLService.lookAt(widget.poi);
+                      // 2. Fly to the POI
+                      final lookAt = LookAtKML.generate(widget.poi);
                       await LGService.instance.sendQuery('flytoview=$lookAt');
                       
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -222,7 +224,15 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                   icon: Icons.public,
                   onTap: () async {
                     if (widget.isConnected) {
-                      final orbitKml = KMLService.buildKML(widget.poi, KMLService.orbit(widget.poi));
+                      final orbitContent = OrbitKML.generate(widget.poi);
+                      final orbitKml = '''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+  <Document>
+    <name>${widget.poi.name}</name>
+    ${LookAtKML.generate(widget.poi)}
+    $orbitContent
+  </Document>
+</kml>''';
                       await LGService.instance.sendKML(orbitKml);
                       await LGService.instance.sendQuery('playtour=Orbit');
                       
