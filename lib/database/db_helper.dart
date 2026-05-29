@@ -21,7 +21,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 4, // Incrementado para asegurar la actualización de columnas
+      version: 5, // Incrementado para añadir ajuste de logos
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -32,6 +32,9 @@ class DatabaseHelper {
       await db.execute('DROP TABLE IF EXISTS pois');
       await _createPOIsTable(db);
       await _seedPOIs(db);
+    }
+    if (oldVersion < 5) {
+      await db.insert('settings', {'key': 'showLogos', 'value': 'true'});
     }
   }
 
@@ -88,6 +91,7 @@ class DatabaseHelper {
     }
 
     await db.insert('settings', {'key': 'language', 'value': 'en'});
+    await db.insert('settings', {'key': 'showLogos', 'value': 'true'});
     await _seedPOIs(db);
   }
 
@@ -132,7 +136,7 @@ class DatabaseHelper {
   }
 
   Future<List<POI>> getPOIsByCountry(int countryId) async {
-    final db = await instance.database;
+    final db = await DatabaseHelper.instance.database;
     final result = await db.query(
       'pois',
       where: 'countryId = ?',
@@ -142,7 +146,7 @@ class DatabaseHelper {
   }
 
   Future<void> saveSetting(String key, String value) async {
-    final db = await instance.database;
+    final db = await DatabaseHelper.instance.database;
     await db.insert(
       'settings',
       {'key': key, 'value': value},
@@ -151,7 +155,7 @@ class DatabaseHelper {
   }
 
   Future<String?> getSetting(String key) async {
-    final db = await instance.database;
+    final db = await DatabaseHelper.instance.database;
     final maps = await db.query(
       'settings',
       columns: ['value'],
@@ -165,13 +169,13 @@ class DatabaseHelper {
   }
 
   Future<List<Country>> getAllCountries() async {
-    final db = await instance.database;
+    final db = await DatabaseHelper.instance.database;
     final result = await db.query('countries');
     return result.map((json) => Country.fromMap(json)).toList();
   }
 
   Future<List<Country>> searchCountries(String query) async {
-    final db = await instance.database;
+    final db = await DatabaseHelper.instance.database;
     final result = await db.query(
       'countries',
       where: 'name LIKE ?',

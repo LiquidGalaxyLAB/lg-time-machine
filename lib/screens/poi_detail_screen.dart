@@ -7,7 +7,6 @@ import '../services/lg_service.dart';
 import '../kmls/logo_kml.dart';
 import '../kmls/look_at_kml.dart';
 import '../kmls/orbit_kml.dart';
-import '../widgets/logo_panel.dart';
 
 class POIDetailScreen extends StatefulWidget {
   final POI poi;
@@ -24,6 +23,42 @@ class POIDetailScreen extends StatefulWidget {
 }
 
 class _POIDetailScreenState extends State<POIDetailScreen> {
+  bool _isGeneratingFuture = false;
+  bool _futureImageExists = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFutureImage();
+  }
+
+  void _checkFutureImage() {
+    // In a real app, we would check if the file exists on disk
+    // For this simulation, we'll use a simple state
+  }
+
+  Future<void> _generateFutureImage() async {
+    setState(() {
+      _isGeneratingFuture = true;
+    });
+
+    // Simulate AI generation delay
+    await Future.delayed(const Duration(seconds: 3));
+
+    if (mounted) {
+      setState(() {
+        _isGeneratingFuture = false;
+        _futureImageExists = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(LanguageManager.instance.translate('future_success')),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -140,33 +175,86 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
   }
 
   Widget _buildPOIImage() {
-    final assetPathJpg = 'assets/images/PointsOfInterest/Default/${widget.poi.name}.jpg';
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: Image.asset(
-          assetPathJpg,
-          width: double.infinity,
-          height: 220,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            final assetPathPng = 'assets/images/PointsOfInterest/Default/${widget.poi.name}.png';
-            return Image.asset(
-              assetPathPng,
-              width: double.infinity,
-              height: 220,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                width: double.infinity,
-                height: 220,
-                color: Colors.white10,
-                child: const Icon(Icons.image_not_supported, color: Colors.white24, size: 50),
+    return ValueListenableBuilder<double>(
+      valueListenable: TimeManager.instance.timeNotifier,
+      builder: (context, timeValue, child) {
+        final isFuture = timeValue == 2.0;
+        String assetPath = 'assets/images/PointsOfInterest/Default/${widget.poi.name}.jpg';
+
+        if (isFuture && _futureImageExists) {
+          // In a real scenario, this would be a FileImage or a specific asset
+          // For now, we use a placeholder or the same image to demonstrate the logic
+          assetPath = 'assets/images/PointsOfInterest/Default/${widget.poi.name}.jpg';
+        }
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Stack(
+                  children: [
+                    Image.asset(
+                      assetPath,
+                      width: double.infinity,
+                      height: 220,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        final assetPathPng = 'assets/images/PointsOfInterest/Default/${widget.poi.name}.png';
+                        return Image.asset(
+                          assetPathPng,
+                          width: double.infinity,
+                          height: 220,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            width: double.infinity,
+                            height: 220,
+                            color: Colors.white10,
+                            child: const Icon(Icons.image_not_supported, color: Colors.white24, size: 50),
+                          ),
+                        );
+                      },
+                    ),
+                    if (isFuture && _futureImageExists)
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.cyanAccent.withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            LanguageManager.instance.translate('ai_generated'),
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            );
-          },
-        ),
-      ),
+              if (isFuture && _futureImageExists)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    '${LanguageManager.instance.translate('estimation_of')} ${widget.poi.name} in 2075',
+                    style: TextStyle(
+                      color: Colors.cyanAccent.withOpacity(0.7),
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -183,14 +271,10 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                   icon: Icons.rocket_launch,
                   onTap: () async {
                     if (widget.isConnected) {
-                      // 1. Ensure logos are still there
                       final logosKml = LogoKML.generate();
                       await LGService.instance.sendLogoKML(logosKml);
-                      
-                      // 2. Fly to the POI
-                      final lookAt = LookAtKML.generate(widget.poi);
+                      final lookAt = LookAtKML.generate(widget.poi, LGService.instance.screens);
                       await LGService.instance.sendQuery('flytoview=$lookAt');
-                      
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Traveling to ${widget.poi.name}...'),
@@ -229,13 +313,16 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
   <Document>
     <name>${widget.poi.name}</name>
-    ${LookAtKML.generate(widget.poi)}
-    $orbitContent
+    <gx:Tour>
+      <name>Orbit</name>
+      <gx:Playlist>
+        $orbitContent
+      </gx:Playlist>
+    </gx:Tour>
   </Document>
 </kml>''';
                       await LGService.instance.sendKML(orbitKml);
                       await LGService.instance.sendQuery('playtour=Orbit');
-                      
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Starting orbit around ${widget.poi.name}...'),
@@ -254,56 +341,95 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
               Expanded(child: _buildButton('SHOW STATISTICS')),
             ],
           ),
+          ValueListenableBuilder<double>(
+            valueListenable: TimeManager.instance.timeNotifier,
+            builder: (context, timeValue, child) {
+              final isFuture = timeValue == 2.0;
+              if (!isFuture) return const SizedBox.shrink();
+              return Column(
+                children: [
+                  const SizedBox(height: 15),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildButton(
+                          _futureImageExists
+                              ? LanguageManager.instance.translate('regenerate_future')
+                              : LanguageManager.instance.translate('generate_future'),
+                          icon: Icons.auto_awesome,
+                          onTap: _isGeneratingFuture ? null : _generateFutureImage,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (_isGeneratingFuture)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: LinearProgressIndicator(
+                        backgroundColor: Colors.white10,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.cyanAccent),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
         ],
       ),
     );
   }
 
   Widget _buildButton(String label, {IconData? icon, VoidCallback? onTap}) {
+    final bool isDisabled = onTap == null;
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.blue.withOpacity(0.5),
-              Colors.blue.withOpacity(0.2),
+      child: Opacity(
+        opacity: isDisabled ? 0.4 : 1.0,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.blue.withOpacity(0.5),
+                Colors.blue.withOpacity(0.2),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: Colors.blue.withOpacity(0.4)),
+            boxShadow: isDisabled
+                ? []
+                : [
+                    BoxShadow(
+                      color: Colors.blue.withOpacity(0.2),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, color: Colors.white, size: 16),
+                const SizedBox(width: 4),
+              ],
+              Flexible(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.3,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.visible,
+                  softWrap: false,
+                ),
+              ),
             ],
           ),
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: Colors.blue.withOpacity(0.4)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blue.withOpacity(0.2),
-              blurRadius: 8,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (icon != null) ...[
-              Icon(icon, color: Colors.white, size: 16),
-              const SizedBox(width: 4),
-            ],
-            Flexible(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.3,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.visible,
-                softWrap: false,
-              ),
-            ),
-          ],
         ),
       ),
     );

@@ -11,6 +11,7 @@ class LGService {
   SSHClient? _client;
   bool _isConnected = false;
   bool get isConnected => _isConnected;
+  int get screens => _screens;
   String? _host;
   int? _port;
 
@@ -38,6 +39,8 @@ class LGService {
         onPasswordRequest: () => password,
       );
       
+      await _client!.authenticated;
+      
       _isConnected = true;
       
       // Ensure directories exist
@@ -48,6 +51,22 @@ class LGService {
     } catch (e) {
       _isConnected = false;
       return false;
+    }
+  }
+
+  Future<void> reconnect() async {
+    if (_host == null || _port == null || _username == null || _password == null) return;
+    try {
+      final socket = await SSHSocket.connect(_host!, _port!, timeout: const Duration(seconds: 5));
+      _client = SSHClient(
+        socket,
+        username: _username!,
+        onPasswordRequest: () => _password,
+      );
+      await _client!.authenticated;
+      _isConnected = true;
+    } catch (e) {
+      _isConnected = false;
     }
   }
 
@@ -62,11 +81,15 @@ class LGService {
   }
 
   Future<String?> execute(String command) async {
+    if (_client == null || _client?.isClosed == true) {
+      await reconnect();
+    }
     if (!_isConnected || _client == null) return null;
     try {
       final session = await _client!.execute(command);
       return await utf8.decodeStream(session.stdout);
     } catch (e) {
+      _isConnected = false; // Mark as disconnected if execution fails due to connection
       return null;
     }
   }
@@ -78,31 +101,35 @@ class LGService {
 
   Future<void> sendLogoKML(String kml) async {
     int rigs = (_screens / 2).floor() + 2;
+    await execute("mkdir -p /var/www/html/kml");
     await execute("cat <<'EOF' > /var/www/html/kml/slave_$rigs.kml\n$kml\nEOF");
   }
 
   Future<void> uploadAssets() async {
+    if (!_isConnected || _client == null) return;
+
     final assets = [
-      'bg_box.png',
-      'LiquidGalaxyTimeMachine_Logo.png',
-      'LiquidGalaxy_Logo.png',
-      'GoogleSummerOfCode_Logo.png',
-      'LaboratorisTIC_Logo.png',
+      {'path': 'assets/images/KMLs/Logo/KMLs_Logo.png', 'name': 'KMLs_Logo.png'},
     ];
 
-    await execute('mkdir -p /var/www/html/logos');
-
-    for (var asset in assets) {
-      try {
-        final byteData = await rootBundle.load('assets/images/KMLs/Logo/$asset');
-        final bytes = byteData.buffer.asUint8List();
-        final session = await _client!.sftp();
-        final file = await session.open('/var/www/html/logos/$asset', mode: SftpFileOpenMode.create | SftpFileOpenMode.write);
-        await file.write(Stream.value(bytes));
-        await file.close();
-      } catch (e) {
-        print('Error uploading $asset: $e');
+    try {
+      await execute('mkdir -p /var/www/html/logos');
+      final sftp = await _client!.sftp();
+      
+      for (var asset in assets) {
+        try {
+          final byteData = await rootBundle.load(asset['path']!);
+          final bytes = byteData.buffer.asUint8List();
+          final file = await sftp.open('/var/www/html/logos/${asset['name']}', 
+            mode: SftpFileOpenMode.create | SftpFileOpenMode.write | SftpFileOpenMode.truncate);
+          await file.write(Stream.value(bytes));
+          await file.close();
+        } catch (e) {
+          print('Error uploading ${asset['name']}: $e');
+        }
       }
+    } catch (e) {
+      print('SFTP Error: $e');
     }
   }
 
@@ -112,7 +139,11 @@ class LGService {
   }
 
   Future<void> sendQuery(String query) async {
-    await execute("echo '$query' > /tmp/query.txt");
+    await execute('echo "$query" > /tmp/query.txt');
+  }
+
+  Future<void> stopOrbit() async {
+    await sendQuery('exittour=true');
   }
 
   Future<void> clearKML() async {
@@ -126,6 +157,7 @@ class LGService {
   <Document>
   </Document>
 </kml>''';
+    await execute("mkdir -p /var/www/html/kml");
     await execute("cat <<'EOF' > /var/www/html/kml/slave_$rigs.kml\n$blank\nEOF");
   }
 

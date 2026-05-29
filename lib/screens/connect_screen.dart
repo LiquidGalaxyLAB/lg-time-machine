@@ -118,9 +118,16 @@ class _ConnectScreenState extends State<ConnectScreen> {
       // Upload logo assets to LG
       await LGService.instance.uploadAssets();
 
-      // Clear previous KMLs and logos to ensure a clean slate after connection
+      // Clear previous KMLs to ensure a clean slate after connection
       await LGService.instance.clearKML();
-      await LGService.instance.clearLogos();
+      
+      // Check logo visibility setting
+      final showLogos = await DatabaseHelper.instance.getSetting('showLogos');
+      if (showLogos == 'true' || showLogos == null) {
+        await LGService.instance.sendLogoKML(LogoKML.generate());
+      } else {
+        await LGService.instance.clearLogos();
+      }
 
       widget.onConnectToggle();
       AppNotifications.show(context, LanguageManager.instance.translate('connected'));

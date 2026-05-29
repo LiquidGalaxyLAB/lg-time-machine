@@ -47,6 +47,12 @@ class LanguageManager {
       'confirm_message': 'Are you sure you want to',
       'yes': 'YES',
       'no': 'NO',
+      'generate_future': 'GENERATE FUTURE ESTIMATION IMAGE',
+      'regenerate_future': 'REGENERATE FUTURE ESTIMATION',
+      'ai_generated': 'AI GENERATED',
+      'estimation_of': 'Estimation of',
+      'generating_future': 'Generating future estimation image...',
+      'future_success': 'Future estimation image generated successfully!',
     },
     'es': {
       'connect': 'Conectar',
@@ -83,6 +89,12 @@ class LanguageManager {
       'confirm_message': '¿Estás seguro de que quieres',
       'yes': 'SÍ',
       'no': 'NO',
+      'generate_future': 'GENERAR IMAGEN DE ESTIMACIÓN FUTURA',
+      'regenerate_future': 'REGENERAR ESTIMACIÓN FUTURA',
+      'ai_generated': 'GENERADO POR IA',
+      'estimation_of': 'Estimación de',
+      'generating_future': 'Generando imagen de estimación futura...',
+      'future_success': '¡Imagen de estimación futura generada con éxito!',
     },
     'ca': {
       'connect': 'Connectar',
@@ -119,6 +131,12 @@ class LanguageManager {
       'confirm_message': 'Estàs segur que vols',
       'yes': 'SÍ',
       'no': 'NO',
+      'generate_future': 'GENERAR IMATGE D\'ESTIMACIÓ FUTURA',
+      'regenerate_future': 'REGENERAR ESTIMACIÓ FUTURA',
+      'ai_generated': 'GENERAT PER IA',
+      'estimation_of': 'Estimació de',
+      'generating_future': 'Generant imatge d\'estimació futura...',
+      'future_success': 'Imatge d\'estimació futura generada correctament!',
     },
   };
 

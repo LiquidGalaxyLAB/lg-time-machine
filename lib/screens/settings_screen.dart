@@ -3,6 +3,7 @@ import 'dart:ui';
 import '../services/language_manager.dart';
 import '../services/lg_service.dart';
 import '../kmls/logo_kml.dart';
+import '../database/db_helper.dart';
 
 class SettingsScreen extends StatefulWidget {
   final bool isConnected;
@@ -19,8 +20,23 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _showLogos = false;
+  bool _showLogos = true;
   bool _isSettingRefresh = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final showLogos = await DatabaseHelper.instance.getSetting('showLogos');
+    if (showLogos != null) {
+      setState(() {
+        _showLogos = showLogos == 'true';
+      });
+    }
+  }
   bool _isResetingRefresh = false;
   bool _isRelaunching = false;
   bool _isRebooting = false;
@@ -314,6 +330,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               _buildCustomCheckbox(_showLogos, (val) async {
                 setState(() => _showLogos = val);
+                await DatabaseHelper.instance.saveSetting('showLogos', val.toString());
                 if (widget.isConnected) {
                   if (val) {
                     await LGService.instance.sendLogoKML(LogoKML.generate());

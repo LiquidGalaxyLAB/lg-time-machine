@@ -17,16 +17,8 @@ class LogoKML {
   static String generateContent() {
     const String baseUrl = "http://lg1:81/logos";
     return '''
-    <!-- Background Box - Narrower and higher -->
-    ${screenOverlayImage('$baseUrl/bg_box.png', 0.05, 0.02, 0.40, 0.25)}
-    
-    <!-- Main App Logo -->
-     ${screenOverlayImage('$baseUrl/LiquidGalaxyTimeMachine_Logo.png', 0.07, 0.04, 0.36, 0.12)}
-    
-    <!-- Partner Logos - Aligned horizontally -->
-    ${screenOverlayImage('$baseUrl/LiquidGalaxy_Logo.png', 0.22, 0.06, 0.09, 0.04)}
-    ${screenOverlayImage('$baseUrl/GoogleSummerOfCode_Logo.png', 0.22, 0.17, 0.09, 0.04)}
-    ${screenOverlayImage('$baseUrl/LaboratorisTIC_Logo.png', 0.22, 0.28, 0.09, 0.04)}
+    <!-- Main Branding Overlay -->
+    ${screenOverlayImage('$baseUrl/KMLs_Logo.png', 0.02, 0.01, 0.71, 0.44)}
     ''';
   }
 
