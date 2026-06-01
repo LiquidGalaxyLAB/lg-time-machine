@@ -6,6 +6,7 @@ import 'about_us_screen.dart';
 import 'help_screen.dart';
 import 'settings_screen.dart';
 import '../services/language_manager.dart';
+import '../services/lg_service.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -17,14 +18,14 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
   int _selectedIndex = 1; // Default to Timeline
   late PageController _pageController;
-  bool _isConnected = false;
+  bool get _isConnected => LGService.instance.isConnected;
   bool _isMenuOpen = false;
   late AnimationController _menuAnimationController;
   late Animation<Offset> _menuOffsetAnimation;
 
   void _toggleConnection() {
     setState(() {
-      _isConnected = !_isConnected;
+      // LGService now manages the connection state
     });
   }
 
@@ -78,70 +79,75 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String>(
-      valueListenable: LanguageManager.instance.languageNotifier,
-      builder: (context, lang, child) {
-        return Scaffold(
-          resizeToAvoidBottomInset: false,
-          body: Stack(
-            children: [
-              Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/Timeline/GalaxyBackground.png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: SafeArea(
-                  bottom: false,
-                  child: Column(
-                    children: [
-                      // Header with Logo
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10.0),
-                        child: Image.asset(
-                          'assets/images/Timeline/LogoApp_Menu.png',
-                          width: double.infinity,
-                          height: 100,
-                          fit: BoxFit.contain,
-                        ),
+    return ListenableBuilder(
+      listenable: LGService.instance,
+      builder: (context, child) {
+        return ValueListenableBuilder<String>(
+          valueListenable: LanguageManager.instance.languageNotifier,
+          builder: (context, lang, child) {
+            return Scaffold(
+              resizeToAvoidBottomInset: false,
+              body: Stack(
+                children: [
+                  Container(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/Timeline/GalaxyBackground.png'),
+                        fit: BoxFit.cover,
                       ),
-                      // Body
-                      Expanded(
-                        child: PageView(
-                          controller: _pageController,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _selectedIndex = index;
-                            });
-                          },
-                          children: [
-                            ConnectScreen(
-                              isConnected: _isConnected,
-                              onConnectToggle: _toggleConnection,
-                              onMenuToggle: _toggleMenu,
+                    ),
+                    child: SafeArea(
+                      bottom: false,
+                      child: Column(
+                        children: [
+                          // Header with Logo
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            child: Image.asset(
+                              'assets/images/Timeline/LogoApp_Menu.png',
+                              width: double.infinity,
+                              height: 100,
+                              fit: BoxFit.contain,
                             ),
-                            TimelineScreen(
-                              onTabChange: _onItemTapped,
-                              isConnected: _isConnected,
-                              onMenuToggle: _toggleMenu,
+                          ),
+                          // Body
+                          Expanded(
+                            child: PageView(
+                              controller: _pageController,
+                              onPageChanged: (index) {
+                                setState(() {
+                                  _selectedIndex = index;
+                                });
+                              },
+                              children: [
+                                ConnectScreen(
+                                  isConnected: _isConnected,
+                                  onConnectToggle: _toggleConnection,
+                                  onMenuToggle: _toggleMenu,
+                                ),
+                                TimelineScreen(
+                                  onTabChange: _onItemTapped,
+                                  isConnected: _isConnected,
+                                  onMenuToggle: _toggleMenu,
+                                ),
+                                SettingsScreen(
+                                  isConnected: _isConnected,
+                                  onMenuToggle: _toggleMenu,
+                                ),
+                              ],
                             ),
-                            SettingsScreen(
-                              isConnected: _isConnected,
-                              onMenuToggle: _toggleMenu,
-                            ),
-                          ],
-                        ),
+                          ),
+                          // Bottom Navigation
+                          _buildBottomNav(),
+                        ],
                       ),
-                      // Bottom Navigation
-                      _buildBottomNav(),
-                    ],
+                    ),
                   ),
-                ),
+                  _buildSideMenu(),
+                ],
               ),
-              _buildSideMenu(),
-            ],
-          ),
+            );
+          },
         );
       },
     );

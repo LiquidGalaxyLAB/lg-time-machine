@@ -37,6 +37,8 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.9.0
   dartssh2: ^2.17.1
+  http: ^1.2.1
+  csv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -71,9 +73,18 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - lib/services/Pois.json
     - assets/images/Timeline/
-    - assets/images/PointsOfInterest/Default/
     - assets/images/KMLs/Logo/
+    - assets/PointsOfInterest/Sagrada Familia/info.json
+    - assets/PointsOfInterest/Sagrada Familia/Images/Past/
+    - assets/PointsOfInterest/Sagrada Familia/Images/Present/
+    - assets/PointsOfInterest/Plaza Mayor de Salamanca/info.json
+    - assets/PointsOfInterest/Plaza Mayor de Salamanca/Images/Past/
+    - assets/PointsOfInterest/Plaza Mayor de Salamanca/Images/Present/
+    - assets/PointsOfInterest/Cathedral of Santiago de Compostela/info.json
+    - assets/PointsOfInterest/Cathedral of Santiago de Compostela/Images/Past/
+    - assets/PointsOfInterest/Cathedral of Santiago de Compostela/Images/Present/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

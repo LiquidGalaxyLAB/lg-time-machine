@@ -2,9 +2,10 @@ import 'package:dartssh2/dartssh2.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class LGService {
+class LGService extends ChangeNotifier {
   static final LGService instance = LGService._init();
   LGService._init();
 
@@ -42,6 +43,7 @@ class LGService {
       await _client!.authenticated;
       
       _isConnected = true;
+      notifyListeners();
       
       // Ensure directories exist
       await execute('mkdir -p /var/www/html/logos');
@@ -50,6 +52,7 @@ class LGService {
       return true;
     } catch (e) {
       _isConnected = false;
+      notifyListeners();
       return false;
     }
   }
@@ -65,13 +68,16 @@ class LGService {
       );
       await _client!.authenticated;
       _isConnected = true;
+      notifyListeners();
     } catch (e) {
       _isConnected = false;
+      notifyListeners();
     }
   }
 
   Future<void> disconnect() async {
     _isConnected = false;
+    notifyListeners();
     try {
       _client?.close();
     } catch (e) {
@@ -90,6 +96,7 @@ class LGService {
       return await utf8.decodeStream(session.stdout);
     } catch (e) {
       _isConnected = false; // Mark as disconnected if execution fails due to connection
+      notifyListeners();
       return null;
     }
   }
@@ -99,10 +106,14 @@ class LGService {
     await _setKmlTxt();
   }
 
+  Future<void> sendTimeKML(String kml) async {
+    await execute("cat <<'EOF' > /var/www/html/time.kml\n$kml\nEOF");
+    await _setTimeKmlTxt();
+  }
+
   Future<void> sendLogoKML(String kml) async {
-    int rigs = (_screens / 2).floor() + 2;
     await execute("mkdir -p /var/www/html/kml");
-    await execute("cat <<'EOF' > /var/www/html/kml/slave_$rigs.kml\n$kml\nEOF");
+    await execute("cat <<'EOF' > /var/www/html/kml/slave_1.kml\n$kml\nEOF");
   }
 
   Future<void> uploadAssets() async {
@@ -138,12 +149,143 @@ class LGService {
     await execute(kmlContent);
   }
 
+  Future<void> _setTimeKmlTxt() async {
+    final kmlContent = "echo 'http://lg1:81/time.kml' > /var/www/html/kmls.txt";
+    await execute(kmlContent);
+  }
+
   Future<void> sendQuery(String query) async {
     await execute('echo "$query" > /tmp/query.txt');
   }
 
-  Future<void> stopOrbit() async {
-    await sendQuery('exittour=true');
+  bool _orbitPlaying = false;
+  bool get orbitPlaying => _orbitPlaying;
+  Timer? _orbitTimer;
+  String? _lastOrbitPosition;
+
+  String orbitLookAtLinear(
+    double latitude,
+    double longitude,
+    double zoom,
+    double tilt,
+    double bearing,
+  ) {
+    final lookAt =
+        '<gx:duration>0.3</gx:duration><gx:flyToMode>smooth</gx:flyToMode><LookAt>'
+        '<longitude>$longitude</longitude><latitude>$latitude</latitude>'
+        '<range>$zoom</range><tilt>$tilt</tilt>'
+        '<heading>$bearing</heading>'
+        '<altitudeMode>relativeToGround</altitudeMode></LookAt>';
+
+    _lastOrbitPosition = lookAt;
+    return lookAt;
+  }
+
+  Future<void> flyToOrbit(
+    String context,
+    double latitude,
+    double longitude,
+    double zoom,
+    double tilt,
+    double bearing,
+  ) async {
+    try {
+      final String lookAt = orbitLookAtLinear(
+        latitude,
+        longitude,
+        zoom,
+        tilt,
+        bearing,
+      );
+      await sendQuery('flytoview=$lookAt');
+      await Future.delayed(const Duration(milliseconds: 50));
+    } catch (error) {
+      print('Error in flyToOrbit: $error');
+    }
+  }
+
+  Future<bool> orbitPlay(
+    double latitude,
+    double longitude,
+    double zoom,
+    double tilt, {
+    double initialBearing = 0,
+  }) async {
+    if (_orbitPlaying) {
+      return false;
+    }
+
+    if (!_isConnected) {
+      print('Cannot start orbit: LG not connected');
+      return false;
+    }
+
+    _orbitPlaying = true;
+    notifyListeners();
+
+    try {
+      const int steps = 60;
+      const int stepDuration = 400; // ms
+      // Calculate starting step from initial bearing
+      int currentStep = (initialBearing * steps / 360).floor();
+      bool isMoving = false;
+
+      _orbitTimer = Timer.periodic(const Duration(milliseconds: stepDuration), (
+        timer,
+      ) async {
+        if (!_orbitPlaying) {
+          timer.cancel();
+          return;
+        }
+
+        if (isMoving) {
+          return;
+        }
+
+        try {
+          isMoving = true;
+          double bearing = (currentStep * (360 / steps)) % 360;
+          await flyToOrbit(
+            'Orbit',
+            latitude,
+            longitude,
+            zoom,
+            tilt,
+            bearing,
+          ).timeout(const Duration(milliseconds: 380));
+          currentStep++;
+          isMoving = false;
+        } catch (e) {
+          isMoving = false;
+        }
+      });
+
+      return true;
+    } catch (e) {
+      _orbitPlaying = false;
+      notifyListeners();
+      print('Error during orbit: $e');
+      return false;
+    }
+  }
+
+  Future<void> orbitStop() async {
+    _orbitTimer?.cancel();
+    _orbitTimer = null;
+    _orbitPlaying = false;
+    notifyListeners();
+
+    try {
+      await sendQuery('exittour=true');
+
+      if (_lastOrbitPosition != null) {
+        await sendQuery(
+          'flytoview=$_lastOrbitPosition',
+        );
+      }
+    } catch (e) {
+      print('Error stopping orbit: $e');
+    }
   }
 
   Future<void> clearKML() async {
@@ -151,7 +293,8 @@ class LGService {
   }
 
   Future<void> clearLogos() async {
-    int rigs = (_screens / 2).floor() + 2;
+    int rigs = _screens - 1;
+    if (rigs < 1) rigs = 1;
     String blank = '''<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
   <Document>

@@ -3,7 +3,10 @@ import 'dart:ui';
 import '../models/country.dart';
 import '../models/poi.dart';
 import '../database/db_helper.dart';
+import '../services/poi_service.dart';
 import '../services/language_manager.dart';
+import '../services/time_manager.dart';
+import '../services/time_manager.dart';
 import 'poi_detail_screen.dart';
 
 class POIScreen extends StatefulWidget {
@@ -23,6 +26,7 @@ class POIScreen extends StatefulWidget {
 class _POIScreenState extends State<POIScreen> {
   List<POI> _allPois = [];
   List<POI> _filteredPois = [];
+  bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -39,11 +43,22 @@ class _POIScreenState extends State<POIScreen> {
   }
 
   Future<void> _loadPOIs() async {
-    final pois = await DatabaseHelper.instance.getPOIsByCountry(widget.country.id!);
-    setState(() {
-      _allPois = pois;
-      _filteredPois = pois;
-    });
+    setState(() => _isLoading = true);
+    try {
+      final pois = await POIService().loadPOIs();
+      // Use case-insensitive comparison for country matching
+      final countryPois = pois.where((poi) => 
+        poi.country.toLowerCase().trim() == widget.country.name.toLowerCase().trim()
+      ).toList();
+      setState(() {
+        _allPois = countryPois;
+        _filteredPois = countryPois;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading POIs in screen: $e');
+      setState(() => _isLoading = false);
+    }
   }
 
   void _filterPOIs() {
@@ -182,81 +197,110 @@ class _POIScreenState extends State<POIScreen> {
   }
 
   Widget _buildPOIList() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator(color: Colors.white));
+    }
+    if (_filteredPois.isEmpty) {
+      return Center(
+        child: Text(
+          'No places found',
+          style: TextStyle(color: Colors.white.withOpacity(0.5)),
+        ),
+      );
+    }
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
       itemCount: _filteredPois.length,
       itemBuilder: (context, index) {
         final poi = _filteredPois[index];
-        final assetPathJpg = 'assets/images/PointsOfInterest/Default/${poi.name}.jpg';
         
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => POIDetailScreen(
-                  poi: poi,
-                  isConnected: widget.isConnected,
-                ),
-              ),
+        return ValueListenableBuilder<String>(
+          valueListenable: LanguageManager.instance.languageNotifier,
+          builder: (context, currentLang, child) {
+            return ValueListenableBuilder<double>(
+              valueListenable: TimeManager.instance.timeNotifier,
+              builder: (context, timeValue, child) {
+                String thumbnailPath = '';
+                
+                if (timeValue == 0) { // Past
+                  thumbnailPath = poi.pastImages.isNotEmpty ? poi.pastImages.first : (poi.presentImages.isNotEmpty ? poi.presentImages.first : '');
+                } else {
+                  // present (1.0) or future (2.0)
+                  thumbnailPath = poi.presentImages.isNotEmpty ? poi.presentImages.first : (poi.pastImages.isNotEmpty ? poi.pastImages.first : '');
+                }
+
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => POIDetailScreen(
+                          poi: poi,
+                          isConnected: widget.isConnected,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: thumbnailPath.isNotEmpty 
+                            ? Image.asset(
+                                thumbnailPath,
+                                width: 100,
+                                height: 80,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  print('Error loading image asset: $thumbnailPath');
+                                  return Container(
+                                    width: 100,
+                                    height: 80,
+                                    color: Colors.white10,
+                                    child: const Icon(Icons.image_not_supported, color: Colors.white24),
+                                  );
+                                },
+                              )
+                            : Container(
+                                width: 100,
+                                height: 80,
+                                color: Colors.white10,
+                                child: const Icon(Icons.image_not_supported, color: Colors.white24),
+                              ),
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                poi.name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                poi.description,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.6),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
             );
-          },
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 20),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.asset(
-                    assetPathJpg,
-                    width: 100,
-                    height: 80,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      // Try png if jpg fails
-                      final assetPathPng = 'assets/images/PointsOfInterest/Default/${poi.name}.png';
-                      return Image.asset(
-                        assetPathPng,
-                        width: 100,
-                        height: 80,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          width: 100,
-                          height: 80,
-                          color: Colors.white10,
-                          child: const Icon(Icons.image_not_supported, color: Colors.white24),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        poi.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        poi.description,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          }
         );
       },
     );

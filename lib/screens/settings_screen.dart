@@ -31,11 +31,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _loadSettings() async {
     final showLogos = await DatabaseHelper.instance.getSetting('showLogos');
-    if (showLogos != null) {
-      setState(() {
+    setState(() {
+      if (showLogos != null) {
         _showLogos = showLogos == 'true';
-      });
-    }
+      }
+    });
   }
   bool _isResetingRefresh = false;
   bool _isRelaunching = false;

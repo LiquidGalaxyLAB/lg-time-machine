@@ -71,6 +71,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
 
   Future<void> _handleConnect() async {
     if (widget.isConnected) {
+      await LGService.instance.clearLogos();
       await LGService.instance.clearKML();
       await LGService.instance.disconnect();
       widget.onConnectToggle();
@@ -123,6 +124,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
       
       // Check logo visibility setting
       final showLogos = await DatabaseHelper.instance.getSetting('showLogos');
+
       if (showLogos == 'true' || showLogos == null) {
         await LGService.instance.sendLogoKML(LogoKML.generate());
       } else {

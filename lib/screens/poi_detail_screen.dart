@@ -32,6 +32,14 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     _checkFutureImage();
   }
 
+  @override
+  void dispose() {
+    if (LGService.instance.orbitPlaying) {
+      LGService.instance.orbitStop();
+    }
+    super.dispose();
+  }
+
   void _checkFutureImage() {
     // In a real app, we would check if the file exists on disk
     // For this simulation, we'll use a simple state
@@ -61,43 +69,49 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/Timeline/GalaxyBackground.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  _buildHeader(context),
-                  _buildTitle(),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          _buildPOIImage(),
-                          const SizedBox(height: 20),
-                          _buildToolButtons(),
-                        ],
-                      ),
-                    ),
+    return ListenableBuilder(
+      listenable: LGService.instance,
+      builder: (context, _) {
+        final bool isConnected = LGService.instance.isConnected;
+        return Scaffold(
+          body: Stack(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/Timeline/GalaxyBackground.png'),
+                    fit: BoxFit.cover,
                   ),
-                  _buildTimelineSlider(),
-                ],
+                ),
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      _buildHeader(context, isConnected),
+                      _buildTitle(),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              _buildPOIImage(),
+                              const SizedBox(height: 20),
+                              _buildToolButtons(isConnected),
+                            ],
+                          ),
+                        ),
+                      ),
+                      _buildTimelineSlider(),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, bool isConnected) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Column(
@@ -126,15 +140,15 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: widget.isConnected ? const Color(0xFF8AFF8A).withOpacity(0.2) : const Color(0xFFFF8A8A).withOpacity(0.2),
+                  color: isConnected ? const Color(0xFF8AFF8A).withOpacity(0.2) : const Color(0xFFFF8A8A).withOpacity(0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: widget.isConnected ? const Color(0xFF8AFF8A).withOpacity(0.4) : const Color(0xFFFF8A8A).withOpacity(0.4),
+                    color: isConnected ? const Color(0xFF8AFF8A).withOpacity(0.4) : const Color(0xFFFF8A8A).withOpacity(0.4),
                   ),
                 ),
                 child: Icon(
                   Icons.wifi,
-                  color: widget.isConnected ? const Color(0xFF8AFF8A) : const Color(0xFFFF8A8A),
+                  color: isConnected ? const Color(0xFF8AFF8A) : const Color(0xFFFF8A8A),
                   size: 24,
                 ),
               ),
@@ -178,13 +192,18 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     return ValueListenableBuilder<double>(
       valueListenable: TimeManager.instance.timeNotifier,
       builder: (context, timeValue, child) {
-        final isFuture = timeValue == 2.0;
-        String assetPath = 'assets/images/PointsOfInterest/Default/${widget.poi.name}.jpg';
+        String assetPath = '';
+        bool isFuture = timeValue == 2.0;
+        bool isPresent = timeValue == 1.0;
+        bool isPast = timeValue == 0.0;
 
-        if (isFuture && _futureImageExists) {
-          // In a real scenario, this would be a FileImage or a specific asset
-          // For now, we use a placeholder or the same image to demonstrate the logic
-          assetPath = 'assets/images/PointsOfInterest/Default/${widget.poi.name}.jpg';
+        if (isPast) {
+          assetPath = widget.poi.pastImages.isNotEmpty ? widget.poi.pastImages.first : '';
+        } else if (isPresent) {
+          assetPath = widget.poi.presentImages.isNotEmpty ? widget.poi.presentImages.first : '';
+        } else if (isFuture) {
+          // Future image logic
+          assetPath = widget.poi.presentImages.isNotEmpty ? widget.poi.presentImages.first : '';
         }
 
         return Padding(
@@ -195,27 +214,25 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                 borderRadius: BorderRadius.circular(15),
                 child: Stack(
                   children: [
-                    Image.asset(
-                      assetPath,
-                      width: double.infinity,
-                      height: 220,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        final assetPathPng = 'assets/images/PointsOfInterest/Default/${widget.poi.name}.png';
-                        return Image.asset(
-                          assetPathPng,
-                          width: double.infinity,
-                          height: 220,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
+                    assetPath.isNotEmpty
+                        ? Image.asset(
+                            assetPath,
+                            width: double.infinity,
+                            height: 220,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              width: double.infinity,
+                              height: 220,
+                              color: Colors.white10,
+                              child: const Icon(Icons.image_not_supported, color: Colors.white24, size: 50),
+                            ),
+                          )
+                        : Container(
                             width: double.infinity,
                             height: 220,
                             color: Colors.white10,
                             child: const Icon(Icons.image_not_supported, color: Colors.white24, size: 50),
                           ),
-                        );
-                      },
-                    ),
                     if (isFuture && _futureImageExists)
                       Positioned(
                         top: 10,
@@ -258,7 +275,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     );
   }
 
-  Widget _buildToolButtons() {
+  Widget _buildToolButtons(bool isConnected) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Column(
@@ -270,7 +287,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                   LanguageManager.instance.translate('travel_lg').toUpperCase(),
                   icon: Icons.rocket_launch,
                   onTap: () async {
-                    if (widget.isConnected) {
+                    if (isConnected) {
                       final logosKml = LogoKML.generate();
                       await LGService.instance.sendLogoKML(logosKml);
                       final lookAt = LookAtKML.generate(widget.poi, LGService.instance.screens);
@@ -303,37 +320,49 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
           Row(
             children: [
               Expanded(
-                child: _buildButton(
-                  'ORBIT AROUND',
-                  icon: Icons.public,
-                  onTap: () async {
-                    if (widget.isConnected) {
-                      final orbitContent = OrbitKML.generate(widget.poi);
-                      final orbitKml = '''<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
-  <Document>
-    <name>${widget.poi.name}</name>
-    <gx:Tour>
-      <name>Orbit</name>
-      <gx:Playlist>
-        $orbitContent
-      </gx:Playlist>
-    </gx:Tour>
-  </Document>
-</kml>''';
-                      await LGService.instance.sendKML(orbitKml);
-                      await LGService.instance.sendQuery('playtour=Orbit');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Starting orbit around ${widget.poi.name}...'),
-                          backgroundColor: Colors.blue.withOpacity(0.8),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please connect to Liquid Galaxy first')),
-                      );
-                    }
+                child: ListenableBuilder(
+                  listenable: LGService.instance,
+                  builder: (context, _) {
+                    final isOrbiting = LGService.instance.orbitPlaying;
+                    return _buildButton(
+                      isOrbiting ? 'STOP ORBIT' : 'ORBIT AROUND',
+                      icon: isOrbiting ? Icons.stop_circle : Icons.public,
+                      color: isOrbiting ? Colors.red : Colors.blue,
+                      onTap: () async {
+                        if (isConnected) {
+                          if (isOrbiting) {
+                            await LGService.instance.orbitStop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Orbit stopped'),
+                                backgroundColor: Colors.orange,
+                              ),
+                            );
+                            return;
+                          }
+
+                          // Start the orbit using the new method
+                          await LGService.instance.orbitPlay(
+                            widget.poi.latitude,
+                            widget.poi.longitude,
+                            widget.poi.range / LGService.instance.screens,
+                            45, // Tilt
+                            initialBearing: widget.poi.heading,
+                          );
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Starting orbit around ${widget.poi.name}...'),
+                              backgroundColor: Colors.blue.withOpacity(0.8),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Please connect to Liquid Galaxy first')),
+                          );
+                        }
+                      },
+                    );
                   },
                 ),
               ),
@@ -379,8 +408,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     );
   }
 
-  Widget _buildButton(String label, {IconData? icon, VoidCallback? onTap}) {
+  Widget _buildButton(String label, {IconData? icon, VoidCallback? onTap, Color? color}) {
     final bool isDisabled = onTap == null;
+    final baseColor = color ?? Colors.blue;
     return GestureDetector(
       onTap: onTap,
       child: Opacity(
@@ -390,17 +420,17 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.blue.withOpacity(0.5),
-                Colors.blue.withOpacity(0.2),
+                baseColor.withOpacity(0.5),
+                baseColor.withOpacity(0.2),
               ],
             ),
             borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: Colors.blue.withOpacity(0.4)),
+            border: Border.all(color: baseColor.withOpacity(0.4)),
             boxShadow: isDisabled
                 ? []
                 : [
                     BoxShadow(
-                      color: Colors.blue.withOpacity(0.2),
+                      color: baseColor.withOpacity(0.2),
                       blurRadius: 8,
                       spreadRadius: 1,
                     ),
