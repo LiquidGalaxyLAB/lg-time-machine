@@ -21,7 +21,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _showLogos = true;
-  bool _isSettingRefresh = false;
+
 
   @override
   void initState() {
@@ -38,7 +38,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  bool _isResetingRefresh = false;
   bool _isRelaunching = false;
   bool _isRebooting = false;
   bool _isClearingKml = false;
