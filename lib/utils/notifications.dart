@@ -10,8 +10,8 @@ class AppNotifications {
       elevation: 0,
       behavior: SnackBarBehavior.fixed,
       backgroundColor: isError
-          ? const Color(0xFFFF8A8A).withValues(alpha:0.9)
-          : const Color(0xFF8AFF8A).withValues(alpha:0.9),
+          ? const Color(0xFFFF8A8A).withValues(alpha: 0.9)
+          : const Color(0xFF8AFF8A).withValues(alpha: 0.9),
       content: Container(
         height: 60,
         alignment: Alignment.center,

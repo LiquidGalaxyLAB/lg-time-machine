@@ -186,9 +186,11 @@ class _ConnectScreenState extends State<ConnectScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha:0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withValues(alpha:0.2)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: const Icon(Icons.menu, color: Colors.white, size: 28),
                 ),
@@ -240,12 +242,12 @@ class _ConnectScreenState extends State<ConnectScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha:0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withValues(alpha:0.3)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             spreadRadius: 1,
           ),
@@ -259,7 +261,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: TextStyle(
-            color: Colors.white.withValues(alpha:0.5),
+            color: Colors.white.withValues(alpha: 0.5),
             fontWeight: FontWeight.w400,
           ),
           border: InputBorder.none,
@@ -282,24 +284,27 @@ class _ConnectScreenState extends State<ConnectScreen> {
           gradient: LinearGradient(
             colors: widget.isConnected
                 ? [
-                    const Color(0xFFFF8A8A).withValues(alpha:0.6),
-                    const Color(0xFFFF8A8A).withValues(alpha:0.3),
+                    const Color(0xFFFF8A8A).withValues(alpha: 0.6),
+                    const Color(0xFFFF8A8A).withValues(alpha: 0.3),
                   ]
-                : [Colors.blue.withValues(alpha:0.6), Colors.blue.withValues(alpha:0.3)],
+                : [
+                    Colors.blue.withValues(alpha: 0.6),
+                    Colors.blue.withValues(alpha: 0.3),
+                  ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
             color: widget.isConnected
-                ? const Color(0xFFFF8A8A).withValues(alpha:0.4)
-                : Colors.white.withValues(alpha:0.4),
+                ? const Color(0xFFFF8A8A).withValues(alpha: 0.4)
+                : Colors.white.withValues(alpha: 0.4),
           ),
           boxShadow: [
             BoxShadow(
               color: widget.isConnected
-                  ? const Color(0xFFFF8A8A).withValues(alpha:0.3)
-                  : Colors.blue.withValues(alpha:0.3),
+                  ? const Color(0xFFFF8A8A).withValues(alpha: 0.3)
+                  : Colors.blue.withValues(alpha: 0.3),
               blurRadius: 15,
               spreadRadius: 2,
             ),

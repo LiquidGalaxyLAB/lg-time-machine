@@ -130,9 +130,11 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha:0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withValues(alpha:0.2)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: const Icon(
                     Icons.arrow_back_ios_new,
@@ -145,13 +147,13 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isConnected
-                      ? const Color(0xFF8AFF8A).withValues(alpha:0.2)
-                      : const Color(0xFFFF8A8A).withValues(alpha:0.2),
+                      ? const Color(0xFF8AFF8A).withValues(alpha: 0.2)
+                      : const Color(0xFFFF8A8A).withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isConnected
-                        ? const Color(0xFF8AFF8A).withValues(alpha:0.4)
-                        : const Color(0xFFFF8A8A).withValues(alpha:0.4),
+                        ? const Color(0xFF8AFF8A).withValues(alpha: 0.4)
+                        : const Color(0xFFFF8A8A).withValues(alpha: 0.4),
                   ),
                 ),
                 child: Icon(
@@ -264,7 +266,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.cyanAccent.withValues(alpha:0.8),
+                            color: Colors.cyanAccent.withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
@@ -286,7 +288,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                   child: Text(
                     '${LanguageManager.instance.translate('estimation_of')} ${widget.poi.name} in 2075',
                     style: TextStyle(
-                      color: Colors.cyanAccent.withValues(alpha:0.7),
+                      color: Colors.cyanAccent.withValues(alpha: 0.7),
                       fontSize: 12,
                       fontStyle: FontStyle.italic,
                     ),
@@ -322,7 +324,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Traveling to ${widget.poi.name}...'),
-                          backgroundColor: Colors.blue.withValues(alpha:0.8),
+                          backgroundColor: Colors.blue.withValues(alpha: 0.8),
                         ),
                       );
                     } else {
@@ -386,7 +388,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                               content: Text(
                                 'Starting orbit around ${widget.poi.name}...',
                               ),
-                              backgroundColor: Colors.blue.withValues(alpha:0.8),
+                              backgroundColor: Colors.blue.withValues(
+                                alpha: 0.8,
+                              ),
                             ),
                           );
                         } else {
@@ -469,15 +473,18 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [baseColor.withValues(alpha:0.5), baseColor.withValues(alpha:0.2)],
+              colors: [
+                baseColor.withValues(alpha: 0.5),
+                baseColor.withValues(alpha: 0.2),
+              ],
             ),
             borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: baseColor.withValues(alpha:0.4)),
+            border: Border.all(color: baseColor.withValues(alpha: 0.4)),
             boxShadow: isDisabled
                 ? []
                 : [
                     BoxShadow(
-                      color: baseColor.withValues(alpha:0.2),
+                      color: baseColor.withValues(alpha: 0.2),
                       blurRadius: 8,
                       spreadRadius: 1,
                     ),
@@ -520,9 +527,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           margin: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha:0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: Colors.white.withValues(alpha:0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -551,26 +558,26 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
               SliderTheme(
                 data: SliderTheme.of(context).copyWith(
                   activeTrackColor: Colors.cyanAccent,
-                  inactiveTrackColor: Colors.white.withValues(alpha:0.2),
+                  inactiveTrackColor: Colors.white.withValues(alpha: 0.2),
                   trackHeight: 4.0,
                   thumbColor: Colors.white,
                   thumbShape: const RoundSliderThumbShape(
                     enabledThumbRadius: 10.0,
                   ),
-                  overlayColor: Colors.cyanAccent.withValues(alpha:0.3),
+                  overlayColor: Colors.cyanAccent.withValues(alpha: 0.3),
                   overlayShape: const RoundSliderOverlayShape(
                     overlayRadius: 20.0,
                   ),
                   tickMarkShape: const RoundSliderTickMarkShape(),
                   activeTickMarkColor: Colors.cyanAccent,
-                  inactiveTickMarkColor: Colors.white.withValues(alpha:0.3),
+                  inactiveTickMarkColor: Colors.white.withValues(alpha: 0.3),
                 ),
                 child: Container(
                   height: 35,
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.cyanAccent.withValues(alpha:0.3),
+                        color: Colors.cyanAccent.withValues(alpha: 0.3),
                         blurRadius: 15,
                         spreadRadius: 1,
                       ),
@@ -602,19 +609,21 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
           color: isSelected
-              ? Colors.cyanAccent.withValues(alpha:0.2)
+              ? Colors.cyanAccent.withValues(alpha: 0.2)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
             color: isSelected
-                ? Colors.cyanAccent.withValues(alpha:0.4)
+                ? Colors.cyanAccent.withValues(alpha: 0.4)
                 : Colors.transparent,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.white.withValues(alpha:0.5),
+            color: isSelected
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.5),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 9,
             letterSpacing: 1.0,

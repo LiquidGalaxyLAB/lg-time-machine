@@ -46,9 +46,11 @@ class AboutUsScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha:0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withValues(alpha:0.2)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: const Icon(
                     Icons.arrow_back_ios_new,
@@ -61,13 +63,13 @@ class AboutUsScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isConnected
-                      ? const Color(0xFF8AFF8A).withValues(alpha:0.2)
-                      : const Color(0xFFFF8A8A).withValues(alpha:0.2),
+                      ? const Color(0xFF8AFF8A).withValues(alpha: 0.2)
+                      : const Color(0xFFFF8A8A).withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isConnected
-                        ? const Color(0xFF8AFF8A).withValues(alpha:0.4)
-                        : const Color(0xFFFF8A8A).withValues(alpha:0.4),
+                        ? const Color(0xFF8AFF8A).withValues(alpha: 0.4)
+                        : const Color(0xFFFF8A8A).withValues(alpha: 0.4),
                   ),
                 ),
                 child: Icon(
