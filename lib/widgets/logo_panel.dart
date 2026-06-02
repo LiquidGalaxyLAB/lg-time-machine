@@ -20,15 +20,15 @@ class LogoPanel extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.blue.withOpacity(0.8),
-              Colors.blue.withOpacity(0.4),
+              Colors.blue.withValues(alpha:0.8),
+              Colors.blue.withValues(alpha:0.4),
             ],
           ),
           borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: Colors.white.withOpacity(0.3)),
+          border: Border.all(color: Colors.white.withValues(alpha:0.3)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha:0.3),
               blurRadius: 15,
               spreadRadius: 2,
             ),

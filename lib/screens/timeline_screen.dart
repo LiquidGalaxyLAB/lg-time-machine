@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import '../database/db_helper.dart';
 import '../models/country.dart';
 import '../services/language_manager.dart';
@@ -77,10 +76,10 @@ class _TimelineScreenState extends State<TimelineScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha:0.1),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha:0.2),
                         ),
                       ),
                       child: const Icon(
@@ -100,24 +99,24 @@ class _TimelineScreenState extends State<TimelineScreen> {
                           'search_countries',
                         ),
                         hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withValues(alpha:0.6),
                         ),
                         prefixIcon: Icon(
                           Icons.search,
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withValues(alpha:0.6),
                         ),
                         filled: true,
-                        fillColor: Colors.white.withOpacity(0.15),
+                        fillColor: Colors.white.withValues(alpha:0.15),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha:0.3),
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha:0.2),
                           ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(vertical: 0),
@@ -138,15 +137,15 @@ class _TimelineScreenState extends State<TimelineScreen> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha:0.1),
                       borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
+                      border: Border.all(color: Colors.white.withValues(alpha:0.05)),
                     ),
                     child: ListTile(
                       visualDensity: VisualDensity.compact,
                       leading: CircleAvatar(
                         radius: 16,
-                        backgroundColor: Colors.white.withOpacity(0.2),
+                        backgroundColor: Colors.white.withValues(alpha:0.2),
                         child: Text(
                           country.flag,
                           style: const TextStyle(fontSize: 16),
@@ -197,9 +196,9 @@ class _TimelineScreenState extends State<TimelineScreen> {
                     top: 5.0,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(25),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    border: Border.all(color: Colors.white.withValues(alpha:0.1)),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -234,26 +233,26 @@ class _TimelineScreenState extends State<TimelineScreen> {
                       SliderTheme(
                         data: SliderTheme.of(context).copyWith(
                           activeTrackColor: Colors.cyanAccent,
-                          inactiveTrackColor: Colors.white.withOpacity(0.2),
+                          inactiveTrackColor: Colors.white.withValues(alpha:0.2),
                           trackHeight: 4.0,
                           thumbColor: Colors.white,
                           thumbShape: const RoundSliderThumbShape(
                             enabledThumbRadius: 10.0,
                           ),
-                          overlayColor: Colors.cyanAccent.withOpacity(0.3),
+                          overlayColor: Colors.cyanAccent.withValues(alpha:0.3),
                           overlayShape: const RoundSliderOverlayShape(
                             overlayRadius: 20.0,
                           ),
                           tickMarkShape: const RoundSliderTickMarkShape(),
                           activeTickMarkColor: Colors.cyanAccent,
-                          inactiveTickMarkColor: Colors.white.withOpacity(0.3),
+                          inactiveTickMarkColor: Colors.white.withValues(alpha:0.3),
                         ),
                         child: Container(
                           height: 35,
                           decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.cyanAccent.withOpacity(0.3),
+                                color: Colors.cyanAccent.withValues(alpha:0.3),
                                 blurRadius: 15,
                                 spreadRadius: 1,
                               ),
@@ -289,19 +288,19 @@ class _TimelineScreenState extends State<TimelineScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
           color: isSelected
-              ? Colors.cyanAccent.withOpacity(0.2)
+              ? Colors.cyanAccent.withValues(alpha:0.2)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
             color: isSelected
-                ? Colors.cyanAccent.withOpacity(0.4)
+                ? Colors.cyanAccent.withValues(alpha:0.4)
                 : Colors.transparent,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
+            color: isSelected ? Colors.white : Colors.white.withValues(alpha:0.5),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             fontSize: 9,
             letterSpacing: 1.0,

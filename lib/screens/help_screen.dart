@@ -70,7 +70,7 @@ class HelpScreen extends StatelessWidget {
           Text(
             answer,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha:0.8),
               fontSize: 16,
               height: 1.5,
             ),
@@ -99,9 +99,9 @@ class HelpScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha:0.1),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    border: Border.all(color: Colors.white.withValues(alpha:0.2)),
                   ),
                   child: const Icon(
                     Icons.arrow_back_ios_new,
@@ -114,13 +114,13 @@ class HelpScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isConnected
-                      ? const Color(0xFF8AFF8A).withOpacity(0.2)
-                      : const Color(0xFFFF8A8A).withOpacity(0.2),
+                      ? const Color(0xFF8AFF8A).withValues(alpha:0.2)
+                      : const Color(0xFFFF8A8A).withValues(alpha:0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isConnected
-                        ? const Color(0xFF8AFF8A).withOpacity(0.4)
-                        : const Color(0xFFFF8A8A).withOpacity(0.4),
+                        ? const Color(0xFF8AFF8A).withValues(alpha:0.4)
+                        : const Color(0xFFFF8A8A).withValues(alpha:0.4),
                   ),
                 ),
                 child: Icon(

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import '../models/country.dart';
 import '../models/poi.dart';
-import '../database/db_helper.dart';
 import '../services/poi_service.dart';
 import '../services/language_manager.dart';
 import '../services/time_manager.dart';
@@ -116,9 +114,9 @@ class _POIScreenState extends State<POIScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha:0.1),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    border: Border.all(color: Colors.white.withValues(alpha:0.2)),
                   ),
                   child: const Icon(
                     Icons.arrow_back_ios_new,
@@ -131,13 +129,13 @@ class _POIScreenState extends State<POIScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: widget.isConnected
-                      ? const Color(0xFF8AFF8A).withOpacity(0.2)
-                      : const Color(0xFFFF8A8A).withOpacity(0.2),
+                      ? const Color(0xFF8AFF8A).withValues(alpha:0.2)
+                      : const Color(0xFFFF8A8A).withValues(alpha:0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: widget.isConnected
-                        ? const Color(0xFF8AFF8A).withOpacity(0.4)
-                        : const Color(0xFFFF8A8A).withOpacity(0.4),
+                        ? const Color(0xFF8AFF8A).withValues(alpha:0.4)
+                        : const Color(0xFFFF8A8A).withValues(alpha:0.4),
                   ),
                 ),
                 child: Icon(
@@ -163,17 +161,17 @@ class _POIScreenState extends State<POIScreen> {
         style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           hintText: 'Search places...',
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+          hintStyle: TextStyle(color: Colors.white.withValues(alpha:0.5)),
           prefixIcon: const Icon(Icons.search, color: Colors.white70),
           filled: true,
-          fillColor: Colors.white.withOpacity(0.1),
+          fillColor: Colors.white.withValues(alpha:0.1),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+            borderSide: BorderSide(color: Colors.white.withValues(alpha:0.2)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+            borderSide: BorderSide(color: Colors.white.withValues(alpha:0.1)),
           ),
           contentPadding: const EdgeInsets.symmetric(vertical: 0),
         ),
@@ -213,7 +211,7 @@ class _POIScreenState extends State<POIScreen> {
       return Center(
         child: Text(
           'No places found',
-          style: TextStyle(color: Colors.white.withOpacity(0.5)),
+          style: TextStyle(color: Colors.white.withValues(alpha:0.5)),
         ),
       );
     }
@@ -311,7 +309,7 @@ class _POIScreenState extends State<POIScreen> {
                               Text(
                                 poi.description,
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.6),
+                                  color: Colors.white.withValues(alpha:0.6),
                                   fontSize: 14,
                                 ),
                               ),

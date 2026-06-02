@@ -169,7 +169,7 @@ class _MainScreenState extends State<MainScreen>
               GestureDetector(
                 onTap: _toggleMenu,
                 child: Container(
-                  color: Colors.black.withOpacity(
+                  color: Colors.black.withValues(alpha:
                     0.3 * _menuAnimationController.value,
                   ),
                 ),
@@ -185,10 +185,10 @@ class _MainScreenState extends State<MainScreen>
                         filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha:0.1),
                             border: Border(
                               right: BorderSide(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha:0.2),
                               ),
                             ),
                           ),
@@ -311,13 +311,13 @@ class _MainScreenState extends State<MainScreen>
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha:0.15),
         border: Border(
-          top: BorderSide(color: Colors.white.withOpacity(0.3), width: 1.5),
+          top: BorderSide(color: Colors.white.withValues(alpha:0.3), width: 1.5),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.1),
+            color: Colors.blue.withValues(alpha:0.1),
             blurRadius: 15,
             spreadRadius: 2,
           ),
@@ -351,7 +351,7 @@ class _MainScreenState extends State<MainScreen>
 
   Widget _navItem(IconData icon, String label, int index) {
     bool isSelected = _selectedIndex == index;
-    Color iconColor = isSelected ? Colors.white : Colors.white.withOpacity(0.5);
+    Color iconColor = isSelected ? Colors.white : Colors.white.withValues(alpha:0.5);
 
     if (index == 0) {
       // Connect icon
@@ -359,7 +359,7 @@ class _MainScreenState extends State<MainScreen>
           ? const Color(0xFF8AFF8A)
           : const Color(0xFFFF8A8A);
       if (!isSelected) {
-        iconColor = iconColor.withOpacity(0.7);
+        iconColor = iconColor.withValues(alpha:0.7);
       }
     }
 
@@ -368,7 +368,7 @@ class _MainScreenState extends State<MainScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue.withOpacity(0.2) : Colors.transparent,
+          color: isSelected ? Colors.blue.withValues(alpha:0.2) : Colors.transparent,
           borderRadius: BorderRadius.circular(25),
         ),
         child: Column(
@@ -380,7 +380,7 @@ class _MainScreenState extends State<MainScreen>
               style: TextStyle(
                 color: isSelected
                     ? Colors.white
-                    : Colors.white.withOpacity(0.5),
+                    : Colors.white.withValues(alpha:0.5),
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
