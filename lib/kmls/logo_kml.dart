@@ -1,5 +1,11 @@
 class LogoKML {
-  static String screenOverlayImage(String imageUrl, double top, double left, double width, double height) {
+  static String screenOverlayImage(
+    String imageUrl,
+    double top,
+    double left,
+    double width,
+    double height,
+  ) {
     final double y = 1.0 - top;
     return '''
     <ScreenOverlay>
@@ -20,7 +26,13 @@ class LogoKML {
     const String baseUrl = "http://lg1:81/logos";
     // Posición y tamaño ajustados: bajado un poco, desplazado a la derecha y más ancho.
     // El valor de y=0 en el overlay asegura que el aspect ratio se mantenga en cualquier resolución.
-    final String content = screenOverlayImage('$baseUrl/Logos.png', 0.02, 0.01, 0.71, 0.33);
+    final String content = screenOverlayImage(
+      '$baseUrl/Logos.png',
+      0.02,
+      0.01,
+      0.71,
+      0.33,
+    );
 
     return '''<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">

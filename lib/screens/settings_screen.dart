@@ -37,6 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     });
   }
+
   bool _isResetingRefresh = false;
   bool _isRelaunching = false;
   bool _isRebooting = false;
@@ -86,11 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildPreferencesSection() {
     return _buildContainer(
       title: LanguageManager.instance.translate('preferences').toUpperCase(),
-      child: Column(
-        children: [
-          _buildLanguageRow(),
-        ],
-      ),
+      child: Column(children: [_buildLanguageRow()]),
     );
   }
 
@@ -105,7 +102,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         Text(
           LanguageManager.instance.translate('language').toUpperCase(),
-          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         GestureDetector(
           onTap: _showLanguageDialog,
@@ -124,7 +125,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
                 const SizedBox(width: 8),
-                const Icon(Icons.chevron_right, color: Colors.white70, size: 16),
+                const Icon(
+                  Icons.chevron_right,
+                  color: Colors.white70,
+                  size: 16,
+                ),
               ],
             ),
           ),
@@ -153,8 +158,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    LanguageManager.instance.translate('language').toUpperCase(),
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    LanguageManager.instance
+                        .translate('language')
+                        .toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   _languageOption('ENGLISH', 'en'),
@@ -189,8 +200,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    LanguageManager.instance.translate('confirm_title').toUpperCase(),
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    LanguageManager.instance
+                        .translate('confirm_title')
+                        .toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Text(
@@ -202,16 +219,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildToolButton(LanguageManager.instance.translate('no'), () {
-                          Navigator.pop(context);
-                        }),
+                        child: _buildToolButton(
+                          LanguageManager.instance.translate('no'),
+                          () {
+                            Navigator.pop(context);
+                          },
+                        ),
                       ),
                       const SizedBox(width: 15),
                       Expanded(
-                        child: _buildToolButton(LanguageManager.instance.translate('yes'), () {
-                          onConfirm();
-                          Navigator.pop(context);
-                        }),
+                        child: _buildToolButton(
+                          LanguageManager.instance.translate('yes'),
+                          () {
+                            onConfirm();
+                            Navigator.pop(context);
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -325,12 +348,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                LanguageManager.instance.translate('show_hide_logos').toUpperCase(),
-                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                LanguageManager.instance
+                    .translate('show_hide_logos')
+                    .toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               _buildCustomCheckbox(_showLogos, (val) async {
                 setState(() => _showLogos = val);
-                await DatabaseHelper.instance.saveSetting('showLogos', val.toString());
+                await DatabaseHelper.instance.saveSetting(
+                  'showLogos',
+                  val.toString(),
+                );
                 if (widget.isConnected) {
                   if (val) {
                     await LGService.instance.sendLogoKML(LogoKML.generate());
@@ -384,7 +416,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Widget _buildToolButton(String label, VoidCallback? onTap, {bool loading = false}) {
+  Widget _buildToolButton(
+    String label,
+    VoidCallback? onTap, {
+    bool loading = false,
+  }) {
     return InkWell(
       onTap: loading ? null : onTap,
       borderRadius: BorderRadius.circular(20),
@@ -419,7 +455,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 )
               : Text(
                   label.toUpperCase(),
-                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
         ),
       ),
@@ -443,9 +483,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: value ? Colors.blue : Colors.transparent,
-              boxShadow: value ? [
-                const BoxShadow(color: Colors.blue, blurRadius: 8, spreadRadius: 1)
-              ] : [],
+              boxShadow: value
+                  ? [
+                      const BoxShadow(
+                        color: Colors.blue,
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : [],
             ),
           ),
         ),
@@ -471,7 +517,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Text(
                 title,
-                style: const TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
               ),
               const SizedBox(height: 20),
               child,

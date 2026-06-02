@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
 class AppNotifications {
-  static void show(BuildContext context, String message, {bool isError = false}) {
+  static void show(
+    BuildContext context,
+    String message, {
+    bool isError = false,
+  }) {
     final snackBar = SnackBar(
       elevation: 0,
       behavior: SnackBarBehavior.fixed,
-      backgroundColor: isError 
-          ? const Color(0xFFFF8A8A).withOpacity(0.9) 
+      backgroundColor: isError
+          ? const Color(0xFFFF8A8A).withOpacity(0.9)
           : const Color(0xFF8AFF8A).withOpacity(0.9),
       content: Container(
         height: 60,

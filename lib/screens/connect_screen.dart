@@ -52,11 +52,26 @@ class _ConnectScreenState extends State<ConnectScreen> {
   }
 
   Future<void> _saveSettings() async {
-    await DatabaseHelper.instance.saveSetting('lg_user', _userController.text.trim());
-    await DatabaseHelper.instance.saveSetting('lg_pass', _passwordController.text.trim());
-    await DatabaseHelper.instance.saveSetting('lg_ip', _ipController.text.trim());
-    await DatabaseHelper.instance.saveSetting('lg_port', _portController.text.trim());
-    await DatabaseHelper.instance.saveSetting('lg_screens', _screensController.text.trim());
+    await DatabaseHelper.instance.saveSetting(
+      'lg_user',
+      _userController.text.trim(),
+    );
+    await DatabaseHelper.instance.saveSetting(
+      'lg_pass',
+      _passwordController.text.trim(),
+    );
+    await DatabaseHelper.instance.saveSetting(
+      'lg_ip',
+      _ipController.text.trim(),
+    );
+    await DatabaseHelper.instance.saveSetting(
+      'lg_port',
+      _portController.text.trim(),
+    );
+    await DatabaseHelper.instance.saveSetting(
+      'lg_screens',
+      _screensController.text.trim(),
+    );
   }
 
   @override
@@ -75,7 +90,11 @@ class _ConnectScreenState extends State<ConnectScreen> {
       await LGService.instance.clearKML();
       await LGService.instance.disconnect();
       widget.onConnectToggle();
-      AppNotifications.show(context, LanguageManager.instance.translate('disconnected'), isError: true);
+      AppNotifications.show(
+        context,
+        LanguageManager.instance.translate('disconnected'),
+        isError: true,
+      );
       return;
     }
 
@@ -85,7 +104,11 @@ class _ConnectScreenState extends State<ConnectScreen> {
     final portStr = _portController.text.trim();
     final screensStr = _screensController.text.trim();
 
-    if (user.isEmpty || pass.isEmpty || ip.isEmpty || portStr.isEmpty || screensStr.isEmpty) {
+    if (user.isEmpty ||
+        pass.isEmpty ||
+        ip.isEmpty ||
+        portStr.isEmpty ||
+        screensStr.isEmpty) {
       AppNotifications.show(context, 'Please fill all fields', isError: true);
       return;
     }
@@ -124,7 +147,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
 
       // Clear previous KMLs to ensure a clean slate after connection
       await LGService.instance.clearKML();
-      
+
       // Check logo visibility setting
       final showLogos = await DatabaseHelper.instance.getSetting('showLogos');
 
@@ -135,9 +158,16 @@ class _ConnectScreenState extends State<ConnectScreen> {
       }
 
       widget.onConnectToggle();
-      AppNotifications.show(context, LanguageManager.instance.translate('connected'));
+      AppNotifications.show(
+        context,
+        LanguageManager.instance.translate('connected'),
+      );
     } else {
-      AppNotifications.show(context, 'Connection failed. Check your data.', isError: true);
+      AppNotifications.show(
+        context,
+        'Connection failed. Check your data.',
+        isError: true,
+      );
     }
   }
 
@@ -169,11 +199,27 @@ class _ConnectScreenState extends State<ConnectScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      _buildTextField(_userController, LanguageManager.instance.translate('lg_user')),
-                      _buildTextField(_passwordController, LanguageManager.instance.translate('lg_password'), isPassword: true),
-                      _buildTextField(_ipController, LanguageManager.instance.translate('ip')),
-                      _buildTextField(_portController, LanguageManager.instance.translate('lg_port')),
-                      _buildTextField(_screensController, LanguageManager.instance.translate('screens')),
+                      _buildTextField(
+                        _userController,
+                        LanguageManager.instance.translate('lg_user'),
+                      ),
+                      _buildTextField(
+                        _passwordController,
+                        LanguageManager.instance.translate('lg_password'),
+                        isPassword: true,
+                      ),
+                      _buildTextField(
+                        _ipController,
+                        LanguageManager.instance.translate('ip'),
+                      ),
+                      _buildTextField(
+                        _portController,
+                        LanguageManager.instance.translate('lg_port'),
+                      ),
+                      _buildTextField(
+                        _screensController,
+                        LanguageManager.instance.translate('screens'),
+                      ),
                       const SizedBox(height: 20),
                       _buildConnectButton(),
                     ],
@@ -187,7 +233,11 @@ class _ConnectScreenState extends State<ConnectScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {bool isPassword = false}) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint, {
+    bool isPassword = false,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
@@ -209,9 +259,15 @@ class _ConnectScreenState extends State<ConnectScreen> {
         textAlign: TextAlign.center,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w400),
+          hintStyle: TextStyle(
+            color: Colors.white.withOpacity(0.5),
+            fontWeight: FontWeight.w400,
+          ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 12,
+          ),
         ),
       ),
     );
@@ -230,20 +286,21 @@ class _ConnectScreenState extends State<ConnectScreen> {
                     const Color(0xFFFF8A8A).withOpacity(0.6),
                     const Color(0xFFFF8A8A).withOpacity(0.3),
                   ]
-                : [
-                    Colors.blue.withOpacity(0.6),
-                    Colors.blue.withOpacity(0.3),
-                  ],
+                : [Colors.blue.withOpacity(0.6), Colors.blue.withOpacity(0.3)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
-            color: widget.isConnected ? const Color(0xFFFF8A8A).withOpacity(0.4) : Colors.white.withOpacity(0.4),
+            color: widget.isConnected
+                ? const Color(0xFFFF8A8A).withOpacity(0.4)
+                : Colors.white.withOpacity(0.4),
           ),
           boxShadow: [
             BoxShadow(
-              color: widget.isConnected ? const Color(0xFFFF8A8A).withOpacity(0.3) : Colors.blue.withOpacity(0.3),
+              color: widget.isConnected
+                  ? const Color(0xFFFF8A8A).withOpacity(0.3)
+                  : Colors.blue.withOpacity(0.3),
               blurRadius: 15,
               spreadRadius: 2,
             ),
@@ -252,7 +309,9 @@ class _ConnectScreenState extends State<ConnectScreen> {
         child: Center(
           child: Text(
             LanguageManager.instance
-                .translate(widget.isConnected ? 'disconnect_button' : 'connect_button')
+                .translate(
+                  widget.isConnected ? 'disconnect_button' : 'connect_button',
+                )
                 .toUpperCase(),
             style: const TextStyle(
               color: Colors.white,

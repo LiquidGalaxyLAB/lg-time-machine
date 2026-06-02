@@ -42,7 +42,11 @@ class LogoPanel extends StatelessWidget {
               'assets/logos/app_logo.png',
               height: 60,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.rocket_launch, color: Colors.white, size: 40),
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.rocket_launch,
+                color: Colors.white,
+                size: 40,
+              ),
             ),
             const SizedBox(height: 15),
             // Bottom Row Logos
@@ -66,7 +70,8 @@ class LogoPanel extends StatelessWidget {
       height: 25,
       width: 25,
       fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) => const SizedBox(width: 25, height: 25),
+      errorBuilder: (context, error, stackTrace) =>
+          const SizedBox(width: 25, height: 25),
     );
   }
 }

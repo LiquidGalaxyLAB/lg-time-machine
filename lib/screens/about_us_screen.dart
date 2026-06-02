@@ -19,9 +19,7 @@ class AboutUsScreen extends StatelessWidget {
           child: Column(
             children: [
               _buildHeader(context),
-              const Expanded(
-                child: SizedBox.shrink(),
-              ),
+              const Expanded(child: SizedBox.shrink()),
             ],
           ),
         ),
@@ -52,21 +50,31 @@ class AboutUsScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white.withOpacity(0.2)),
                   ),
-                  child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 24),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isConnected ? const Color(0xFF8AFF8A).withOpacity(0.2) : const Color(0xFFFF8A8A).withOpacity(0.2),
+                  color: isConnected
+                      ? const Color(0xFF8AFF8A).withOpacity(0.2)
+                      : const Color(0xFFFF8A8A).withOpacity(0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isConnected ? const Color(0xFF8AFF8A).withOpacity(0.4) : const Color(0xFFFF8A8A).withOpacity(0.4),
+                    color: isConnected
+                        ? const Color(0xFF8AFF8A).withOpacity(0.4)
+                        : const Color(0xFFFF8A8A).withOpacity(0.4),
                   ),
                 ),
                 child: Icon(
                   Icons.wifi,
-                  color: isConnected ? const Color(0xFF8AFF8A) : const Color(0xFFFF8A8A),
+                  color: isConnected
+                      ? const Color(0xFF8AFF8A)
+                      : const Color(0xFFFF8A8A),
                   size: 24,
                 ),
               ),

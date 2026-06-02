@@ -28,9 +28,16 @@ class POI {
   });
 
   // Helper to get the main thumbnail image (e.g., first present image)
-  String get thumbnail => presentImages.isNotEmpty ? presentImages.first : (pastImages.isNotEmpty ? pastImages.first : '');
+  String get thumbnail => presentImages.isNotEmpty
+      ? presentImages.first
+      : (pastImages.isNotEmpty ? pastImages.first : '');
 
-  factory POI.fromJson(Map<String, dynamic> json, Map<String, dynamic> metadata, List<String> pastImages, List<String> presentImages) {
+  factory POI.fromJson(
+    Map<String, dynamic> json,
+    Map<String, dynamic> metadata,
+    List<String> pastImages,
+    List<String> presentImages,
+  ) {
     return POI(
       name: json['name'] ?? '',
       country: metadata['country'] ?? '',

@@ -57,7 +57,6 @@ class _TimelineScreenState extends State<TimelineScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<String>(
@@ -67,7 +66,10 @@ class _TimelineScreenState extends State<TimelineScreen> {
           children: [
             // Search bar and Menu button
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 10.0,
+              ),
               child: Row(
                 children: [
                   GestureDetector(
@@ -77,9 +79,15 @@ class _TimelineScreenState extends State<TimelineScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white.withOpacity(0.2)),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                        ),
                       ),
-                      child: const Icon(Icons.menu, color: Colors.white, size: 24),
+                      child: const Icon(
+                        Icons.menu,
+                        color: Colors.white,
+                        size: 24,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -88,18 +96,29 @@ class _TimelineScreenState extends State<TimelineScreen> {
                       controller: _searchController,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: LanguageManager.instance.translate('search_countries'),
-                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
-                        prefixIcon: Icon(Icons.search, color: Colors.white.withOpacity(0.6)),
+                        hintText: LanguageManager.instance.translate(
+                          'search_countries',
+                        ),
+                        hintStyle: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Colors.white.withOpacity(0.6),
+                        ),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.15),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                          borderSide: BorderSide(
+                            color: Colors.white.withOpacity(0.3),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                          borderSide: BorderSide(
+                            color: Colors.white.withOpacity(0.2),
+                          ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(vertical: 0),
                       ),
@@ -128,13 +147,24 @@ class _TimelineScreenState extends State<TimelineScreen> {
                       leading: CircleAvatar(
                         radius: 16,
                         backgroundColor: Colors.white.withOpacity(0.2),
-                        child: Text(country.flag, style: const TextStyle(fontSize: 16)),
+                        child: Text(
+                          country.flag,
+                          style: const TextStyle(fontSize: 16),
+                        ),
                       ),
                       title: Text(
                         country.name,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
-                      trailing: const Icon(Icons.chevron_right, color: Colors.white70, size: 20),
+                      trailing: const Icon(
+                        Icons.chevron_right,
+                        color: Colors.white70,
+                        size: 20,
+                      ),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -156,8 +186,16 @@ class _TimelineScreenState extends State<TimelineScreen> {
               valueListenable: TimeManager.instance.timeNotifier,
               builder: (context, timeValue, child) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  margin: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 5.0, top: 5.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 10.0,
+                  ),
+                  margin: const EdgeInsets.only(
+                    left: 16.0,
+                    right: 16.0,
+                    bottom: 5.0,
+                    top: 5.0,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(25),
@@ -169,9 +207,27 @@ class _TimelineScreenState extends State<TimelineScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _timeLabel(LanguageManager.instance.translate('past').toUpperCase(), timeValue == 0, 0),
-                          _timeLabel(LanguageManager.instance.translate('present').toUpperCase(), timeValue == 1, 1),
-                          _timeLabel(LanguageManager.instance.translate('future').toUpperCase(), timeValue == 2, 2),
+                          _timeLabel(
+                            LanguageManager.instance
+                                .translate('past')
+                                .toUpperCase(),
+                            timeValue == 0,
+                            0,
+                          ),
+                          _timeLabel(
+                            LanguageManager.instance
+                                .translate('present')
+                                .toUpperCase(),
+                            timeValue == 1,
+                            1,
+                          ),
+                          _timeLabel(
+                            LanguageManager.instance
+                                .translate('future')
+                                .toUpperCase(),
+                            timeValue == 2,
+                            2,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 2),
@@ -181,9 +237,13 @@ class _TimelineScreenState extends State<TimelineScreen> {
                           inactiveTrackColor: Colors.white.withOpacity(0.2),
                           trackHeight: 4.0,
                           thumbColor: Colors.white,
-                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10.0),
+                          thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 10.0,
+                          ),
                           overlayColor: Colors.cyanAccent.withOpacity(0.3),
-                          overlayShape: const RoundSliderOverlayShape(overlayRadius: 20.0),
+                          overlayShape: const RoundSliderOverlayShape(
+                            overlayRadius: 20.0,
+                          ),
                           tickMarkShape: const RoundSliderTickMarkShape(),
                           activeTickMarkColor: Colors.cyanAccent,
                           inactiveTickMarkColor: Colors.white.withOpacity(0.3),
@@ -228,10 +288,14 @@ class _TimelineScreenState extends State<TimelineScreen> {
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.cyanAccent.withOpacity(0.2) : Colors.transparent,
+          color: isSelected
+              ? Colors.cyanAccent.withOpacity(0.2)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
-            color: isSelected ? Colors.cyanAccent.withOpacity(0.4) : Colors.transparent,
+            color: isSelected
+                ? Colors.cyanAccent.withOpacity(0.4)
+                : Colors.transparent,
           ),
         ),
         child: Text(
@@ -242,12 +306,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
             fontSize: 9,
             letterSpacing: 1.0,
             shadows: isSelected
-                ? [
-                    const Shadow(
-                      color: Colors.cyanAccent,
-                      blurRadius: 6,
-                    )
-                  ]
+                ? [const Shadow(color: Colors.cyanAccent, blurRadius: 6)]
                 : [],
           ),
         ),

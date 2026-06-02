@@ -5,7 +5,7 @@ class OrbitKML {
     String content = '';
     double heading = poi.heading;
     double range = poi.range;
-    
+
     // Applying the same range logic as LookAtKML
     if (rigCount > 0) {
       range = range / rigCount;
@@ -15,7 +15,8 @@ class OrbitKML {
     // while maintaining the same latitude and longitude.
     // This creates an orbit effect around the point.
     for (int i = 0; i <= 360; i += 15) {
-      content += '''
+      content +=
+          '''
         <gx:FlyTo>
           <gx:duration>1.5</gx:duration>
           <gx:flyToMode>smooth</gx:flyToMode>

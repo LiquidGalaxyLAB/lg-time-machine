@@ -69,11 +69,10 @@ class DatabaseHelper {
 
   Future<void> saveSetting(String key, String value) async {
     final db = await DatabaseHelper.instance.database;
-    await db.insert(
-      'settings',
-      {'key': key, 'value': value},
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.insert('settings', {
+      'key': key,
+      'value': value,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<String?> getSetting(String key) async {

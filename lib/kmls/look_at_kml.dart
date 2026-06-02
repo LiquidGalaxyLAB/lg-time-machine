@@ -33,7 +33,7 @@ class LookAtKML {
 
   static String generate(POI poi, [int rigCount = 1]) {
     double range = poi.range;
-    
+
     // Applying the logic from the user snippet: range = value / rigCount
     if (rigCount > 0) {
       range = range / rigCount;

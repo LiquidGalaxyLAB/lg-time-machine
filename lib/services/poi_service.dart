@@ -13,7 +13,7 @@ class POIService {
       "heading": 107.6300761,
       "tilt": 40.0227249,
       "range": 188.5190025,
-      "altitudeMode": "relativeToGround"
+      "altitudeMode": "relativeToGround",
     },
     {
       "backendName": "Sagrada_Familia",
@@ -23,7 +23,7 @@ class POIService {
       "heading": 9.5377605,
       "tilt": 59.4242461,
       "range": 551.3130864,
-      "altitudeMode": "relativeToGround"
+      "altitudeMode": "relativeToGround",
     },
     {
       "backendName": "Cathedral_of_Santiago_de_Compostela",
@@ -33,14 +33,16 @@ class POIService {
       "heading": 54.1152332,
       "tilt": 64.9304054,
       "range": 428.6393375,
-      "altitudeMode": "relativeToGround"
-    }
+      "altitudeMode": "relativeToGround",
+    },
   ];
 
   Future<List<POI>> loadPOIs() async {
     try {
       // 1. Cargar metadata (nombres y descripciones) de Pois.json
-      final String poisJsonString = await rootBundle.loadString('lib/services/Pois.json');
+      final String poisJsonString = await rootBundle.loadString(
+        'lib/services/Pois.json',
+      );
       final Map<String, dynamic> poisMetadata = json.decode(poisJsonString);
 
       List<POI> pois = [];
@@ -64,8 +66,9 @@ class POIService {
 
             if (localData.isNotEmpty) {
               final String folderName = backendName.trim();
-              final String presentImagePath = 'assets/images/PointsOfInterest/$folderName/PresentImage.jpg';
-              
+              final String presentImagePath =
+                  'assets/images/PointsOfInterest/$folderName/PresentImage.jpg';
+
               final List<String> images = [presentImagePath];
 
               Map<String, dynamic> combinedData = {
@@ -79,10 +82,7 @@ class POIService {
                 'altitudeMode': localData['altitudeMode'],
               };
 
-              final metadata = {
-                'country': country,
-                'description': description,
-              };
+              final metadata = {'country': country, 'description': description};
 
               pois.add(POI.fromJson(combinedData, metadata, images, images));
             }

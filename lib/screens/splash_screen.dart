@@ -8,7 +8,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
 
@@ -20,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       duration: const Duration(milliseconds: 1500),
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
-    
+
     _controller.forward();
     _navigateToHome();
   }
@@ -62,7 +63,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   width: MediaQuery.of(context).size.width * 0.7,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.rocket_launch, size: 100, color: Colors.white);
+                    return const Icon(
+                      Icons.rocket_launch,
+                      size: 100,
+                      color: Colors.white,
+                    );
                   },
                 ),
                 const SizedBox(height: 30),

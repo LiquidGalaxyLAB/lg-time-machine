@@ -46,9 +46,13 @@ class _POIScreenState extends State<POIScreen> {
     try {
       final pois = await POIService().loadPOIs();
       // Use case-insensitive comparison for country matching
-      final countryPois = pois.where((poi) => 
-        poi.country.toLowerCase().trim() == widget.country.name.toLowerCase().trim()
-      ).toList();
+      final countryPois = pois
+          .where(
+            (poi) =>
+                poi.country.toLowerCase().trim() ==
+                widget.country.name.toLowerCase().trim(),
+          )
+          .toList();
       setState(() {
         _allPois = countryPois;
         _filteredPois = countryPois;
@@ -85,9 +89,7 @@ class _POIScreenState extends State<POIScreen> {
               _buildHeader(context),
               _buildSearchBar(),
               _buildCountryTitle(),
-              Expanded(
-                child: _buildPOIList(),
-              ),
+              Expanded(child: _buildPOIList()),
             ],
           ),
         ),
@@ -118,21 +120,31 @@ class _POIScreenState extends State<POIScreen> {
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white.withOpacity(0.2)),
                   ),
-                  child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 24),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: widget.isConnected ? const Color(0xFF8AFF8A).withOpacity(0.2) : const Color(0xFFFF8A8A).withOpacity(0.2),
+                  color: widget.isConnected
+                      ? const Color(0xFF8AFF8A).withOpacity(0.2)
+                      : const Color(0xFFFF8A8A).withOpacity(0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: widget.isConnected ? const Color(0xFF8AFF8A).withOpacity(0.4) : const Color(0xFFFF8A8A).withOpacity(0.4),
+                    color: widget.isConnected
+                        ? const Color(0xFF8AFF8A).withOpacity(0.4)
+                        : const Color(0xFFFF8A8A).withOpacity(0.4),
                   ),
                 ),
                 child: Icon(
                   Icons.wifi,
-                  color: widget.isConnected ? const Color(0xFF8AFF8A) : const Color(0xFFFF8A8A),
+                  color: widget.isConnected
+                      ? const Color(0xFF8AFF8A)
+                      : const Color(0xFFFF8A8A),
                   size: 24,
                 ),
               ),
@@ -175,11 +187,7 @@ class _POIScreenState extends State<POIScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
       child: Row(
         children: [
-          Container(
-            width: 3,
-            height: 24,
-            color: Colors.white,
-          ),
+          Container(width: 3, height: 24, color: Colors.white),
           const SizedBox(width: 10),
           Text(
             widget.country.name.toUpperCase(),
@@ -197,7 +205,9 @@ class _POIScreenState extends State<POIScreen> {
 
   Widget _buildPOIList() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: Colors.white));
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      );
     }
     if (_filteredPois.isEmpty) {
       return Center(
@@ -212,7 +222,7 @@ class _POIScreenState extends State<POIScreen> {
       itemCount: _filteredPois.length,
       itemBuilder: (context, index) {
         final poi = _filteredPois[index];
-        
+
         return ValueListenableBuilder<String>(
           valueListenable: LanguageManager.instance.languageNotifier,
           builder: (context, currentLang, child) {
@@ -220,12 +230,19 @@ class _POIScreenState extends State<POIScreen> {
               valueListenable: TimeManager.instance.timeNotifier,
               builder: (context, timeValue, child) {
                 String thumbnailPath = '';
-                
-                if (timeValue == 0) { // Past
-                  thumbnailPath = poi.pastImages.isNotEmpty ? poi.pastImages.first : (poi.presentImages.isNotEmpty ? poi.presentImages.first : '');
+
+                if (timeValue == 0) {
+                  // Past
+                  thumbnailPath = poi.pastImages.isNotEmpty
+                      ? poi.pastImages.first
+                      : (poi.presentImages.isNotEmpty
+                            ? poi.presentImages.first
+                            : '');
                 } else {
                   // present (1.0) or future (2.0)
-                  thumbnailPath = poi.presentImages.isNotEmpty ? poi.presentImages.first : (poi.pastImages.isNotEmpty ? poi.pastImages.first : '');
+                  thumbnailPath = poi.presentImages.isNotEmpty
+                      ? poi.presentImages.first
+                      : (poi.pastImages.isNotEmpty ? poi.pastImages.first : '');
                 }
 
                 return GestureDetector(
@@ -246,28 +263,36 @@ class _POIScreenState extends State<POIScreen> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(15),
-                          child: thumbnailPath.isNotEmpty 
-                            ? Image.asset(
-                                thumbnailPath,
-                                width: 100,
-                                height: 80,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  print('Error loading image asset: $thumbnailPath');
-                                  return Container(
-                                    width: 100,
-                                    height: 80,
-                                    color: Colors.white10,
-                                    child: const Icon(Icons.image_not_supported, color: Colors.white24),
-                                  );
-                                },
-                              )
-                            : Container(
-                                width: 100,
-                                height: 80,
-                                color: Colors.white10,
-                                child: const Icon(Icons.image_not_supported, color: Colors.white24),
-                              ),
+                          child: thumbnailPath.isNotEmpty
+                              ? Image.asset(
+                                  thumbnailPath,
+                                  width: 100,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    print(
+                                      'Error loading image asset: $thumbnailPath',
+                                    );
+                                    return Container(
+                                      width: 100,
+                                      height: 80,
+                                      color: Colors.white10,
+                                      child: const Icon(
+                                        Icons.image_not_supported,
+                                        color: Colors.white24,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Container(
+                                  width: 100,
+                                  height: 80,
+                                  color: Colors.white10,
+                                  child: const Icon(
+                                    Icons.image_not_supported,
+                                    color: Colors.white24,
+                                  ),
+                                ),
                         ),
                         const SizedBox(width: 15),
                         Expanded(
@@ -297,9 +322,9 @@ class _POIScreenState extends State<POIScreen> {
                     ),
                   ),
                 );
-              }
+              },
             );
-          }
+          },
         );
       },
     );

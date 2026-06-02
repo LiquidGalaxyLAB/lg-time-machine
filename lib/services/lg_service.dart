@@ -34,24 +34,28 @@ class LGService extends ChangeNotifier {
     _screens = screens;
     try {
       debugPrint('LGService: Intentando conectar a $host:$port...');
-      final socket = await SSHSocket.connect(host, port, timeout: const Duration(seconds: 10));
-      
+      final socket = await SSHSocket.connect(
+        host,
+        port,
+        timeout: const Duration(seconds: 10),
+      );
+
       _client = SSHClient(
         socket,
         username: username,
         onPasswordRequest: () => password,
       );
-      
+
       debugPrint('LGService: Autenticando usuario $username...');
       await _client!.authenticated.timeout(const Duration(seconds: 15));
-      
+
       _isConnected = true;
       notifyListeners();
       debugPrint('LGService: Conexión establecida con éxito');
-      
+
       await execute('mkdir -p /var/www/html/logos');
       await execute('mkdir -p /var/www/html/kml');
-      
+
       return true;
     } catch (e) {
       debugPrint('LGService: Error de conexión: $e');
@@ -62,9 +66,17 @@ class LGService extends ChangeNotifier {
   }
 
   Future<void> reconnect() async {
-    if (_host == null || _port == null || _username == null || _password == null) return;
+    if (_host == null ||
+        _port == null ||
+        _username == null ||
+        _password == null)
+      return;
     try {
-      final socket = await SSHSocket.connect(_host!, _port!, timeout: const Duration(seconds: 10));
+      final socket = await SSHSocket.connect(
+        _host!,
+        _port!,
+        timeout: const Duration(seconds: 10),
+      );
       _client = SSHClient(
         socket,
         username: _username!,
@@ -102,7 +114,8 @@ class LGService extends ChangeNotifier {
     } catch (e) {
       debugPrint('LGService: Execution error for "$command": $e');
       // Only disconnect if it's a connection-related error
-      if (e.toString().contains('SocketException') || e.toString().contains('Connection failed')) {
+      if (e.toString().contains('SocketException') ||
+          e.toString().contains('Connection failed')) {
         _isConnected = false;
         notifyListeners();
       }
@@ -124,10 +137,12 @@ class LGService extends ChangeNotifier {
     // En tu configuración de 5 pantallas, slave_4 es la de la izquierda del todo.
     // En uno de 3 pantallas, es slave_2.
     int slaveNo = _screens == 5 ? 4 : 2;
-    
+
     await execute('echo $_password | sudo -S mkdir -p /var/www/html/kml');
     await execute('echo $_password | sudo -S chmod -R 777 /var/www/html/kml');
-    await execute("cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.kml\n$kml\nEOF");
+    await execute(
+      "cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.kml\n$kml\nEOF",
+    );
   }
 
   Future<void> uploadAssets() async {
@@ -140,18 +155,25 @@ class LGService extends ChangeNotifier {
     try {
       // 1. Crear el directorio y dar permisos totales usando sudo
       await execute('echo $_password | sudo -S mkdir -p /var/www/html/logos');
-      await execute('echo $_password | sudo -S chmod -R 777 /var/www/html/logos');
+      await execute(
+        'echo $_password | sudo -S chmod -R 777 /var/www/html/logos',
+      );
 
       final sftp = await _client!.sftp();
-      
+
       for (var asset in assets) {
         try {
           final byteData = await rootBundle.load(asset['path']!);
           final bytes = byteData.buffer.asUint8List();
           final remotePath = '/var/www/html/logos/${asset['name']}';
-          
-          final file = await sftp.open(remotePath, 
-            mode: SftpFileOpenMode.create | SftpFileOpenMode.write | SftpFileOpenMode.truncate);
+
+          final file = await sftp.open(
+            remotePath,
+            mode:
+                SftpFileOpenMode.create |
+                SftpFileOpenMode.write |
+                SftpFileOpenMode.truncate,
+          );
           await file.write(Stream.value(bytes));
           await file.close();
           debugPrint('LGService: cargado ${asset['name']} en $remotePath');
@@ -299,9 +321,7 @@ class LGService extends ChangeNotifier {
       await sendQuery('exittour=true');
 
       if (_lastOrbitPosition != null) {
-        await sendQuery(
-          'flytoview=$_lastOrbitPosition',
-        );
+        await sendQuery('flytoview=$_lastOrbitPosition');
       }
     } catch (e) {
       print('Error stopping orbit: $e');
@@ -320,15 +340,18 @@ class LGService extends ChangeNotifier {
     await execute("mkdir -p /var/www/html/kml");
     // Limpiamos desde slave_2 hasta slave_{screens}
     for (var i = 2; i <= _screens; i++) {
-      await execute("cat <<'EOF' > /var/www/html/kml/slave_$i.kml\n$blank\nEOF");
+      await execute(
+        "cat <<'EOF' > /var/www/html/kml/slave_$i.kml\n$blank\nEOF",
+      );
     }
   }
 
   Future<void> relaunch() async {
     if (_password == null || _username == null) return;
-    
+
     for (var i = _screens; i >= 1; i--) {
-      final relaunchCommand = """RELAUNCH_CMD="\\
+      final relaunchCommand =
+          """RELAUNCH_CMD="\\
 if [ -f /etc/init/lxdm.conf ]; then
   export SERVICE=lxdm
 elif [ -f /etc/init/lightdm.conf ]; then
@@ -342,8 +365,10 @@ else
   echo $_password | sudo -S service \\\${SERVICE} restart
 fi
 " && sshpass -p $_password ssh -x -t lg@lg$i "\$RELAUNCH_CMD\"""";
-      
-      await execute('"/home/$_username/bin/lg-relaunch" > /home/$_username/log.txt');
+
+      await execute(
+        '"/home/$_username/bin/lg-relaunch" > /home/$_username/log.txt',
+      );
       await execute(relaunchCommand);
     }
   }
@@ -352,7 +377,8 @@ fi
     if (_password == null) return;
     for (var i = _screens; i >= 1; i--) {
       await execute(
-          'sshpass -p $_password ssh -t lg$i "echo $_password | sudo -S poweroff"');
+        'sshpass -p $_password ssh -t lg$i "echo $_password | sudo -S poweroff"',
+      );
     }
   }
 
@@ -360,23 +386,27 @@ fi
     if (_password == null) return;
     for (var i = _screens; i >= 1; i--) {
       await execute(
-          'sshpass -p $_password ssh -t lg$i "echo $_password | sudo -S reboot"');
+        'sshpass -p $_password ssh -t lg$i "echo $_password | sudo -S reboot"',
+      );
     }
   }
 
   Future<void> setRefresh() async {
     if (_password == null) return;
     try {
-      const search = '<href>##LG_PHPIFACE##kml\\\\/slave_{{slave}}.kml<\\\\/href>';
+      const search =
+          '<href>##LG_PHPIFACE##kml\\\\/slave_{{slave}}.kml<\\\\/href>';
       const replace =
           '<href>##LG_PHPIFACE##kml\\\\/slave_{{slave}}.kml<\\\\/href><refreshMode>onInterval<\\\\/refreshMode><refreshInterval>2<\\\\/refreshInterval>';
-      
+
       for (var i = 2; i <= _screens; i++) {
-        final clearCmd = 'echo $_password | sudo -S sed -i "s/$replace/$search/" ~/earth/kml/slave/myplaces.kml'
-            .replaceAll('{{slave}}', i.toString());
-        final cmd = 'echo $_password | sudo -S sed -i "s/$search/$replace/" ~/earth/kml/slave/myplaces.kml'
-            .replaceAll('{{slave}}', i.toString());
-            
+        final clearCmd =
+            'echo $_password | sudo -S sed -i "s/$replace/$search/" ~/earth/kml/slave/myplaces.kml'
+                .replaceAll('{{slave}}', i.toString());
+        final cmd =
+            'echo $_password | sudo -S sed -i "s/$search/$replace/" ~/earth/kml/slave/myplaces.kml'
+                .replaceAll('{{slave}}', i.toString());
+
         String queryClear = 'sshpass -p $_password ssh -t lg$i \'$clearCmd\'';
         String querySet = 'sshpass -p $_password ssh -t lg$i \'$cmd\'';
 
@@ -393,11 +423,13 @@ fi
     try {
       const search =
           '<href>##LG_PHPIFACE##kml\\\\/slave_{{slave}}.kml<\\\\/href><refreshMode>onInterval<\\\\/refreshMode><refreshInterval>2<\\\\/refreshInterval>';
-      const replace = '<href>##LG_PHPIFACE##kml\\\\/slave_{{slave}}.kml<\\\\/href>';
+      const replace =
+          '<href>##LG_PHPIFACE##kml\\\\/slave_{{slave}}.kml<\\\\/href>';
 
       for (var i = 2; i <= _screens; i++) {
-        final cmd = 'echo $_password | sudo -S sed -i "s/$search/$replace/" ~/earth/kml/slave/myplaces.kml'
-            .replaceAll('{{slave}}', i.toString());
+        final cmd =
+            'echo $_password | sudo -S sed -i "s/$search/$replace/" ~/earth/kml/slave/myplaces.kml'
+                .replaceAll('{{slave}}', i.toString());
         String query = 'sshpass -p $_password ssh -t lg$i \'$cmd\'';
 
         await execute(query);

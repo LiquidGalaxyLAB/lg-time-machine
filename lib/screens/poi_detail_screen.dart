@@ -79,7 +79,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
               Container(
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/images/Timeline/GalaxyBackground.png'),
+                    image: AssetImage(
+                      'assets/images/Timeline/GalaxyBackground.png',
+                    ),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -134,21 +136,31 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white.withOpacity(0.2)),
                   ),
-                  child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 24),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isConnected ? const Color(0xFF8AFF8A).withOpacity(0.2) : const Color(0xFFFF8A8A).withOpacity(0.2),
+                  color: isConnected
+                      ? const Color(0xFF8AFF8A).withOpacity(0.2)
+                      : const Color(0xFFFF8A8A).withOpacity(0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isConnected ? const Color(0xFF8AFF8A).withOpacity(0.4) : const Color(0xFFFF8A8A).withOpacity(0.4),
+                    color: isConnected
+                        ? const Color(0xFF8AFF8A).withOpacity(0.4)
+                        : const Color(0xFFFF8A8A).withOpacity(0.4),
                   ),
                 ),
                 child: Icon(
                   Icons.wifi,
-                  color: isConnected ? const Color(0xFF8AFF8A) : const Color(0xFFFF8A8A),
+                  color: isConnected
+                      ? const Color(0xFF8AFF8A)
+                      : const Color(0xFFFF8A8A),
                   size: 24,
                 ),
               ),
@@ -165,11 +177,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
       child: Row(
         children: [
-          Container(
-            width: 3,
-            height: 24,
-            color: Colors.white,
-          ),
+          Container(width: 3, height: 24, color: Colors.white),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -198,12 +206,18 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
         bool isPast = timeValue == 0.0;
 
         if (isPast) {
-          assetPath = widget.poi.pastImages.isNotEmpty ? widget.poi.pastImages.first : '';
+          assetPath = widget.poi.pastImages.isNotEmpty
+              ? widget.poi.pastImages.first
+              : '';
         } else if (isPresent) {
-          assetPath = widget.poi.presentImages.isNotEmpty ? widget.poi.presentImages.first : '';
+          assetPath = widget.poi.presentImages.isNotEmpty
+              ? widget.poi.presentImages.first
+              : '';
         } else if (isFuture) {
           // Future image logic
-          assetPath = widget.poi.presentImages.isNotEmpty ? widget.poi.presentImages.first : '';
+          assetPath = widget.poi.presentImages.isNotEmpty
+              ? widget.poi.presentImages.first
+              : '';
         }
 
         return Padding(
@@ -220,25 +234,37 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                             width: double.infinity,
                             height: 220,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Container(
-                              width: double.infinity,
-                              height: 220,
-                              color: Colors.white10,
-                              child: const Icon(Icons.image_not_supported, color: Colors.white24, size: 50),
-                            ),
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                                  width: double.infinity,
+                                  height: 220,
+                                  color: Colors.white10,
+                                  child: const Icon(
+                                    Icons.image_not_supported,
+                                    color: Colors.white24,
+                                    size: 50,
+                                  ),
+                                ),
                           )
                         : Container(
                             width: double.infinity,
                             height: 220,
                             color: Colors.white10,
-                            child: const Icon(Icons.image_not_supported, color: Colors.white24, size: 50),
+                            child: const Icon(
+                              Icons.image_not_supported,
+                              color: Colors.white24,
+                              size: 50,
+                            ),
                           ),
                     if (isFuture && _futureImageExists)
                       Positioned(
                         top: 10,
                         right: 10,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.cyanAccent.withOpacity(0.8),
                             borderRadius: BorderRadius.circular(10),
@@ -290,7 +316,10 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                     if (isConnected) {
                       final logosKml = LogoKML.generate();
                       await LGService.instance.sendLogoKML(logosKml);
-                      final lookAt = LookAtKML.generate(widget.poi, LGService.instance.screens);
+                      final lookAt = LookAtKML.generate(
+                        widget.poi,
+                        LGService.instance.screens,
+                      );
                       await LGService.instance.sendQuery('flytoview=$lookAt');
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -300,7 +329,11 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please connect to Liquid Galaxy first')),
+                        const SnackBar(
+                          content: Text(
+                            'Please connect to Liquid Galaxy first',
+                          ),
+                        ),
                       );
                     }
                   },
@@ -352,13 +385,19 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Starting orbit around ${widget.poi.name}...'),
+                              content: Text(
+                                'Starting orbit around ${widget.poi.name}...',
+                              ),
                               backgroundColor: Colors.blue.withOpacity(0.8),
                             ),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Please connect to Liquid Galaxy first')),
+                            const SnackBar(
+                              content: Text(
+                                'Please connect to Liquid Galaxy first',
+                              ),
+                            ),
                           );
                         }
                       },
@@ -383,10 +422,16 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                       Expanded(
                         child: _buildButton(
                           _futureImageExists
-                              ? LanguageManager.instance.translate('regenerate_future')
-                              : LanguageManager.instance.translate('generate_future'),
+                              ? LanguageManager.instance.translate(
+                                  'regenerate_future',
+                                )
+                              : LanguageManager.instance.translate(
+                                  'generate_future',
+                                ),
                           icon: Icons.auto_awesome,
-                          onTap: _isGeneratingFuture ? null : _generateFutureImage,
+                          onTap: _isGeneratingFuture
+                              ? null
+                              : _generateFutureImage,
                         ),
                       ),
                     ],
@@ -396,7 +441,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                       padding: EdgeInsets.only(top: 10),
                       child: LinearProgressIndicator(
                         backgroundColor: Colors.white10,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.cyanAccent),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.cyanAccent,
+                        ),
                       ),
                     ),
                 ],
@@ -408,7 +455,12 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     );
   }
 
-  Widget _buildButton(String label, {IconData? icon, VoidCallback? onTap, Color? color}) {
+  Widget _buildButton(
+    String label, {
+    IconData? icon,
+    VoidCallback? onTap,
+    Color? color,
+  }) {
     final bool isDisabled = onTap == null;
     final baseColor = color ?? Colors.blue;
     return GestureDetector(
@@ -419,10 +471,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                baseColor.withOpacity(0.5),
-                baseColor.withOpacity(0.2),
-              ],
+              colors: [baseColor.withOpacity(0.5), baseColor.withOpacity(0.2)],
             ),
             borderRadius: BorderRadius.circular(25),
             border: Border.all(color: baseColor.withOpacity(0.4)),
@@ -483,9 +532,21 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _timeLabel(LanguageManager.instance.translate('past').toUpperCase(), timeValue == 0, 0),
-                  _timeLabel(LanguageManager.instance.translate('present').toUpperCase(), timeValue == 1, 1),
-                  _timeLabel(LanguageManager.instance.translate('future').toUpperCase(), timeValue == 2, 2),
+                  _timeLabel(
+                    LanguageManager.instance.translate('past').toUpperCase(),
+                    timeValue == 0,
+                    0,
+                  ),
+                  _timeLabel(
+                    LanguageManager.instance.translate('present').toUpperCase(),
+                    timeValue == 1,
+                    1,
+                  ),
+                  _timeLabel(
+                    LanguageManager.instance.translate('future').toUpperCase(),
+                    timeValue == 2,
+                    2,
+                  ),
                 ],
               ),
               const SizedBox(height: 2),
@@ -495,9 +556,13 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                   inactiveTrackColor: Colors.white.withOpacity(0.2),
                   trackHeight: 4.0,
                   thumbColor: Colors.white,
-                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10.0),
+                  thumbShape: const RoundSliderThumbShape(
+                    enabledThumbRadius: 10.0,
+                  ),
                   overlayColor: Colors.cyanAccent.withOpacity(0.3),
-                  overlayShape: const RoundSliderOverlayShape(overlayRadius: 20.0),
+                  overlayShape: const RoundSliderOverlayShape(
+                    overlayRadius: 20.0,
+                  ),
                   tickMarkShape: const RoundSliderTickMarkShape(),
                   activeTickMarkColor: Colors.cyanAccent,
                   inactiveTickMarkColor: Colors.white.withOpacity(0.3),
@@ -538,10 +603,14 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.cyanAccent.withOpacity(0.2) : Colors.transparent,
+          color: isSelected
+              ? Colors.cyanAccent.withOpacity(0.2)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
-            color: isSelected ? Colors.cyanAccent.withOpacity(0.4) : Colors.transparent,
+            color: isSelected
+                ? Colors.cyanAccent.withOpacity(0.4)
+                : Colors.transparent,
           ),
         ),
         child: Text(
@@ -552,12 +621,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
             fontSize: 9,
             letterSpacing: 1.0,
             shadows: isSelected
-                ? [
-                    const Shadow(
-                      color: Colors.cyanAccent,
-                      blurRadius: 6,
-                    )
-                  ]
+                ? [const Shadow(color: Colors.cyanAccent, blurRadius: 6)]
                 : [],
           ),
         ),
