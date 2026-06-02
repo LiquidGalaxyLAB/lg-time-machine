@@ -32,42 +32,45 @@ class AboutUsScreen extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
-              ),
-              child: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-            ),
+          Image.asset(
+            'assets/images/Timeline/LogoApp_Menu.png',
+            width: double.infinity,
+            height: 100,
+            fit: BoxFit.contain,
           ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isConnected ? const Color(0xFF8AFF8A).withOpacity(0.2) : const Color(0xFFFF8A8A).withOpacity(0.2),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: isConnected ? const Color(0xFF8AFF8A).withOpacity(0.4) : const Color(0xFFFF8A8A).withOpacity(0.4),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: isConnected ? const Color(0xFF8AFF8A).withOpacity(0.2) : const Color(0xFFFF8A8A).withOpacity(0.2),
-                  blurRadius: 8,
-                  spreadRadius: 1,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  ),
+                  child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 24),
                 ),
-              ],
-            ),
-            child: Icon(
-              Icons.wifi,
-              color: isConnected ? const Color(0xFF8AFF8A) : const Color(0xFFFF8A8A),
-              size: 24,
-            ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isConnected ? const Color(0xFF8AFF8A).withOpacity(0.2) : const Color(0xFFFF8A8A).withOpacity(0.2),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isConnected ? const Color(0xFF8AFF8A).withOpacity(0.4) : const Color(0xFFFF8A8A).withOpacity(0.4),
+                  ),
+                ),
+                child: Icon(
+                  Icons.wifi,
+                  color: isConnected ? const Color(0xFF8AFF8A) : const Color(0xFFFF8A8A),
+                  size: 24,
+                ),
+              ),
+            ],
           ),
         ],
       ),

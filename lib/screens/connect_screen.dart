@@ -119,6 +119,9 @@ class _ConnectScreenState extends State<ConnectScreen> {
       // Upload logo assets to LG
       await LGService.instance.uploadAssets();
 
+      // Configure slaves to refresh and look for KMLs
+      await LGService.instance.setRefresh();
+
       // Clear previous KMLs to ensure a clean slate after connection
       await LGService.instance.clearKML();
       

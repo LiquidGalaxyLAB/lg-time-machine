@@ -33,24 +33,28 @@ class LGService extends ChangeNotifier {
     _password = password;
     _screens = screens;
     try {
-      final socket = await SSHSocket.connect(host, port, timeout: const Duration(seconds: 5));
+      debugPrint('LGService: Intentando conectar a $host:$port...');
+      final socket = await SSHSocket.connect(host, port, timeout: const Duration(seconds: 10));
+      
       _client = SSHClient(
         socket,
         username: username,
         onPasswordRequest: () => password,
       );
       
-      await _client!.authenticated;
+      debugPrint('LGService: Autenticando usuario $username...');
+      await _client!.authenticated.timeout(const Duration(seconds: 15));
       
       _isConnected = true;
       notifyListeners();
+      debugPrint('LGService: Conexión establecida con éxito');
       
-      // Ensure directories exist
       await execute('mkdir -p /var/www/html/logos');
       await execute('mkdir -p /var/www/html/kml');
       
       return true;
     } catch (e) {
+      debugPrint('LGService: Error de conexión: $e');
       _isConnected = false;
       notifyListeners();
       return false;
@@ -60,13 +64,13 @@ class LGService extends ChangeNotifier {
   Future<void> reconnect() async {
     if (_host == null || _port == null || _username == null || _password == null) return;
     try {
-      final socket = await SSHSocket.connect(_host!, _port!, timeout: const Duration(seconds: 5));
+      final socket = await SSHSocket.connect(_host!, _port!, timeout: const Duration(seconds: 10));
       _client = SSHClient(
         socket,
         username: _username!,
         onPasswordRequest: () => _password,
       );
-      await _client!.authenticated;
+      await _client!.authenticated.timeout(const Duration(seconds: 15));
       _isConnected = true;
       notifyListeners();
     } catch (e) {
@@ -93,10 +97,15 @@ class LGService extends ChangeNotifier {
     if (!_isConnected || _client == null) return null;
     try {
       final session = await _client!.execute(command);
-      return await utf8.decodeStream(session.stdout);
+      final result = await utf8.decodeStream(session.stdout);
+      return result;
     } catch (e) {
-      _isConnected = false; // Mark as disconnected if execution fails due to connection
-      notifyListeners();
+      debugPrint('LGService: Execution error for "$command": $e');
+      // Only disconnect if it's a connection-related error
+      if (e.toString().contains('SocketException') || e.toString().contains('Connection failed')) {
+        _isConnected = false;
+        notifyListeners();
+      }
       return null;
     }
   }
@@ -112,35 +121,46 @@ class LGService extends ChangeNotifier {
   }
 
   Future<void> sendLogoKML(String kml) async {
-    await execute("mkdir -p /var/www/html/kml");
-    await execute("cat <<'EOF' > /var/www/html/kml/slave_1.kml\n$kml\nEOF");
+    // En tu configuración de 5 pantallas, slave_4 es la de la izquierda del todo.
+    // En uno de 3 pantallas, es slave_2.
+    int slaveNo = _screens == 5 ? 4 : 2;
+    
+    await execute('echo $_password | sudo -S mkdir -p /var/www/html/kml');
+    await execute('echo $_password | sudo -S chmod -R 777 /var/www/html/kml');
+    await execute("cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.kml\n$kml\nEOF");
   }
 
   Future<void> uploadAssets() async {
-    if (!_isConnected || _client == null) return;
+    if (!_isConnected || _client == null || _password == null) return;
 
     final assets = [
-      {'path': 'assets/images/KMLs/Logo/KMLs_Logo.png', 'name': 'KMLs_Logo.png'},
+      {'path': 'assets/images/KMLs/Logo/Logos.png', 'name': 'Logos.png'},
     ];
 
     try {
-      await execute('mkdir -p /var/www/html/logos');
+      // 1. Crear el directorio y dar permisos totales usando sudo
+      await execute('echo $_password | sudo -S mkdir -p /var/www/html/logos');
+      await execute('echo $_password | sudo -S chmod -R 777 /var/www/html/logos');
+
       final sftp = await _client!.sftp();
       
       for (var asset in assets) {
         try {
           final byteData = await rootBundle.load(asset['path']!);
           final bytes = byteData.buffer.asUint8List();
-          final file = await sftp.open('/var/www/html/logos/${asset['name']}', 
+          final remotePath = '/var/www/html/logos/${asset['name']}';
+          
+          final file = await sftp.open(remotePath, 
             mode: SftpFileOpenMode.create | SftpFileOpenMode.write | SftpFileOpenMode.truncate);
           await file.write(Stream.value(bytes));
           await file.close();
+          debugPrint('LGService: cargado ${asset['name']} en $remotePath');
         } catch (e) {
-          print('Error uploading ${asset['name']}: $e');
+          debugPrint('LGService: Error subiendo ${asset['name']}: $e');
         }
       }
     } catch (e) {
-      print('SFTP Error: $e');
+      debugPrint('LGService: Error de SFTP: $e');
     }
   }
 
@@ -293,15 +313,15 @@ class LGService extends ChangeNotifier {
   }
 
   Future<void> clearLogos() async {
-    int rigs = _screens - 1;
-    if (rigs < 1) rigs = 1;
     String blank = '''<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
-  <Document>
-  </Document>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document></Document>
 </kml>''';
     await execute("mkdir -p /var/www/html/kml");
-    await execute("cat <<'EOF' > /var/www/html/kml/slave_$rigs.kml\n$blank\nEOF");
+    // Limpiamos desde slave_2 hasta slave_{screens}
+    for (var i = 2; i <= _screens; i++) {
+      await execute("cat <<'EOF' > /var/www/html/kml/slave_$i.kml\n$blank\nEOF");
+    }
   }
 
   Future<void> relaunch() async {

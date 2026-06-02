@@ -76,15 +76,9 @@ flutter:
     - lib/services/Pois.json
     - assets/images/Timeline/
     - assets/images/KMLs/Logo/
-    - assets/PointsOfInterest/Sagrada Familia/info.json
-    - assets/PointsOfInterest/Sagrada Familia/Images/Past/
-    - assets/PointsOfInterest/Sagrada Familia/Images/Present/
-    - assets/PointsOfInterest/Plaza Mayor de Salamanca/info.json
-    - assets/PointsOfInterest/Plaza Mayor de Salamanca/Images/Past/
-    - assets/PointsOfInterest/Plaza Mayor de Salamanca/Images/Present/
-    - assets/PointsOfInterest/Cathedral of Santiago de Compostela/info.json
-    - assets/PointsOfInterest/Cathedral of Santiago de Compostela/Images/Past/
-    - assets/PointsOfInterest/Cathedral of Santiago de Compostela/Images/Present/
+    - assets/images/PointsOfInterest/Sagrada_Familia/PresentImage.jpg
+    - assets/images/PointsOfInterest/Plaza_Mayor_de_Salamanca/PresentImage.jpg
+    - assets/images/PointsOfInterest/Cathedral_of_Santiago_de_Compostela/PresentImage.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

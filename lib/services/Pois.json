@@ -9,8 +9,23 @@
 
   },
   "Spain": {
-    "Sagrada Familia": "Catholic Basilica",
-    "Plaza Mayor de Salamanca": "Plaza Square",
-    "Cathedral of Santiago de Compostela": "Cathedral"
+    "Sagrada_Familia":
+    {
+      "name": "Sagrada Familia",
+      "description": "Catholic Basilica"
+    },
+
+    "Plaza_Mayor_de_Salamanca":
+    {
+      "name": "Plaza Mayor de Salamanca",
+      "description": "Plaza Square"
+    },
+
+    "Cathedral_of_Santiago_de_Compostela":
+    {
+      "name": "Cathedral of Santiago de Compostela",
+      "description": "Cathedral"
+    }
+
   }
 }

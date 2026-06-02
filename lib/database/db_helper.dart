@@ -30,9 +30,6 @@ class DatabaseHelper {
     if (oldVersion < 12) {
       await db.execute('DROP TABLE IF EXISTS pois');
     }
-    if (oldVersion < 6) {
-      await db.insert('settings', {'key': 'logoScale', 'value': '0.6'});
-    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -68,7 +65,6 @@ class DatabaseHelper {
 
     await db.insert('settings', {'key': 'language', 'value': 'en'});
     await db.insert('settings', {'key': 'showLogos', 'value': 'true'});
-    await db.insert('settings', {'key': 'logoScale', 'value': '0.6'});
   }
 
   Future<void> saveSetting(String key, String value) async {

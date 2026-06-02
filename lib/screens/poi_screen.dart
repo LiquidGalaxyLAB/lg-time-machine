@@ -6,7 +6,6 @@ import '../database/db_helper.dart';
 import '../services/poi_service.dart';
 import '../services/language_manager.dart';
 import '../services/time_manager.dart';
-import '../services/time_manager.dart';
 import 'poi_detail_screen.dart';
 
 class POIScreen extends StatefulWidget {
@@ -104,7 +103,7 @@ class _POIScreenState extends State<POIScreen> {
           Image.asset(
             'assets/images/Timeline/LogoApp_Menu.png',
             width: double.infinity,
-            height: 80,
+            height: 100,
             fit: BoxFit.contain,
           ),
           Row(
