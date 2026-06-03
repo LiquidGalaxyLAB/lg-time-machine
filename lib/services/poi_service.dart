@@ -1,48 +1,21 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:csv/csv.dart';
 import '../models/poi.dart';
 
 class POIService {
-  // Datos exportados directamente desde el CSV de Google Sheets para uso offline/local
-  static const List<Map<String, dynamic>> _localPoisData = [
-    {
-      "backendName": "Plaza_Mayor_de_Salamanca",
-      "longitude": -5.6639222,
-      "latitude": 40.9650099,
-      "altitude": 797.1768325,
-      "heading": 107.6300761,
-      "tilt": 40.0227249,
-      "range": 188.5190025,
-      "altitudeMode": "relativeToGround",
-    },
-    {
-      "backendName": "Sagrada_Familia",
-      "longitude": 2.1739006,
-      "latitude": 41.4034299,
-      "altitude": 95.6508464,
-      "heading": 9.5377605,
-      "tilt": 59.4242461,
-      "range": 551.3130864,
-      "altitudeMode": "relativeToGround",
-    },
-    {
-      "backendName": "Cathedral_of_Santiago_de_Compostela",
-      "longitude": -8.5446961,
-      "latitude": 42.8807417,
-      "altitude": 278.4591306,
-      "heading": 54.1152332,
-      "tilt": 64.9304054,
-      "range": 428.6393375,
-      "altitudeMode": "relativeToGround",
-    },
-  ];
-
+  /// Carga los POIs combinando la metadata de Pois.json y las coordenadas de PointsOfInterestCords.csv
   Future<List<POI>> loadPOIs() async {
     try {
-      // 1. Cargar metadata (nombres y descripciones) de Pois.json
-      final String poisJsonString = await rootBundle.loadString(
-        'lib/services/Pois.json',
-      );
+      // 1. Cargar y parsear el archivo CSV de coordenadas local
+      final String csvString = await rootBundle.loadString('lib/services/PointsOfInterestCords.csv');
+      List<List<dynamic>> csvRows = const CsvToListConverter().convert(csvString);
+      
+      if (csvRows.isEmpty) return [];
+      final dataRows = csvRows.sublist(1); // Omitir cabecera
+
+      // 2. Cargar metadata (nombres y descripciones) de Pois.json
+      final String poisJsonString = await rootBundle.loadString('lib/services/Pois.json');
       final Map<String, dynamic> poisMetadata = json.decode(poisJsonString);
 
       List<POI> pois = [];
@@ -58,33 +31,50 @@ class POIService {
             final displayName = poiData['name'] ?? backendName;
             final description = poiData['description'] ?? '';
 
-            // Buscar coordenadas en los datos locales por backendName
-            final localData = _localPoisData.firstWhere(
-              (data) => data['backendName'] == backendName,
-              orElse: () => {},
+            // 3. Buscar la fila en el CSV que coincida con este POI
+            final csvRow = dataRows.firstWhere(
+              (row) => row.isNotEmpty && 
+                      (row[0].toString().trim().toLowerCase() == backendName.toLowerCase().replaceFirst('_', ' ') ||
+                       row[0].toString().trim().toLowerCase() == displayName.toLowerCase().trim() ||
+                       row[0].toString().trim() == backendName),
+              orElse: () => [],
             );
 
-            if (localData.isNotEmpty) {
+            if (csvRow.isNotEmpty) {
               final String folderName = backendName.trim();
-              final String presentImagePath =
-                  'assets/images/PointsOfInterest/$folderName/PresentImage.jpg';
+              
+              // Definimos las rutas para ambas imágenes
+              final String presentImagePath = 'assets/images/PointsOfInterest/$folderName/PresentImage.jpg';
+              final String pastImagePath = 'assets/images/PointsOfInterest/$folderName/PastImage.jpg';
+              
+              final List<String> presentImages = [presentImagePath];
+              final List<String> pastImages = [pastImagePath];
 
-              final List<String> images = [presentImagePath];
+              // Función auxiliar para limpiar números
+              double parseCsvNumber(dynamic value, double defaultValue) {
+                if (value == null) return defaultValue;
+                String cleanValue = value.toString().replaceAll(',', '.').trim();
+                return double.tryParse(cleanValue) ?? defaultValue;
+              }
 
               Map<String, dynamic> combinedData = {
                 'name': displayName,
-                'longitude': localData['longitude'],
-                'latitude': localData['latitude'],
-                'altitude': localData['altitude'],
-                'heading': localData['heading'],
-                'tilt': localData['tilt'],
-                'range': localData['range'],
-                'altitudeMode': localData['altitudeMode'],
+                'longitude': parseCsvNumber(csvRow.length > 1 ? csvRow[1] : 0.0, 0.0),
+                'latitude': parseCsvNumber(csvRow.length > 2 ? csvRow[2] : 0.0, 0.0),
+                'altitude': parseCsvNumber(csvRow.length > 3 ? csvRow[3] : 0.0, 0.0),
+                'heading': parseCsvNumber(csvRow.length > 4 ? csvRow[4] : 0.0, 0.0),
+                'tilt': parseCsvNumber(csvRow.length > 5 ? csvRow[5] : 0.0, 0.0),
+                'range': parseCsvNumber(csvRow.length > 6 ? csvRow[6] : 1000.0, 1000.0),
+                'altitudeMode': csvRow.length > 7 ? csvRow[7].toString().trim() : 'relativeToGround',
               };
 
-              final metadata = {'country': country, 'description': description};
+              final metadata = {
+                'country': country,
+                'description': description,
+              };
 
-              pois.add(POI.fromJson(combinedData, metadata, images, images));
+              // Ahora pasamos listas diferentes para pasado y presente
+              pois.add(POI.fromJson(combinedData, metadata, pastImages, presentImages));
             }
           }
         }
@@ -92,7 +82,7 @@ class POIService {
 
       return pois;
     } catch (e) {
-      print('Error loading POIs: $e');
+      print('Error loading POIs from local CSV: $e');
       return [];
     }
   }

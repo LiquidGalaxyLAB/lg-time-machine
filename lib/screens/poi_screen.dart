@@ -229,21 +229,7 @@ class _POIScreenState extends State<POIScreen> {
             return ValueListenableBuilder<double>(
               valueListenable: TimeManager.instance.timeNotifier,
               builder: (context, timeValue, child) {
-                String thumbnailPath = '';
-
-                if (timeValue == 0) {
-                  // Past
-                  thumbnailPath = poi.pastImages.isNotEmpty
-                      ? poi.pastImages.first
-                      : (poi.presentImages.isNotEmpty
-                            ? poi.presentImages.first
-                            : '');
-                } else {
-                  // present (1.0) or future (2.0)
-                  thumbnailPath = poi.presentImages.isNotEmpty
-                      ? poi.presentImages.first
-                      : (poi.pastImages.isNotEmpty ? poi.pastImages.first : '');
-                }
+                final String thumbnailPath = poi.getCurrentImage(timeValue);
 
                 return GestureDetector(
                   onTap: () {

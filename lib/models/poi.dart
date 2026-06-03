@@ -27,7 +27,15 @@ class POI {
     this.altitudeMode = 'relativeToGround',
   });
 
-  // Helper to get the main thumbnail image (e.g., first present image)
+  /// Devuelve la imagen correspondiente según el estado del tiempo (0: Past, 1: Present)
+  String getCurrentImage(double timeValue) {
+    if (timeValue == 0 && pastImages.isNotEmpty) {
+      return pastImages.first;
+    }
+    return presentImages.isNotEmpty ? presentImages.first : '';
+  }
+
+  // Helper para el thumbnail inicial
   String get thumbnail => presentImages.isNotEmpty
       ? presentImages.first
       : (pastImages.isNotEmpty ? pastImages.first : '');

@@ -1,4 +1,4 @@
 ,longitude,latitude,altitude,heading,tilt,range,altitudeMode
-Plaza Mayor de Salamanca,"-5,6639222","40,9650099","797,1768325","107,6300761","40,0227249","188,5190025",relativeToGround
-Sagrada Familia,"2,1739006","41,4034299","95,6508464","9,5377605","59,4242461","551,3130864",relativeToGround
-Cathedral of Santiago de Compostela,"-8,5446961","42,8807417","278,4591306","54,1152332","64,9304054","428,6393375",relativeToGround
+Plaza_Mayor_de_Salamanca,"-5,6640872","40,964992","798,6063256","32,4040443","36,238118","396,5614473",relativeToGround
+Sagrada_Familia,"2,1739814","41,4041199","34,4277368","7,3142434","43,4539370","1.035,7634342",relativeToGround
+Cathedral_of_Santiago_de_Compostela,"-8,5447720","42,8807781","273,8333140","41,8425964","46,5491716","458,3338752",relativeToGround
