@@ -1,4 +1,8 @@
 ,longitude,latitude,altitude,heading,tilt,range,altitudeMode
-Plaza_Mayor_de_Salamanca,"-5,6640872","40,964992","798,6063256","32,4040443","36,238118","396,5614473",relativeToGround
-Sagrada_Familia,"2,1739814","41,4041199","34,4277368","7,3142434","43,4539370","1.035,7634342",relativeToGround
-Cathedral_of_Santiago_de_Compostela,"-8,5447720","42,8807781","273,8333140","41,8425964","46,5491716","458,3338752",relativeToGround
+Plaza_Mayor_de_Salamanca,"-5,6639800","40,9649549","796,9393443","1,2535476","31,8720105","1.586,7236185",relativeToGround
+Sagrada_Familia,"2,1739658","41,4033606","41,9021466","45,9814489","44,1113928","2.477,1266987",relativeToGround
+Cathedral_of_Santiago_de_Compostela,"-8,5444787","42,8806364","278,3192014","70,0247714","43,4980707","1.078,0526330",relativeToGround
+,,,,,,,
+,,,,,,,
+,,,,,,,
+,, ,,,,,

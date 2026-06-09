@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../kmls/time_kml.dart';
 import '../database/db_helper.dart';
 import 'lg_service.dart';
 
@@ -37,8 +36,7 @@ class TimeManager {
 
   Future<void> _updateLGTime(double value) async {
     if (LGService.instance.isConnected) {
-      final kml = TimeKML.generate(value);
-      await LGService.instance.sendTimeKML(kml);
+      await LGService.instance.clearTime();
     }
   }
 }

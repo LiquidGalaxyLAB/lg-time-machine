@@ -5,6 +5,7 @@ import '../services/time_manager.dart';
 import '../services/lg_service.dart';
 import '../kmls/logo_kml.dart';
 import '../kmls/look_at_kml.dart';
+import '../kmls/statistics_kml.dart';
 
 class POIDetailScreen extends StatefulWidget {
   final POI poi;
@@ -23,6 +24,7 @@ class POIDetailScreen extends StatefulWidget {
 class _POIDetailScreenState extends State<POIDetailScreen> {
   bool _isGeneratingFuture = false;
   bool _futureImageExists = false;
+  bool _showingStatistics = false;
 
   @override
   void initState() {
@@ -35,12 +37,14 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     if (LGService.instance.orbitPlaying) {
       LGService.instance.orbitStop();
     }
+    if (_showingStatistics) {
+      LGService.instance.clearStatistics();
+    }
     super.dispose();
   }
 
   void _checkFutureImage() {
     // In a real app, we would check if the file exists on disk
-    // For this simulation, we'll use a simple state
   }
 
   Future<void> _generateFutureImage() async {
@@ -214,7 +218,6 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
               ? widget.poi.presentImages.first
               : '';
         } else if (isFuture) {
-          // Future image logic
           assetPath = widget.poi.presentImages.isNotEmpty
               ? widget.poi.presentImages.first
               : '';
@@ -302,158 +305,313 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
   }
 
   Widget _buildToolButtons(bool isConnected) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildButton(
-                  LanguageManager.instance.translate('travel_lg').toUpperCase(),
-                  icon: Icons.rocket_launch,
-                  onTap: () async {
-                    if (isConnected) {
-                      final logosKml = LogoKML.generate();
-                      await LGService.instance.sendLogoKML(logosKml);
-                      final lookAt = LookAtKML.generate(
-                        widget.poi,
-                        LGService.instance.screens,
-                      );
-                      await LGService.instance.sendQuery('flytoview=$lookAt');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Traveling to ${widget.poi.name}...'),
-                          backgroundColor: Colors.blue.withValues(alpha: 0.8),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Please connect to Liquid Galaxy first',
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 15),
-          Row(
-            children: [
-              Expanded(child: _buildButton('COMPARE WITH PRESENT')),
-              const SizedBox(width: 15),
-              Expanded(child: _buildButton('AI NARRATION')),
-            ],
-          ),
-          const SizedBox(height: 15),
-          Row(
-            children: [
-              Expanded(
-                child: ListenableBuilder(
-                  listenable: LGService.instance,
-                  builder: (context, _) {
-                    final isOrbiting = LGService.instance.orbitPlaying;
-                    return _buildButton(
-                      isOrbiting ? 'STOP ORBIT' : 'ORBIT AROUND',
-                      icon: isOrbiting ? Icons.stop_circle : Icons.public,
-                      color: isOrbiting ? Colors.red : Colors.blue,
-                      onTap: () async {
-                        if (isConnected) {
-                          if (isOrbiting) {
-                            await LGService.instance.orbitStop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Orbit stopped'),
-                                backgroundColor: Colors.orange,
-                              ),
-                            );
-                            return;
-                          }
+    return ValueListenableBuilder<double>(
+      valueListenable: TimeManager.instance.timeNotifier,
+      builder: (context, timeValue, child) {
+        final bool isPast = timeValue == 0.0;
+        final bool isPresent = timeValue == 1.0;
+        final bool isFuture = timeValue == 2.0;
 
-                          // Start the orbit using the new method
-                          await LGService.instance.orbitPlay(
-                            widget.poi.latitude,
-                            widget.poi.longitude,
-                            widget.poi.range / LGService.instance.screens,
-                            45, // Tilt
-                            initialBearing: widget.poi.heading,
-                          );
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Starting orbit around ${widget.poi.name}...',
-                              ),
-                              backgroundColor: Colors.blue.withValues(
-                                alpha: 0.8,
-                              ),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Please connect to Liquid Galaxy first',
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 15),
-              Expanded(child: _buildButton('SHOW STATISTICS')),
-            ],
-          ),
-          ValueListenableBuilder<double>(
-            valueListenable: TimeManager.instance.timeNotifier,
-            builder: (context, timeValue, child) {
-              final isFuture = timeValue == 2.0;
-              if (!isFuture) return const SizedBox.shrink();
-              return Column(
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            children: [
+              Row(
                 children: [
-                  const SizedBox(height: 15),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildButton(
-                          _futureImageExists
-                              ? LanguageManager.instance.translate(
-                                  'regenerate_future',
-                                )
-                              : LanguageManager.instance.translate(
-                                  'generate_future',
-                                ),
-                          icon: Icons.auto_awesome,
-                          onTap: _isGeneratingFuture
-                              ? null
-                              : _generateFutureImage,
-                        ),
-                      ),
-                    ],
+                  Expanded(
+                    child: _buildButton(
+                      LanguageManager.instance
+                          .translate('travel_lg')
+                          .toUpperCase(),
+                      icon: Icons.rocket_launch,
+                      onTap: _showingStatistics
+                          ? null
+                          : () async {
+                              if (isConnected) {
+                                final logosKml = LogoKML.generate();
+                                await LGService.instance.sendLogoKML(logosKml);
+                                final lookAt = LookAtKML.generate(
+                                  widget.poi,
+                                  LGService.instance.screens,
+                                );
+                                await LGService.instance.sendQuery(
+                                  'flytoview=$lookAt',
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Traveling to ${widget.poi.name}...',
+                                    ),
+                                    backgroundColor: Colors.blue.withValues(
+                                      alpha: 0.8,
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Please connect to Liquid Galaxy first',
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                    ),
                   ),
-                  if (_isGeneratingFuture)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: LinearProgressIndicator(
-                        backgroundColor: Colors.white10,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.cyanAccent,
-                        ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                children: [
+                  if (!isPresent) ...[
+                    Expanded(
+                      child: _buildButton(
+                        'COMPARE WITH PRESENT',
+                        onTap: _showingStatistics
+                            ? null
+                            : () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Comparing current view with Present...',
+                                    ),
+                                    backgroundColor: Colors.blueAccent,
+                                  ),
+                                );
+                              },
                       ),
                     ),
+                    const SizedBox(width: 15),
+                  ],
+                  Expanded(
+                    child: _buildButton(
+                      'AI NARRATION',
+                      onTap: _showingStatistics
+                          ? null
+                          : () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Starting AI Narration...'),
+                                  backgroundColor: Colors.blueAccent,
+                                ),
+                              );
+                            },
+                    ),
+                  ),
                 ],
-              );
-            },
+              ),
+              const SizedBox(height: 15),
+              Row(
+                children: [
+                  Expanded(
+                    child: ListenableBuilder(
+                      listenable: LGService.instance,
+                      builder: (context, _) {
+                        final isOrbiting = LGService.instance.orbitPlaying;
+                        return _buildButton(
+                          isOrbiting ? 'STOP ORBIT' : 'ORBIT AROUND',
+                          icon: isOrbiting ? Icons.stop_circle : Icons.public,
+                          color: isOrbiting ? Colors.red : Colors.blue,
+                          onTap: _showingStatistics
+                              ? null
+                              : () async {
+                                  if (isConnected) {
+                                    if (isOrbiting) {
+                                      await LGService.instance.orbitStop();
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Orbit stopped'),
+                                          backgroundColor: Colors.orange,
+                                        ),
+                                      );
+                                      return;
+                                    }
+
+                                    await LGService.instance.orbitPlay(
+                                      widget.poi.latitude,
+                                      widget.poi.longitude,
+                                      widget.poi.range /
+                                          LGService.instance.screens,
+                                      45,
+                                      initialBearing: widget.poi.heading,
+                                    );
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Starting orbit around ${widget.poi.name}...',
+                                        ),
+                                        backgroundColor: Colors.blue.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Please connect to Liquid Galaxy first',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: _buildButton(
+                      _showingStatistics
+                          ? 'HIDE STATISTICS'
+                          : 'SHOW STATISTICS',
+                      color: _showingStatistics ? Colors.orange : Colors.blue,
+                      onTap: (!isConnected || isFuture)
+                          ? null
+                          : () async {
+                              if (_showingStatistics) {
+                                await LGService.instance.clearStatistics();
+                                setState(() {
+                                  _showingStatistics = false;
+                                });
+                              } else {
+                                String? assetPath;
+                                if (isPast) {
+                                  assetPath = widget.poi.pastImages.isNotEmpty
+                                      ? widget.poi.pastImages.first
+                                      : null;
+                                } else if (isPresent) {
+                                  assetPath =
+                                      widget.poi.presentImages.isNotEmpty
+                                      ? widget.poi.presentImages.first
+                                      : null;
+                                }
+
+                                if (assetPath != null) {
+                                  final fileName = await LGService.instance
+                                      .uploadPOIImage(assetPath);
+                                  if (fileName != null) {
+                                    final imageUrl =
+                                        'http://lg1:81/logos/$fileName';
+                                    final int totalScreens =
+                                        LGService.instance.screens;
+
+                                    // 1. Limpiamos KMLs previos
+                                    await LGService.instance.clearStatistics();
+
+                                    // 2. Enviamos KMLs de ScreenOverlay a cada pantalla
+                                    // La imagen es panorámica (~2.9 de ancho relativo).
+                                    // Queremos centrarla en las 3 pantallas centrales.
+
+                                    if (totalScreens >= 3) {
+                                      // Cálculos para imagen panorámica (sizeX = 2.9)
+                                      // Queremos que la imagen cubra 3 pantallas.
+
+                                      // Screen 1 (Centro - Master): Usamos el canal individual slave_1 para evitar duplicidad en los esclavos.
+                                      // IMPORTANTE: Requiere hacer un RELAUNCH desde la App tras el primer "Connect" para que LG1 cargue el NetworkLink.
+                                      final centerKml = StatisticsKML.generate(
+                                        imageUrl: imageUrl,
+                                        screenX: 0.5,
+                                        overlayX: 0.5,
+                                      );
+                                      await LGService.instance.sendSlaveKML(
+                                        1,
+                                        centerKml,
+                                      );
+
+                                      // Screen Izquierda (Slave 3 o 5): Muestra la parte izquierda
+                                      // El borde derecho de esta pantalla debe coincidir con el borde izquierdo de la central
+                                      // Borde izquierdo de central es image_x = 0.5 - (0.5 / 2.9) = 0.3275
+                                      int leftSlave = totalScreens >= 5 ? 5 : 3;
+                                      final leftKml = StatisticsKML.generate(
+                                        imageUrl: imageUrl,
+                                        screenX: 1.0,
+                                        overlayX: 0.3275,
+                                      );
+                                      await LGService.instance.sendSlaveKML(
+                                        leftSlave,
+                                        leftKml,
+                                      );
+
+                                      // Screen Derecha (Slave 2): Muestra la parte derecha
+                                      // El borde izquierdo de esta pantalla debe coincidir con el borde derecho de la central
+                                      // Borde derecho de central es image_x = 0.5 + (0.5 / 2.9) = 0.6724
+                                      int rightSlave = 2;
+                                      final rightKml = StatisticsKML.generate(
+                                        imageUrl: imageUrl,
+                                        screenX: 0.0,
+                                        overlayX: 0.6724,
+                                      );
+                                      await LGService.instance.sendSlaveKML(
+                                        rightSlave,
+                                        rightKml,
+                                      );
+                                    } else {
+                                      // Solo una pantalla o configuración básica
+                                      final singleKml = StatisticsKML.generate(
+                                        imageUrl: imageUrl,
+                                        screenX: 0.5,
+                                        overlayX: 0.5,
+                                        sizeX:
+                                            1.0, // Ajustamos el tamaño para una sola pantalla
+                                      );
+                                      await LGService.instance.sendSlaveKML(
+                                        1,
+                                        singleKml,
+                                      );
+                                    }
+
+                                    setState(() {
+                                      _showingStatistics = true;
+                                    });
+                                  }
+                                }
+                              }
+                            },
+                    ),
+                  ),
+                ],
+              ),
+              if (isFuture) ...[
+                const SizedBox(height: 15),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildButton(
+                        _futureImageExists
+                            ? LanguageManager.instance.translate(
+                                'regenerate_future',
+                              )
+                            : LanguageManager.instance.translate(
+                                'generate_future',
+                              ),
+                        icon: Icons.auto_awesome,
+                        onTap: (_isGeneratingFuture || _showingStatistics)
+                            ? null
+                            : _generateFutureImage,
+                      ),
+                    ),
+                  ],
+                ),
+                if (_isGeneratingFuture)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: LinearProgressIndicator(
+                      backgroundColor: Colors.white10,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.cyanAccent,
+                      ),
+                    ),
+                  ),
+              ],
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -523,78 +681,95 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     return ValueListenableBuilder<double>(
       valueListenable: TimeManager.instance.timeNotifier,
       builder: (context, timeValue, child) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          margin: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _timeLabel(
-                    LanguageManager.instance.translate('past').toUpperCase(),
-                    timeValue == 0,
-                    0,
-                  ),
-                  _timeLabel(
-                    LanguageManager.instance.translate('present').toUpperCase(),
-                    timeValue == 1,
-                    1,
-                  ),
-                  _timeLabel(
-                    LanguageManager.instance.translate('future').toUpperCase(),
-                    timeValue == 2,
-                    2,
-                  ),
-                ],
+        return AbsorbPointer(
+          absorbing: _showingStatistics,
+          child: Opacity(
+            opacity: _showingStatistics ? 0.5 : 1.0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 10.0,
               ),
-              const SizedBox(height: 2),
-              SliderTheme(
-                data: SliderTheme.of(context).copyWith(
-                  activeTrackColor: Colors.cyanAccent,
-                  inactiveTrackColor: Colors.white.withValues(alpha: 0.2),
-                  trackHeight: 4.0,
-                  thumbColor: Colors.white,
-                  thumbShape: const RoundSliderThumbShape(
-                    enabledThumbRadius: 10.0,
-                  ),
-                  overlayColor: Colors.cyanAccent.withValues(alpha: 0.3),
-                  overlayShape: const RoundSliderOverlayShape(
-                    overlayRadius: 20.0,
-                  ),
-                  tickMarkShape: const RoundSliderTickMarkShape(),
-                  activeTickMarkColor: Colors.cyanAccent,
-                  inactiveTickMarkColor: Colors.white.withValues(alpha: 0.3),
-                ),
-                child: Container(
-                  height: 35,
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.cyanAccent.withValues(alpha: 0.3),
-                        blurRadius: 15,
-                        spreadRadius: 1,
+              margin: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _timeLabel(
+                        LanguageManager.instance
+                            .translate('past')
+                            .toUpperCase(),
+                        timeValue == 0,
+                        0,
+                      ),
+                      _timeLabel(
+                        LanguageManager.instance
+                            .translate('present')
+                            .toUpperCase(),
+                        timeValue == 1,
+                        1,
+                      ),
+                      _timeLabel(
+                        LanguageManager.instance
+                            .translate('future')
+                            .toUpperCase(),
+                        timeValue == 2,
+                        2,
                       ),
                     ],
                   ),
-                  child: Slider(
-                    value: timeValue,
-                    min: 0,
-                    max: 2,
-                    divisions: 2,
-                    onChanged: (value) {
-                      TimeManager.instance.setTime(value);
-                    },
+                  const SizedBox(height: 2),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: Colors.cyanAccent,
+                      inactiveTrackColor: Colors.white.withValues(alpha: 0.2),
+                      trackHeight: 4.0,
+                      thumbColor: Colors.white,
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 10.0,
+                      ),
+                      overlayColor: Colors.cyanAccent.withValues(alpha: 0.3),
+                      overlayShape: const RoundSliderOverlayShape(
+                        overlayRadius: 20.0,
+                      ),
+                      tickMarkShape: const RoundSliderTickMarkShape(),
+                      activeTickMarkColor: Colors.cyanAccent,
+                      inactiveTickMarkColor: Colors.white.withValues(
+                        alpha: 0.3,
+                      ),
+                    ),
+                    child: Container(
+                      height: 35,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.cyanAccent.withValues(alpha: 0.3),
+                            blurRadius: 15,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: Slider(
+                        value: timeValue,
+                        min: 0,
+                        max: 2,
+                        divisions: 2,
+                        onChanged: (value) {
+                          TimeManager.instance.setTime(value);
+                        },
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },

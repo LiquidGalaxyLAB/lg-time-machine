@@ -52,8 +52,19 @@ class LGService extends ChangeNotifier {
       notifyListeners();
       debugPrint('LGService: Conexión establecida con éxito');
 
-      await execute('mkdir -p /var/www/html/logos');
-      await execute('mkdir -p /var/www/html/kml');
+      // Limpiar y asegurar directorios con permisos totales
+      await execute('echo $_password | sudo -S mkdir -p /var/www/html/logos');
+      await execute(
+        'echo $_password | sudo -S chmod -R 777 /var/www/html/logos',
+      );
+      await execute(
+        'echo $_password | sudo -S rm -f /var/www/html/logos/statistics.png',
+      ); // Eliminar basura previa
+      await execute('echo $_password | sudo -S mkdir -p /var/www/html/kml');
+      await execute('echo $_password | sudo -S chmod -R 777 /var/www/html/kml');
+
+      // Configurar refrescos automáticos en todas las pantallas
+      await setRefresh();
 
       return true;
     } catch (e) {
@@ -144,6 +155,14 @@ class LGService extends ChangeNotifier {
     );
   }
 
+  Future<void> sendSlaveKML(int slaveNo, String kml) async {
+    await execute('echo $_password | sudo -S mkdir -p /var/www/html/kml');
+    await execute('echo $_password | sudo -S chmod -R 777 /var/www/html/kml');
+    await execute(
+      "cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.kml\n$kml\nEOF",
+    );
+  }
+
   Future<void> uploadAssets() async {
     if (!_isConnected || _client == null || _password == null) return;
 
@@ -185,13 +204,74 @@ class LGService extends ChangeNotifier {
     }
   }
 
+  Future<String?> uploadPOIImage(String assetPath) async {
+    if (!_isConnected || _client == null || _password == null) return null;
+
+    try {
+      final byteData = await rootBundle.load(assetPath);
+      final bytes = byteData.buffer.asUint8List();
+
+      // Detectamos la extensión real del archivo (jpg o png)
+      final extension = assetPath.split('.').last.toLowerCase();
+      final fileName = 'statistics.$extension';
+      final remotePath = '/var/www/html/logos/$fileName';
+
+      // Eliminamos versiones anteriores para evitar conflictos de extensión
+      await execute(
+        'echo $_password | sudo -S rm -f /var/www/html/logos/statistics.jpg',
+      );
+      await execute(
+        'echo $_password | sudo -S rm -f /var/www/html/logos/statistics.png',
+      );
+
+      final sftp = await _client!.sftp();
+      final file = await sftp.open(
+        remotePath,
+        mode:
+            SftpFileOpenMode.create |
+            SftpFileOpenMode.write |
+            SftpFileOpenMode.truncate,
+      );
+      await file.write(Stream.value(bytes));
+      await file.close();
+
+      debugPrint('LGService: cargado POI image en $remotePath');
+      return fileName;
+    } catch (e) {
+      debugPrint('LGService: Error subiendo POI image: $e');
+      return null;
+    }
+  }
+
+  Future<void> sendStatisticsKML(String kml) async {
+    await execute("cat <<'EOF' > /var/www/html/kmls.kml\n$kml\nEOF");
+    await _setKmlTxt();
+  }
+
+  Future<void> clearStatistics() async {
+    final blank = '''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document></Document>
+</kml>''';
+    // 1. Limpiamos el canal global (Master)
+    await sendStatisticsKML(blank);
+    // 2. Limpiamos todos los canales individuales (1 al 5)
+    for (var i = 1; i <= 5; i++) {
+      await sendSlaveKML(i, blank);
+    }
+  }
+
   Future<void> _setKmlTxt() async {
-    final kmlContent = "echo 'http://lg1:81/kmls.kml' > /var/www/html/kmls.txt";
+    final version = DateTime.now().millisecondsSinceEpoch;
+    final kmlContent =
+        "echo 'http://lg1:81/kmls.kml?v=$version' > /var/www/html/kmls.txt";
     await execute(kmlContent);
   }
 
   Future<void> _setTimeKmlTxt() async {
-    final kmlContent = "echo 'http://lg1:81/time.kml' > /var/www/html/kmls.txt";
+    final version = DateTime.now().millisecondsSinceEpoch;
+    final kmlContent =
+        "echo 'http://lg1:81/time.kml?v=$version' > /var/www/html/kmls.txt";
     await execute(kmlContent);
   }
 
@@ -329,6 +409,12 @@ class LGService extends ChangeNotifier {
 
   Future<void> clearKML() async {
     await execute("echo '' > /var/www/html/kmls.kml");
+    await _setKmlTxt();
+  }
+
+  Future<void> clearTime() async {
+    await execute("echo '' > /var/www/html/time.kml");
+    await _setTimeKmlTxt();
   }
 
   Future<void> clearLogos() async {
@@ -347,6 +433,9 @@ class LGService extends ChangeNotifier {
 
   Future<void> relaunch() async {
     if (_password == null || _username == null) return;
+
+    // 1. Aseguramos que los links estén configurados antes de reiniciar
+    await setRefresh();
 
     for (var i = _screens; i >= 1; i--) {
       final relaunchCommand =
@@ -393,48 +482,59 @@ fi
   Future<void> setRefresh() async {
     if (_password == null) return;
     try {
-      const search =
-          '<href>##LG_PHPIFACE##kml\\\\/slave_{{slave}}.kml<\\\\/href>';
-      const replace =
-          '<href>##LG_PHPIFACE##kml\\\\/slave_{{slave}}.kml<\\\\/href><refreshMode>onInterval<\\\\/refreshMode><refreshInterval>2<\\\\/refreshInterval>';
+      for (var i = 1; i <= _screens; i++) {
+        // Rutas directas para asegurar la configuración
+        final paths = [
+          '/home/lg/earth/kml/myplaces.kml',
+          '/home/lg/earth/kml/slave/myplaces.kml',
+          '/home/lg/.googleearth/instance-1/myplaces.kml',
+        ];
 
-      for (var i = 2; i <= _screens; i++) {
-        final clearCmd =
-            'echo $_password | sudo -S sed -i "s/$replace/$search/" ~/earth/kml/slave/myplaces.kml'
-                .replaceAll('{{slave}}', i.toString());
-        final cmd =
-            'echo $_password | sudo -S sed -i "s/$search/$replace/" ~/earth/kml/slave/myplaces.kml'
-                .replaceAll('{{slave}}', i.toString());
+        final host = i == 1 ? 'localhost' : 'lg1';
+        final globalUrl = 'http://$host:81/kmls.txt';
+        final slaveUrl = 'http://$host:81/kml/slave_$i.kml';
 
-        String queryClear = 'sshpass -p $_password ssh -t lg$i \'$clearCmd\'';
-        String querySet = 'sshpass -p $_password ssh -t lg$i \'$cmd\'';
+        for (var path in paths) {
+          String script =
+              """
+            if [ -f $path ]; then
+              # Eliminar entradas previas para evitar duplicidad o basura
+              sed -i '/slave_$i.kml/d' $path
+              sed -i '/kmls.txt/d' $path
+              # Insertar nuevos NetworkLinks antes del cierre del Documento
+              sed -i '/<\\/Document>/i <NetworkLink><name>global_$i</name><Link><href>$globalUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' $path
+              sed -i '/<\\/Document>/i <NetworkLink><name>slave_$i</name><Link><href>$slaveUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' $path
+            fi
+          """;
 
-        await execute(queryClear);
-        await execute(querySet);
+          String execCmd = "echo '$_password' | sudo -S bash -c \"$script\"";
+          if (i == 1) {
+            await execute(execCmd);
+          } else {
+            await execute('sshpass -p $_password ssh -t lg$i "$execCmd"');
+          }
+        }
       }
+      debugPrint('LGService: Refresco configurado e inyectado correctamente.');
     } catch (e) {
-      print(e);
+      debugPrint('LGService: Error crítico en setRefresh: $e');
     }
   }
 
   Future<void> resetRefresh() async {
     if (_password == null) return;
     try {
-      const search =
-          '<href>##LG_PHPIFACE##kml\\\\/slave_{{slave}}.kml<\\\\/href><refreshMode>onInterval<\\\\/refreshMode><refreshInterval>2<\\\\/refreshInterval>';
-      const replace =
-          '<href>##LG_PHPIFACE##kml\\\\/slave_{{slave}}.kml<\\\\/href>';
-
-      for (var i = 2; i <= _screens; i++) {
+      for (var i = 1; i <= _screens; i++) {
+        String path = i == 1
+            ? '~/earth/kml/myplaces.kml'
+            : '~/earth/kml/slave/myplaces.kml';
+        // Eliminamos las etiquetas de refresco
         final cmd =
-            'echo $_password | sudo -S sed -i "s/$search/$replace/" ~/earth/kml/slave/myplaces.kml'
-                .replaceAll('{{slave}}', i.toString());
-        String query = 'sshpass -p $_password ssh -t lg$i \'$cmd\'';
-
-        await execute(query);
+            "echo '$_password' | sudo -S sed -i 's@<refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval>@@g' $path";
+        await execute('sshpass -p $_password ssh -t lg$i "$cmd"');
       }
     } catch (e) {
-      print(e);
+      debugPrint('LGService: Error al resetear refresco: $e');
     }
   }
 }
