@@ -5,7 +5,8 @@ import '../services/time_manager.dart';
 import '../services/lg_service.dart';
 import '../kmls/logo_kml.dart';
 import '../kmls/look_at_kml.dart';
-import '../kmls/statistics_kml.dart';
+import '../kmls/statistics_overlay_kml.dart';
+import '../kmls/comparison_overlay_kml.dart';
 
 class POIDetailScreen extends StatefulWidget {
   final POI poi;
@@ -25,6 +26,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
   bool _isGeneratingFuture = false;
   bool _futureImageExists = false;
   bool _showingStatistics = false;
+  bool _isLoadingStatistics = false;
+  bool _showingComparison = false;
+  bool _isLoadingComparison = false;
 
   @override
   void initState() {
@@ -39,6 +43,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     }
     if (_showingStatistics) {
       LGService.instance.clearStatistics();
+    }
+    if (_showingComparison) {
+      LGService.instance.clearComparison();
     }
     super.dispose();
   }
@@ -367,18 +374,135 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                   if (!isPresent) ...[
                     Expanded(
                       child: _buildButton(
-                        'COMPARE WITH PRESENT',
-                        onTap: _showingStatistics
+                        _showingComparison
+                            ? 'HIDE COMPARISON'
+                            : 'COMPARE WITH PRESENT',
+                        color: _showingComparison ? Colors.red : Colors.blue,
+                        isLoading: _isLoadingComparison,
+                        onTap:
+                            (!isConnected ||
+                                _isLoadingComparison ||
+                                _showingStatistics)
                             ? null
-                            : () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Comparing current view with Present...',
-                                    ),
-                                    backgroundColor: Colors.blueAccent,
-                                  ),
-                                );
+                            : () async {
+                                setState(() {
+                                  _isLoadingComparison = true;
+                                });
+
+                                if (_showingComparison) {
+                                  await LGService.instance.clearComparison();
+                                  await LGService.instance.sendLogoKML(
+                                    LogoKML.generate(),
+                                  );
+                                  if (mounted) {
+                                    setState(() {
+                                      _showingComparison = false;
+                                      _isLoadingComparison = false;
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Comparison hidden'),
+                                        backgroundColor: Colors.blueAccent,
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  final pastPath =
+                                      widget.poi.pastImages.isNotEmpty
+                                      ? widget.poi.pastImages.first
+                                      : null;
+                                  final presentPath =
+                                      widget.poi.presentImages.isNotEmpty
+                                      ? widget.poi.presentImages.first
+                                      : null;
+
+                                  if (pastPath != null && presentPath != null) {
+                                    final pastName = await LGService.instance
+                                        .uploadPOIImage(
+                                          pastPath,
+                                          customName: 'comparison_past',
+                                        );
+                                    final presentName = await LGService.instance
+                                        .uploadPOIImage(
+                                          presentPath,
+                                          customName: 'comparison_present',
+                                        );
+
+                                    if (pastName != null &&
+                                        presentName != null) {
+                                      final pastUrl =
+                                          'http://lg1:81/logos/$pastName';
+                                      final presentUrl =
+                                          'http://lg1:81/logos/$presentName';
+
+                                      await LGService.instance
+                                          .clearComparison();
+                                      await LGService.instance
+                                          .createComparisonHTML(
+                                            pastUrl,
+                                            presentUrl,
+                                          );
+
+                                      final balloonKml =
+                                          ComparisonOverlayKML.generate(
+                                            poi: widget.poi,
+                                          );
+                                      await LGService.instance.sendSlaveKML(
+                                        3,
+                                        balloonKml,
+                                      );
+
+                                      // Orden: lg4, lg5 (PAST) | lg1, lg2 (PRESENT)
+                                      // lg4: Left half of Past
+                                      await LGService.instance.openBrowser(
+                                        4,
+                                        'http://lg1:81/comparison.html?mode=past&side=left',
+                                      );
+                                      // lg5: Right half of Past
+                                      await LGService.instance.openBrowser(
+                                        5,
+                                        'http://lg1:81/comparison.html?mode=past&side=right',
+                                      );
+                                      // lg1: Left half of Present
+                                      await LGService.instance.openBrowser(
+                                        1,
+                                        'http://lg1:81/comparison.html?mode=present&side=left',
+                                      );
+                                      // lg2: Right half of Present
+                                      await LGService.instance.openBrowser(
+                                        2,
+                                        'http://lg1:81/comparison.html?mode=present&side=right',
+                                      );
+
+                                      if (mounted) {
+                                        setState(() {
+                                          _showingComparison = true;
+                                          _isLoadingComparison = false;
+                                        });
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Comparison loaded successfully!',
+                                            ),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                      }
+                                    } else {
+                                      if (mounted)
+                                        setState(
+                                          () => _isLoadingComparison = false,
+                                        );
+                                    }
+                                  } else {
+                                    if (mounted)
+                                      setState(
+                                        () => _isLoadingComparison = false,
+                                      );
+                                  }
+                                }
                               },
                       ),
                     ),
@@ -470,14 +594,29 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                           ? 'HIDE STATISTICS'
                           : 'SHOW STATISTICS',
                       color: _showingStatistics ? Colors.orange : Colors.blue,
-                      onTap: (!isConnected || isFuture)
+                      isLoading: _isLoadingStatistics,
+                      onTap:
+                          (!isConnected ||
+                              isFuture ||
+                              _isLoadingStatistics ||
+                              _showingComparison)
                           ? null
                           : () async {
+                              setState(() {
+                                _isLoadingStatistics = true;
+                              });
+
                               if (_showingStatistics) {
                                 await LGService.instance.clearStatistics();
-                                setState(() {
-                                  _showingStatistics = false;
-                                });
+                                await LGService.instance.sendLogoKML(
+                                  LogoKML.generate(),
+                                );
+                                if (mounted) {
+                                  setState(() {
+                                    _showingStatistics = false;
+                                    _isLoadingStatistics = false;
+                                  });
+                                }
                               } else {
                                 String? assetPath;
                                 if (isPast) {
@@ -500,73 +639,86 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                                     final int totalScreens =
                                         LGService.instance.screens;
 
-                                    // 1. Limpiamos KMLs previos
+                                    // 1. Limpiamos KMLs y navegadores previos
                                     await LGService.instance.clearStatistics();
 
-                                    // 2. Enviamos KMLs de ScreenOverlay a cada pantalla
-                                    // La imagen es panorámica (~2.9 de ancho relativo).
-                                    // Queremos centrarla en las 3 pantallas centrales.
+                                    // 2. Creamos los HTMLs para el fondo (LG4, LG1, LG2)
+                                    await LGService.instance
+                                        .createStatisticsHTML(imageUrl);
 
-                                    if (totalScreens >= 3) {
-                                      // Cálculos para imagen panorámica (sizeX = 2.9)
-                                      // Queremos que la imagen cubra 3 pantallas.
+                                    final String statsText = isPast
+                                        ? widget.poi.statisticsTextPast
+                                        : widget.poi.statisticsTextPresent;
 
-                                      // Screen 1 (Centro - Master): Usamos el canal individual slave_1 para evitar duplicidad en los esclavos.
-                                      // IMPORTANTE: Requiere hacer un RELAUNCH desde la App tras el primer "Connect" para que LG1 cargue el NetworkLink.
-                                      final centerKml = StatisticsKML.generate(
-                                        imageUrl: imageUrl,
-                                        screenX: 0.5,
-                                        overlayX: 0.5,
+                                    // 3. Generamos y enviamos el KML de la burbuja nativa a LG3 (Slave 3)
+                                    final String balloonKml =
+                                        StatisticsOverlayKML.generate(
+                                          poi: widget.poi,
+                                          imageUrl: imageUrl,
+                                          statisticsText: statsText,
+                                        );
+                                    await LGService.instance.sendSlaveKML(
+                                      3,
+                                      balloonKml,
+                                    );
+
+                                    // 4. Abrimos los navegadores para los fondos panorámicos
+                                    if (totalScreens == 5) {
+                                      // LG5 (Izquierda)
+                                      await LGService.instance.openBrowser(
+                                        5,
+                                        'http://lg1:81/statistics.html?screen=left',
                                       );
-                                      await LGService.instance.sendSlaveKML(
+
+                                      // LG1 (Centro)
+                                      await LGService.instance.openBrowser(
                                         1,
-                                        centerKml,
+                                        'http://lg1:81/statistics.html?screen=center',
                                       );
 
-                                      // Screen Izquierda (Slave 3 o 5): Muestra la parte izquierda
-                                      // El borde derecho de esta pantalla debe coincidir con el borde izquierdo de la central
-                                      // Borde izquierdo de central es image_x = 0.5 - (0.5 / 2.9) = 0.3275
-                                      int leftSlave = totalScreens >= 5 ? 5 : 3;
-                                      final leftKml = StatisticsKML.generate(
-                                        imageUrl: imageUrl,
-                                        screenX: 1.0,
-                                        overlayX: 0.3275,
+                                      // LG2 (Derecha)
+                                      await LGService.instance.openBrowser(
+                                        2,
+                                        'http://lg1:81/statistics.html?screen=right',
                                       );
-                                      await LGService.instance.sendSlaveKML(
-                                        leftSlave,
-                                        leftKml,
+                                    } else if (totalScreens == 3) {
+                                      // LG1 (Centro)
+                                      await LGService.instance.openBrowser(
+                                        1,
+                                        'http://lg1:81/statistics.html?screen=center',
                                       );
 
-                                      // Screen Derecha (Slave 2): Muestra la parte derecha
-                                      // El borde izquierdo de esta pantalla debe coincidir con el borde derecho de la central
-                                      // Borde derecho de central es image_x = 0.5 + (0.5 / 2.9) = 0.6724
-                                      int rightSlave = 2;
-                                      final rightKml = StatisticsKML.generate(
-                                        imageUrl: imageUrl,
-                                        screenX: 0.0,
-                                        overlayX: 0.6724,
+                                      // LG2 (Derecha - con logo)
+                                      await LGService.instance.openBrowser(
+                                        2,
+                                        'http://lg1:81/statistics.html?screen=right',
                                       );
-                                      await LGService.instance.sendSlaveKML(
-                                        rightSlave,
-                                        rightKml,
-                                      );
+                                      // LG3 tiene el globo de estadísticas (KML)
                                     } else {
-                                      // Solo una pantalla o configuración básica
-                                      final singleKml = StatisticsKML.generate(
-                                        imageUrl: imageUrl,
-                                        screenX: 0.5,
-                                        overlayX: 0.5,
-                                        sizeX:
-                                            1.0, // Ajustamos el tamaño para una sola pantalla
-                                      );
-                                      await LGService.instance.sendSlaveKML(
+                                      // Solo una pantalla
+                                      await LGService.instance.openBrowser(
                                         1,
-                                        singleKml,
+                                        'http://lg1:81/statistics.html?screen=center',
                                       );
                                     }
 
+                                    if (mounted) {
+                                      setState(() {
+                                        _showingStatistics = true;
+                                        _isLoadingStatistics = false;
+                                      });
+                                    }
+                                  } else {
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLoadingStatistics = false;
+                                      });
+                                    }
+                                  }
+                                } else {
+                                  if (mounted) {
                                     setState(() {
-                                      _showingStatistics = true;
+                                      _isLoadingStatistics = false;
                                     });
                                   }
                                 }
@@ -620,8 +772,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     IconData? icon,
     VoidCallback? onTap,
     Color? color,
+    bool isLoading = false,
   }) {
-    final bool isDisabled = onTap == null;
+    final bool isDisabled = onTap == null && !isLoading;
     final baseColor = color ?? Colors.blue;
     return GestureDetector(
       onTap: onTap,
@@ -651,13 +804,23 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (icon != null) ...[
+              if (isLoading) ...[
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ] else if (icon != null) ...[
                 Icon(icon, color: Colors.white, size: 16),
                 const SizedBox(width: 4),
               ],
               Flexible(
                 child: Text(
-                  label,
+                  isLoading ? 'LOADING...' : label,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 10,
@@ -682,9 +845,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
       valueListenable: TimeManager.instance.timeNotifier,
       builder: (context, timeValue, child) {
         return AbsorbPointer(
-          absorbing: _showingStatistics,
+          absorbing: _showingStatistics || _showingComparison,
           child: Opacity(
-            opacity: _showingStatistics ? 0.5 : 1.0,
+            opacity: (_showingStatistics || _showingComparison) ? 0.5 : 1.0,
             child: Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 20.0,

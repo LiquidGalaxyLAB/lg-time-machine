@@ -50,13 +50,13 @@ class POIService {
             );
 
             if (csvRow.isNotEmpty) {
-              final String folderName = backendName.trim();
+              final String fileNameBase = backendName.trim();
 
-              // Definimos las rutas para ambas imágenes
+              // Definimos las rutas para ambas imágenes siguiendo el nuevo patrón plano
               final String presentImagePath =
-                  'assets/images/PointsOfInterest/$folderName/PresentImage.jpg';
+                  'assets/images/PointsOfInterest/${fileNameBase}_Present.jpg';
               final String pastImagePath =
-                  'assets/images/PointsOfInterest/$folderName/PastImage.jpg';
+                  'assets/images/PointsOfInterest/${fileNameBase}_Past.jpg';
 
               final List<String> presentImages = [presentImagePath];
               final List<String> pastImages = [pastImagePath];
@@ -102,7 +102,15 @@ class POIService {
                     : 'relativeToGround',
               };
 
-              final metadata = {'country': country, 'description': description};
+              final metadata = {
+                'country': country,
+                'description': description,
+                'statistics_text_present':
+                    poiData['statistics_text_present'] ?? '',
+                'statistics_text_past': poiData['statistics_text_past'] ?? '',
+                'past_comparison_summary':
+                    poiData['past_comparison_summary'] ?? '',
+              };
 
               // Ahora pasamos listas diferentes para pasado y presente
               pois.add(

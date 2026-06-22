@@ -77,12 +77,7 @@ flutter:
     - lib/services/PointsOfInterestCords.csv
     - assets/images/Timeline/
     - assets/images/KMLs/Logo/
-    - assets/images/PointsOfInterest/Sagrada_Familia/PresentImage.jpg
-    - assets/images/PointsOfInterest/Sagrada_Familia/PastImage.jpg
-    - assets/images/PointsOfInterest/Plaza_Mayor_de_Salamanca/PresentImage.jpg
-    - assets/images/PointsOfInterest/Plaza_Mayor_de_Salamanca/PastImage.jpg
-    - assets/images/PointsOfInterest/Cathedral_of_Santiago_de_Compostela/PresentImage.jpg
-    - assets/images/PointsOfInterest/Cathedral_of_Santiago_de_Compostela/PastImage.jpg
+    - assets/images/PointsOfInterest/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

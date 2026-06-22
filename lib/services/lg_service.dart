@@ -13,6 +13,7 @@ class LGService extends ChangeNotifier {
   bool get isConnected => _isConnected;
   int get screens => _screens;
   String? _host;
+  String? get host => _host;
   int? _port;
 
   String? _password;
@@ -143,11 +144,7 @@ class LGService extends ChangeNotifier {
     await _setTimeKmlTxt();
   }
 
-  Future<void> sendLogoKML(String kml) async {
-    // En tu configuración de 5 pantallas, slave_4 es la de la izquierda del todo.
-    // En uno de 3 pantallas, es slave_2.
-    int slaveNo = _screens == 5 ? 4 : 2;
-
+  Future<void> sendSlaveKML(int slaveNo, String kml) async {
     await execute('echo $_password | sudo -S mkdir -p /var/www/html/kml');
     await execute('echo $_password | sudo -S chmod -R 777 /var/www/html/kml');
     await execute(
@@ -155,12 +152,11 @@ class LGService extends ChangeNotifier {
     );
   }
 
-  Future<void> sendSlaveKML(int slaveNo, String kml) async {
-    await execute('echo $_password | sudo -S mkdir -p /var/www/html/kml');
-    await execute('echo $_password | sudo -S chmod -R 777 /var/www/html/kml');
-    await execute(
-      "cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.kml\n$kml\nEOF",
-    );
+  Future<void> sendLogoKML(String kml) async {
+    // En tu configuración de 5 pantallas, LG4 es el objetivo (slave_4).
+    // En uno de 3 pantallas, LG2 es el objetivo (slave_2).
+    int slaveNo = _screens == 5 ? 4 : 2;
+    await sendSlaveKML(slaveNo, kml);
   }
 
   Future<void> uploadAssets() async {
@@ -204,7 +200,7 @@ class LGService extends ChangeNotifier {
     }
   }
 
-  Future<String?> uploadPOIImage(String assetPath) async {
+  Future<String?> uploadPOIImage(String assetPath, {String? customName}) async {
     if (!_isConnected || _client == null || _password == null) return null;
 
     try {
@@ -213,16 +209,27 @@ class LGService extends ChangeNotifier {
 
       // Detectamos la extensión real del archivo (jpg o png)
       final extension = assetPath.split('.').last.toLowerCase();
-      final fileName = 'statistics.$extension';
+      final fileName = customName != null
+          ? '$customName.$extension'
+          : 'statistics.$extension';
       final remotePath = '/var/www/html/logos/$fileName';
 
-      // Eliminamos versiones anteriores para evitar conflictos de extensión
-      await execute(
-        'echo $_password | sudo -S rm -f /var/www/html/logos/statistics.jpg',
-      );
-      await execute(
-        'echo $_password | sudo -S rm -f /var/www/html/logos/statistics.png',
-      );
+      // Eliminamos versiones anteriores del mismo nombre para evitar conflictos de extensión
+      if (customName == null) {
+        await execute(
+          'echo $_password | sudo -S rm -f /var/www/html/logos/statistics.jpg',
+        );
+        await execute(
+          'echo $_password | sudo -S rm -f /var/www/html/logos/statistics.png',
+        );
+      } else {
+        await execute(
+          'echo $_password | sudo -S rm -f /var/www/html/logos/$customName.jpg',
+        );
+        await execute(
+          'echo $_password | sudo -S rm -f /var/www/html/logos/$customName.png',
+        );
+      }
 
       final sftp = await _client!.sftp();
       final file = await sftp.open(
@@ -235,7 +242,7 @@ class LGService extends ChangeNotifier {
       await file.write(Stream.value(bytes));
       await file.close();
 
-      debugPrint('LGService: cargado POI image en $remotePath');
+      debugPrint('LGService: cargado POI image $fileName en $remotePath');
       return fileName;
     } catch (e) {
       debugPrint('LGService: Error subiendo POI image: $e');
@@ -243,22 +250,207 @@ class LGService extends ChangeNotifier {
     }
   }
 
-  Future<void> sendStatisticsKML(String kml) async {
-    await execute("cat <<'EOF' > /var/www/html/kmls.kml\n$kml\nEOF");
-    await _setKmlTxt();
+  Future<void> openBrowser(int screenNo, String url) async {
+    final user = _username ?? 'lg';
+    final chromeArgs =
+        "--no-first-run --no-default-browser-check --kiosk --incognito "
+        "--disable-infobars --disable-session-crashed-bubble "
+        "--user-data-dir=/tmp/chrome$screenNo --no-sandbox --disable-gpu "
+        "--test-type --disable-features=Translate --no-errdialogs";
+
+    final command =
+        "export DISPLAY=:0; "
+        "export XAUTHORITY=/home/$user/.Xauthority; "
+        "(google-chrome $chromeArgs '$url' || "
+        "google-chrome-stable $chromeArgs '$url' || "
+        "chromium-browser $chromeArgs '$url' || "
+        "chromium $chromeArgs '$url') "
+        "> /dev/null 2>&1 &";
+
+    debugPrint('LGService: Opening browser on screen $screenNo with URL: $url');
+    if (screenNo == 1) {
+      await execute(command);
+    } else {
+      await execute(
+        "sshpass -p '$_password' ssh -n -o StrictHostKeyChecking=no $user@lg$screenNo \"$command\"",
+      );
+    }
+  }
+
+  Future<void> stopBrowser(int screenNo) async {
+    final user = _username ?? 'lg';
+    final command = "pkill -f /tmp/chrome$screenNo || true";
+    debugPrint('LGService: Stopping browser on screen $screenNo');
+    if (screenNo == 1) {
+      await execute(command);
+    } else {
+      await execute(
+        "sshpass -p '$_password' ssh -n -o StrictHostKeyChecking=no $user@lg$screenNo \"$command\"",
+      );
+    }
+  }
+
+  Future<void> createStatisticsHTML(String imageUrl) async {
+    final bool isThreeScreen = _screens == 3;
+    final htmlContent =
+        '''
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: black;
+    width: 100vw;
+    height: 100vh;
+  }
+  .container {
+    width: 300vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  img.bg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .logo-overlay {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 250px;
+    height: auto;
+    z-index: 1000;
+    display: ${isThreeScreen ? 'block' : 'none'};
+  }
+</style>
+</head>
+<body>
+  <div class="container" id="container">
+    <img class="bg" src="$imageUrl">
+  </div>
+  
+  <img src="http://lg1:81/logos/Logos.png" class="logo-overlay">
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const screen = urlParams.get('screen');
+    const container = document.getElementById('container');
+
+    if (screen === 'left') {
+      container.style.left = '0vw';
+    }
+    if (screen === 'center') {
+      container.style.left = '-100vw';
+    }
+    if (screen === 'right') {
+      container.style.left = '-200vw';
+    }
+  </script>
+</body>
+</html>
+''';
+    await execute(
+      "cat <<'EOF' > /var/www/html/statistics.html\n$htmlContent\nEOF",
+    );
+  }
+
+  Future<void> createComparisonHTML(String pastUrl, String presentUrl) async {
+    final htmlContent =
+        '''
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: black;
+    width: 100vw;
+    height: 100vh;
+  }
+  .container {
+    width: 200vw;
+    height: 100vh;
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  img {
+    width: 200vw;
+    height: 100vh;
+    object-fit: cover;
+  }
+</style>
+</head>
+<body>
+  <div class="container" id="container">
+    <img id="main-img" src="">
+  </div>
+  
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const side = urlParams.get('side'); // 'left' or 'right'
+    const mode = urlParams.get('mode'); // 'past' or 'present'
+    
+    const img = document.getElementById('main-img');
+    const container = document.getElementById('container');
+
+    if (mode === 'past') {
+      img.src = '$pastUrl';
+    } else {
+      img.src = '$presentUrl';
+    }
+
+    if (side === 'right') {
+      container.style.left = '-100vw';
+    } else {
+      container.style.left = '0vw';
+    }
+  </script>
+</body>
+</html>
+''';
+    await execute(
+      "cat <<'EOF' > /var/www/html/comparison.html\n$htmlContent\nEOF",
+    );
   }
 
   Future<void> clearStatistics() async {
-    final blank = '''<?xml version="1.0" encoding="UTF-8"?>
+    await stopBrowser(1);
+    await stopBrowser(2);
+    if (_screens == 5) {
+      await stopBrowser(4);
+      await stopBrowser(5);
+    }
+    await clearSlaveKML(3);
+  }
+
+  Future<void> clearComparison() async {
+    await stopBrowser(1);
+    await stopBrowser(2);
+    await stopBrowser(4);
+    await stopBrowser(5);
+    await clearSlaveKML(3);
+  }
+
+  Future<void> clearSlaveKML(int slaveNo) async {
+    String blank = '''<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document></Document>
 </kml>''';
-    // 1. Limpiamos el canal global (Master)
-    await sendStatisticsKML(blank);
-    // 2. Limpiamos todos los canales individuales (1 al 5)
-    for (var i = 1; i <= 5; i++) {
-      await sendSlaveKML(i, blank);
-    }
+    await execute(
+      "cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.kml\n$blank\nEOF",
+    );
   }
 
   Future<void> _setKmlTxt() async {
@@ -423,8 +615,8 @@ class LGService extends ChangeNotifier {
   <Document></Document>
 </kml>''';
     await execute("mkdir -p /var/www/html/kml");
-    // Limpiamos desde slave_2 hasta slave_{screens}
-    for (var i = 2; i <= _screens; i++) {
+    // Limpiamos todos los esclavos posibles para asegurar que no queden logos residuales
+    for (var i = 1; i <= _screens; i++) {
       await execute(
         "cat <<'EOF' > /var/www/html/kml/slave_$i.kml\n$blank\nEOF",
       );
@@ -433,8 +625,8 @@ class LGService extends ChangeNotifier {
 
   Future<void> relaunch() async {
     if (_password == null || _username == null) return;
+    final user = _username!;
 
-    // 1. Aseguramos que los links estén configurados antes de reiniciar
     await setRefresh();
 
     for (var i = _screens; i >= 1; i--) {
@@ -452,29 +644,35 @@ if  [[ \\\$(service \\\$SERVICE status) =~ 'stop' ]]; then
 else
   echo $_password | sudo -S service \\\${SERVICE} restart
 fi
-" && sshpass -p $_password ssh -x -t lg@lg$i "\$RELAUNCH_CMD\"""";
+" && sshpass -p $_password ssh -x -t $user@lg$i "\$RELAUNCH_CMD\"""";
 
-      await execute(
-        '"/home/$_username/bin/lg-relaunch" > /home/$_username/log.txt',
-      );
+      if (i == 1) {
+        await execute('"/home/$user/bin/lg-relaunch" > /home/$user/log.txt');
+      } else {
+        await execute(
+          'sshpass -p $_password ssh -t lg$i "\"/home/$user/bin/lg-relaunch\" > /home/$user/log.txt"',
+        );
+      }
       await execute(relaunchCommand);
     }
   }
 
   Future<void> shutdown() async {
     if (_password == null) return;
+    final user = _username ?? 'lg';
     for (var i = _screens; i >= 1; i--) {
       await execute(
-        'sshpass -p $_password ssh -t lg$i "echo $_password | sudo -S poweroff"',
+        'sshpass -p $_password ssh -t $user@lg$i "echo $_password | sudo -S poweroff"',
       );
     }
   }
 
   Future<void> reboot() async {
     if (_password == null) return;
+    final user = _username ?? 'lg';
     for (var i = _screens; i >= 1; i--) {
       await execute(
-        'sshpass -p $_password ssh -t lg$i "echo $_password | sudo -S reboot"',
+        'sshpass -p $_password ssh -t $user@lg$i "echo $_password | sudo -S reboot"',
       );
     }
   }
@@ -503,7 +701,7 @@ fi
               sed -i '/kmls.txt/d' $path
               # Insertar nuevos NetworkLinks antes del cierre del Documento
               sed -i '/<\\/Document>/i <NetworkLink><name>global_$i</name><Link><href>$globalUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' $path
-              sed -i '/<\\/Document>/i <NetworkLink><name>slave_$i</name><Link><href>$slaveUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' $path
+              sed -i '/<\\/Document>/i <NetworkLink><name>slave_$i</name><Link><href>$slaveUrl</href><refreshMode>onChange</refreshMode></Link></NetworkLink>' $path
             fi
           """;
 

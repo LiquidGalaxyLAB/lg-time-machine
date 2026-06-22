@@ -12,6 +12,10 @@ class POI {
   final double range;
   final String altitudeMode;
 
+  final String statisticsTextPresent;
+  final String statisticsTextPast;
+  final String comparisonSummary;
+
   POI({
     required this.name,
     required this.country,
@@ -25,6 +29,9 @@ class POI {
     this.tilt = 0.0,
     this.range = 1000.0,
     this.altitudeMode = 'relativeToGround',
+    this.statisticsTextPresent = '',
+    this.statisticsTextPast = '',
+    this.comparisonSummary = '',
   });
 
   /// Devuelve la imagen correspondiente según el estado del tiempo (0: Past, 1: Present)
@@ -59,6 +66,9 @@ class POI {
       tilt: double.tryParse(json['tilt']?.toString() ?? '0.0') ?? 0.0,
       range: double.tryParse(json['range']?.toString() ?? '1000.0') ?? 1000.0,
       altitudeMode: json['altitudeMode'] ?? 'relativeToGround',
+      statisticsTextPresent: metadata['statistics_text_present'] ?? '',
+      statisticsTextPast: metadata['statistics_text_past'] ?? '',
+      comparisonSummary: metadata['past_comparison_summary'] ?? '',
     );
   }
 }

@@ -1,31 +1,45 @@
 {
   "United States": {
-
-  },
-  "Italy": {
-
   },
   "France": {
-
+  },
+  "Italy": {
   },
   "Spain": {
-    "Sagrada_Familia":
-    {
+    "Sagrada_Familia": {
       "name": "Sagrada Familia",
-      "description": "Catholic Basilica"
+      "description": "Catholic Basilica",
+      "statistics_text_present": "-Height: 172.5 m\n-Visitors: 8–10 million/year\n-Capacity: ~15,000 people\n-Avg. visit: 2.5 h\n-Energy: self-sufficient",
+      "statistics_text_past": "-Started: 1882\n-Architect: Antoni Gaudí\n-Style: Modernisme\n-Original budget: Humble donations\n-Status in 1900: Only Nativity facade started",
+      "past_comparison_summary": "A transition from a visionary construction site to a world-renowned architectural masterpiece."
     },
-
-    "Plaza_Mayor_de_Salamanca":
-    {
+    "Plaza_Mayor_de_Salamanca": {
       "name": "Plaza Mayor de Salamanca",
-      "description": "Plaza Square"
+      "description": "Plaza Square",
+      "statistics_text_present": "-Style: Churrigueresque Baroque\n-Surface: 6,400 m²\n-Medallions: 88 carved faces\n-Arches: 88 semicircular arches\n-Tradition: Meeting point for students",
+      "statistics_text_past": "-Built: 1729–1755\n-Architect: Alberto Churriguera\n-Original use: Bullfights until 1854\n-Material: Villamayor stone\n-Royal support: Philip V",
+      "past_comparison_summary": "Evolution from a multifunctional royal square and bullring to the social heart of university life."
     },
-
-    "Cathedral_of_Santiago_de_Compostela":
-    {
+    "Cathedral_of_Santiago_de_Compostela": {
       "name": "Cathedral of Santiago de Compostela",
-      "description": "Cathedral"
+      "description": "Cathedral",
+      "statistics_text_present": "-Pilgrims: >300,000/year\n-Main attraction: Botafumeiro\n-Style: Romanesque, Gothic, Baroque\n-Botafumeiro weight: 53 kg\n-Botafumeiro speed: 68 km/h",
+      "statistics_text_past": "-Consecrated: 1211\n-Pórtico de la Gloria: Master Mateo\n-Origin: Discovery of St. James tomb\n-Expansion: Baroque facade (18th century)\n-Defense: Fortress-like towers",
+      "past_comparison_summary": "From a medieval defensive fortress and pilgrimage site to a Baroque religious icon."
+    },
+    "Alhambra_de_Granada": {
+      "name": "Alhambra de Granada",
+      "description": "Palace and fortress complex",
+      "statistics_text_present": "-Visitors: 2.7 million/year\n-Surface: 140,000 m²\n-UNESCO Site since: 1984\n-Gardens: Generalife\n-Status: Most visited in Spain",
+      "statistics_text_past": "-Started: 1238 (Nasrid Dynasty)\n-Founder: Muhammad I\n-Style: Moorish Architecture\n-Capture: 1492 by Catholic Monarchs\n-Addition: Palace of Charles V (1527)",
+      "past_comparison_summary": "The transformation of a Nasrid royal citadel into a Spanish Renaissance monumental complex."
+    },
+    "Palacio_Real_de_Madrid": {
+      "name": "Palacio Real de Madrid",
+      "description": "Royal Palace",
+      "statistics_text_present": "-Floor area: 135,000 m²\n-Rooms: 3,418\n-Status: Largest in Europe by floor area\n-Visitors: 1.5 million/year\n-Collections: Stradivarius Palatinos",
+      "statistics_text_past": "-Built: 1738–1755\n-Site: Former Moorish Alcázar\n-Fire: Destroyed old palace in 1734\n-Architects: Juvarra & Sacchetti\n-First Royal: Charles III in 1764",
+      "past_comparison_summary": "The reconstruction after the 1734 fire, replacing the old Alcázar with Europe's largest palace."
     }
-
   }
 }
