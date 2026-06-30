@@ -77,11 +77,7 @@ class AboutUsScreen extends StatelessWidget {
   Widget _buildSectionText(String text) {
     return Text(
       text,
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 14,
-        height: 1.5,
-      ),
+      style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.5),
       textAlign: TextAlign.justify,
     );
   }
@@ -95,10 +91,7 @@ class AboutUsScreen extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             text,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
         ],
       ),
