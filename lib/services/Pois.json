@@ -1,9 +1,72 @@
 {
   "United States": {
+    "Statue_of_Liberty": {
+      "name": "Statue of Liberty",
+      "description": "Iconic monument on Liberty Island",
+      "statistics_text_present": "-Height: 93 m\n-Visitors: 3.2 million/year\n-Material: Copper\n-UNESCO Site since: 1984\n-Opened: October 28, 1886",
+      "statistics_text_past": "-Gift: From France to USA\n-Architect: Frédéric Auguste Bartholdi\n-Original color: Dull brown (copper)\n-Engineering: Gustave Eiffel framework\n-Symbolism: Enlightenment and Freedom",
+      "past_comparison_summary": "From a shiny copper gift to a green-patina symbol of American freedom and democracy."
+    },
+    "Golden_Gate_Bridge": {
+      "name": "Golden Gate Bridge",
+      "description": "Famous suspension bridge in San Francisco",
+      "statistics_text_present": "-Length: 2,737 m\n-Color: International Orange\n-Daily traffic: ~110,000 cars\n-Towers height: 227 m\n-Completed: 1937",
+      "statistics_text_past": "-Built: 1933–1937\n-Engineer: Joseph Strauss\n-Style: Art Deco elements\n-Materials: 88,000 tons of steel\n-History: Replaced ferry service",
+      "past_comparison_summary": "A marvel of 1930s engineering that became San Francisco's most iconic silhouette."
+    },
+    "Lincoln_Memorial": {
+      "name": "Lincoln Memorial",
+      "description": "National monument honoring Abraham Lincoln",
+      "statistics_text_present": "-Height: 30 m\n-Columns: 36 Doric columns\n-Statue height: 5.8 m\n-Visitors: 7 million/year\n-Style: Greek Doric temple",
+      "statistics_text_past": "-Built: 1914–1922\n-Architect: Henry Bacon\n-Statue Sculptor: Daniel Chester French\n-Site: Reclaimed swampland\n-Dedicated: May 30, 1922",
+      "past_comparison_summary": "A solemn Greek-inspired temple rising from marshland to honor the legacy of national unity."
+    }
   },
   "France": {
+    "Eiffel_Tower": {
+      "name": "Eiffel Tower",
+      "description": "Iron lattice tower in Paris",
+      "statistics_text_present": "-Height: 330 m\n-Visitors: 6 million/year\n-Floors: 3 accessible levels\n-Maintenance: Repainted every 7 years\n-Status: Global icon of France",
+      "statistics_text_past": "-Built: 1887–1889\n-Occasion: 1889 World's Fair\n-Architect: Stephen Sauvestre\n-Engineer: Gustave Eiffel\n-Controversy: Initially hated by many artists",
+      "past_comparison_summary": "From a 'useless' temporary exhibition piece to the global symbol of French elegance."
+    },
+    "Louvre_Museum": {
+      "name": "Louvre Museum",
+      "description": "World's largest art museum",
+      "statistics_text_present": "-Visitors: 9 million/year\n-Objects: ~38,000 on display\n-Pyramid addition: 1989\n-Surface: 72,735 m²\n-Famous work: Mona Lisa",
+      "statistics_text_past": "-Origins: Medieval fortress (12th C)\n-Rebuilt: As royal palace (16th C)\n-Royal use: Primary residence until Versailles\n-Museum Opening: 1793\n-Architecture: French Renaissance and Baroque",
+      "past_comparison_summary": "Evolution from a defensive medieval fortress to the world's most visited art sanctuary."
+    },
+    "Mont_Saint_Michel": {
+      "name": "Mont Saint-Michel",
+      "description": "Tidal island and abbey in Normandy",
+      "statistics_text_present": "-Population: ~30 residents\n-Visitors: 3 million/year\n-UNESCO Site since: 1979\n-Access: New bridge completed in 2014\n-Tides: Highest in Europe",
+      "statistics_text_past": "-Founded: Abbey started in 8th C\n-Defense: Survived Hundred Years' War\n-Prison: Used as jail during French Revolution\n-Strategic: Fortified island village\n-Causeway: Original was a tidal path",
+      "past_comparison_summary": "A spiritual island fortress that survived centuries of conflict to become a tourist jewel."
+    }
   },
   "Italy": {
+    "Colosseum": {
+      "name": "Colosseum",
+      "description": "Ancient Roman amphitheatre",
+      "statistics_text_present": "-Capacity: ~50,000 people\n-Status: UNESCO World Heritage\n-Material: Travertine, tuff, and brick-faced concrete\n-Visitors: 7 million/year\n-Symbol: Iconic Rome landmark",
+      "statistics_text_past": "-Completed: 80 AD (Vespasian/Titus)\n-Games: Gladiatorial contests and mock sea battles\n-Facade: Originally covered in marble\n-Damage: Earthquakes and stone robbers\n-Hypogeum: Underground tunnel network",
+      "past_comparison_summary": "The transformation of the Roman Empire's grandest arena into a preserved symbol of antiquity."
+    },
+    "Leaning_Tower_of_Pisa": {
+      "name": "Leaning Tower of Pisa",
+      "description": "Freestanding bell tower",
+      "statistics_text_present": "-Height: 56 m\n-Lean: ~3.97 degrees\n-Weight: ~14,500 tons\n-Steps: 294 or 296\n-Stabilized: Major restoration in 1990-2001",
+      "statistics_text_past": "-Construction: Started in 1173\n-Problem: Began leaning during 2nd floor construction\n-Soil: Unstable clay, mud, and sand\n-Duration: Took 199 years to finish\n-Architect: Unknown (attributed to Bonanno Pisano)",
+      "past_comparison_summary": "An accidental architectural error that became one of the most famous landmarks in the world."
+    },
+    "Pantheon": {
+      "name": "Pantheon",
+      "description": "Ancient Roman temple and church",
+      "statistics_text_present": "-Dome: World's largest unreinforced concrete dome\n-Diameter: 43.3 m\n-Status: State-owned church (Basilica)\n-Tombs: Raphael and Italian Kings\n-Occasion: Still active for religious services",
+      "statistics_text_past": "-Commissioned: Marcus Agrippa (original)\n-Rebuilt: Hadrian in ~126 AD\n-Purpose: Temple for all Roman gods\n-Conversion: Consecrated as church in 609 AD\n-Oculus: The only source of natural light",
+      "past_comparison_summary": "An architectural masterpiece that has remained in continuous use for nearly 2,000 years."
+    }
   },
   "Spain": {
     "Sagrada_Familia": {

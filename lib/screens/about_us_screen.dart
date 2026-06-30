@@ -19,10 +19,88 @@ class AboutUsScreen extends StatelessWidget {
           child: Column(
             children: [
               _buildHeader(context),
-              const Expanded(child: SizedBox.shrink()),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      _buildSectionTitle('APP DESCRIPTION'),
+                      const SizedBox(height: 10),
+                      _buildSectionText(
+                        'Liquid Galaxy Time Machine is an interactive application designed to visualize the evolution of historical landmarks over time. '
+                        'Using the power of Liquid Galaxy, users can travel through past, present, and future eras, exploring how architecture and landscapes have transformed '
+                        'through immersive 3D visualizations and historical data.',
+                      ),
+                      const SizedBox(height: 30),
+                      _buildSectionTitle('MENTIONS'),
+                      const SizedBox(height: 10),
+                      _buildMentionItem('Jan Sánchez - App Creator'),
+                      _buildMentionItem('Alfredo Bautista - Mentor'),
+                      _buildMentionItem('Andreu Ibañez - Mentor'),
+                      _buildMentionItem('Liquid Galaxy Project'),
+                      _buildMentionItem('Parc Agrobiotech Lleida'),
+                      _buildMentionItem('Laboratoris TIC'),
+                      const SizedBox(height: 40),
+                      Center(
+                        child: Image.asset(
+                          'assets/images/Timeline/LogoDisplayScreen.png',
+                          width: 250,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: Colors.cyanAccent,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 1.2,
+      ),
+    );
+  }
+
+  Widget _buildSectionText(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 14,
+        height: 1.5,
+      ),
+      textAlign: TextAlign.justify,
+    );
+  }
+
+  Widget _buildMentionItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        children: [
+          const Icon(Icons.star, color: Colors.cyanAccent, size: 16),
+          const SizedBox(width: 10),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+            ),
+          ),
+        ],
       ),
     );
   }
