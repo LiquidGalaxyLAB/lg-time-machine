@@ -60,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen>
               children: [
                 Image.asset(
                   'assets/images/KMLs/Logo/LiquidGalaxyTimeMachine_Logo.png',
-                  width: MediaQuery.of(context).size.width * 0.7,
+                  width: MediaQuery.of(context).size.width * 0.5,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return const Icon(
@@ -72,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
                 const SizedBox(height: 30),
                 const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.cyanAccent),
                 ),
               ],
             ),

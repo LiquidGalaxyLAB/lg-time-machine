@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/language_manager.dart';
 
 class AboutUsScreen extends StatelessWidget {
   final bool isConnected;
@@ -7,6 +8,8 @@ class AboutUsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isTablet = MediaQuery.of(context).size.width >= 600;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -18,40 +21,92 @@ class AboutUsScreen extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              _buildHeader(context),
+              _buildHeader(context, isTablet),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-                      _buildSectionTitle('APP DESCRIPTION'),
-                      const SizedBox(height: 10),
-                      _buildSectionText(
-                        'Liquid Galaxy Time Machine is an interactive application designed to visualize the evolution of historical landmarks over time. '
-                        'Using the power of Liquid Galaxy, users can travel through past, present, and future eras, exploring how architecture and landscapes have transformed '
-                        'through immersive 3D visualizations and historical data.',
+                  child: Center(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: isTablet ? 800 : double.infinity,
                       ),
-                      const SizedBox(height: 30),
-                      _buildSectionTitle('MENTIONS'),
-                      const SizedBox(height: 10),
-                      _buildMentionItem('Jan Sánchez - App Creator'),
-                      _buildMentionItem('Alfredo Bautista - Mentor'),
-                      _buildMentionItem('Andreu Ibañez - Mentor'),
-                      _buildMentionItem('Liquid Galaxy Project'),
-                      _buildMentionItem('Parc Agrobiotech Lleida'),
-                      _buildMentionItem('Laboratoris TIC'),
-                      const SizedBox(height: 40),
-                      Center(
-                        child: Image.asset(
-                          'assets/images/Timeline/LogoDisplayScreen.png',
-                          width: 250,
-                          fit: BoxFit.contain,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 24.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 20),
+                                _buildSectionTitle(
+                                  LanguageManager.instance
+                                      .translate('app_description_title'),
+                                ),
+                                const SizedBox(height: 10),
+                                _buildSectionText(
+                                  LanguageManager.instance
+                                      .translate('app_description_text'),
+                                ),
+                                const SizedBox(height: 30),
+                                _buildSectionTitle(
+                                  LanguageManager.instance
+                                      .translate('mentions_title'),
+                                ),
+                                const SizedBox(height: 10),
+                                _buildMentionItem(LanguageManager.instance
+                                    .translate('mention_jan')),
+                                _buildMentionItem(LanguageManager.instance
+                                    .translate('mention_alfredo')),
+                                _buildMentionItem(LanguageManager.instance
+                                    .translate('mention_andreu')),
+                                _buildMentionItem(LanguageManager.instance
+                                    .translate('mention_lg')),
+                                _buildMentionItem(LanguageManager.instance
+                                    .translate('mention_parc')),
+                                _buildMentionItem(LanguageManager.instance
+                                    .translate('mention_laboratoris')),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 40),
+                          Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(top: 40),
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: 80,
+                                  width: double.infinity,
+                                  decoration: const BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.transparent,
+                                        Colors.white
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  color: Colors.white,
+                                  padding: const EdgeInsets.only(bottom: 40),
+                                  child: Center(
+                                    child: Image.asset(
+                                      'assets/images/Timeline/LogoDisplayScreen.png',
+                                      width: isTablet ? 500 : 350,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 20),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -98,7 +153,7 @@ class AboutUsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, bool isTablet) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Column(
@@ -106,7 +161,7 @@ class AboutUsScreen extends StatelessWidget {
           Image.asset(
             'assets/images/Timeline/LogoApp_Menu.png',
             width: double.infinity,
-            height: 100,
+            height: isTablet ? 150 : 100,
             fit: BoxFit.contain,
           ),
           Row(
@@ -158,3 +213,4 @@ class AboutUsScreen extends StatelessWidget {
     );
   }
 }
+

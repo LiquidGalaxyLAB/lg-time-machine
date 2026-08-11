@@ -86,73 +86,145 @@ class _MainScreenState extends State<MainScreen>
         return ValueListenableBuilder<String>(
           valueListenable: LanguageManager.instance.languageNotifier,
           builder: (context, lang, child) {
-            return Scaffold(
-              resizeToAvoidBottomInset: false,
-              body: Stack(
-                children: [
-                  Container(
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(
-                          'assets/images/Timeline/GalaxyBackground.png',
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                bool isTablet = constraints.maxWidth > 600;
+                return Scaffold(
+                  resizeToAvoidBottomInset: false,
+                  body: Stack(
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                              'assets/images/Timeline/GalaxyBackground.png',
+                            ),
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    child: SafeArea(
-                      bottom: false,
-                      child: Column(
-                        children: [
-                          // Header with Logo
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0),
-                            child: Image.asset(
-                              'assets/images/Timeline/LogoApp_Menu.png',
-                              width: double.infinity,
-                              height: 100,
-                              fit: BoxFit.contain,
-                            ),
+                        child: SafeArea(
+                          bottom: false,
+                          child: Row(
+                            children: [
+                              if (isTablet) _buildNavigationRail(),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    // Header with Logo
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10.0,
+                                      ),
+                                      child: Image.asset(
+                                        'assets/images/Timeline/LogoApp_Menu.png',
+                                        width: double.infinity,
+                                        height: isTablet ? 120 : 100,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                    // Body
+                                    Expanded(
+                                      child: PageView(
+                                        controller: _pageController,
+                                        onPageChanged: (index) {
+                                          setState(() {
+                                            _selectedIndex = index;
+                                          });
+                                        },
+                                        children: [
+                                          ConnectScreen(
+                                            isConnected: _isConnected,
+                                            onConnectToggle: _toggleConnection,
+                                            onMenuToggle: _toggleMenu,
+                                          ),
+                                          TimelineScreen(
+                                            onTabChange: _onItemTapped,
+                                            isConnected: _isConnected,
+                                            onMenuToggle: _toggleMenu,
+                                          ),
+                                          SettingsScreen(
+                                            isConnected: _isConnected,
+                                            onMenuToggle: _toggleMenu,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    // Bottom Navigation only for phones
+                                    if (!isTablet) _buildBottomNav(),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          // Body
-                          Expanded(
-                            child: PageView(
-                              controller: _pageController,
-                              onPageChanged: (index) {
-                                setState(() {
-                                  _selectedIndex = index;
-                                });
-                              },
-                              children: [
-                                ConnectScreen(
-                                  isConnected: _isConnected,
-                                  onConnectToggle: _toggleConnection,
-                                  onMenuToggle: _toggleMenu,
-                                ),
-                                TimelineScreen(
-                                  onTabChange: _onItemTapped,
-                                  isConnected: _isConnected,
-                                  onMenuToggle: _toggleMenu,
-                                ),
-                                SettingsScreen(
-                                  isConnected: _isConnected,
-                                  onMenuToggle: _toggleMenu,
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Bottom Navigation
-                          _buildBottomNav(),
-                        ],
+                        ),
                       ),
-                    ),
+                      _buildSideMenu(),
+                    ],
                   ),
-                  _buildSideMenu(),
-                ],
-              ),
+                );
+              },
             );
           },
         );
       },
+    );
+  }
+
+  Widget _buildNavigationRail() {
+    return NavigationRail(
+      selectedIndex: _selectedIndex,
+      onDestinationSelected: _onItemTapped,
+      backgroundColor: Colors.white.withValues(alpha: 0.1),
+      labelType: NavigationRailLabelType.all,
+      unselectedLabelTextStyle: TextStyle(
+        color: Colors.white.withValues(alpha: 0.5),
+        fontSize: 12,
+      ),
+      selectedLabelTextStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+      ),
+      leading: Column(
+        children: [
+          const SizedBox(height: 8),
+          IconButton(
+            icon: const Icon(Icons.menu, color: Colors.white),
+            onPressed: _toggleMenu,
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+      destinations: [
+        NavigationRailDestination(
+          icon: Icon(
+            Icons.wifi,
+            color: _isConnected
+                ? const Color(0xFF8AFF8A).withValues(alpha: 0.7)
+                : const Color(0xFFFF8A8A).withValues(alpha: 0.7),
+          ),
+          selectedIcon: Icon(
+            Icons.wifi,
+            color: _isConnected
+                ? const Color(0xFF8AFF8A)
+                : const Color(0xFFFF8A8A),
+          ),
+          label: Text(LanguageManager.instance.translate('connect')),
+        ),
+        NavigationRailDestination(
+          icon: Icon(
+            Icons.location_on,
+            color: Colors.white.withValues(alpha: 0.5),
+          ),
+          selectedIcon: const Icon(Icons.location_on, color: Colors.white),
+          label: Text(LanguageManager.instance.translate('timeline')),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.settings, color: Colors.white.withValues(alpha: 0.5)),
+          selectedIcon: const Icon(Icons.settings, color: Colors.white),
+          label: Text(LanguageManager.instance.translate('settings')),
+        ),
+      ],
     );
   }
 

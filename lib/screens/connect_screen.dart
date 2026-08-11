@@ -4,6 +4,8 @@ import '../services/lg_service.dart';
 import '../kmls/logo_kml.dart';
 import '../utils/notifications.dart';
 import '../database/db_helper.dart';
+import '../services/poi_service.dart';
+
 
 class ConnectScreen extends StatefulWidget {
   final bool isConnected;
@@ -108,13 +110,21 @@ class _ConnectScreenState extends State<ConnectScreen> {
         ip.isEmpty ||
         portStr.isEmpty ||
         screensStr.isEmpty) {
-      AppNotifications.show(context, 'Please fill all fields', isError: true);
+      AppNotifications.show(
+        context,
+        LanguageManager.instance.translate('fill_fields_error'),
+        isError: true,
+      );
       return;
     }
 
     final port = int.tryParse(portStr);
     if (port == null) {
-      AppNotifications.show(context, 'Invalid port', isError: true);
+      AppNotifications.show(
+        context,
+        LanguageManager.instance.translate('invalid_port_error'),
+        isError: true,
+      );
       return;
     }
 
@@ -138,11 +148,8 @@ class _ConnectScreenState extends State<ConnectScreen> {
 
     if (success) {
       await _saveSettings();
-      // Upload logo assets to LG
-      await LGService.instance.uploadAssets();
-
-      // Configure slaves to refresh and look for KMLs
-      await LGService.instance.setRefresh();
+      // Upload logo assets immediately
+      await LGService.instance.uploadLogos();
 
       // Clear previous KMLs to ensure a clean slate after connection
       await LGService.instance.clearKML();
@@ -161,10 +168,20 @@ class _ConnectScreenState extends State<ConnectScreen> {
         context,
         LanguageManager.instance.translate('connected'),
       );
+
+      // Load all POIs to get their asset paths and pre-cache them in background
+      POIService().loadPOIs().then((pois) {
+        final List<String> allAssetPaths = [];
+        for (var poi in pois) {
+          allAssetPaths.addAll(poi.pastImages);
+          allAssetPaths.addAll(poi.presentImages);
+        }
+        LGService.instance.preCachePOIImages(allAssetPaths);
+      });
     } else {
       AppNotifications.show(
         context,
-        'Connection failed. Check your data.',
+        LanguageManager.instance.translate('connection_failed_error'),
         isError: true,
       );
     }
@@ -172,58 +189,96 @@ class _ConnectScreenState extends State<ConnectScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isTablet = size.width > 600;
+
     return ValueListenableBuilder<String>(
       valueListenable: LanguageManager.instance.languageNotifier,
       builder: (context, lang, child) {
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30.0),
+          padding: EdgeInsets.symmetric(horizontal: isTablet ? 60.0 : 30.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-              GestureDetector(
-                onTap: widget.onMenuToggle,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.2),
+              if (!isTablet)
+                GestureDetector(
+                  onTap: widget.onMenuToggle,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.2),
+                      ),
                     ),
+                    child: const Icon(Icons.menu, color: Colors.white, size: 28),
                   ),
-                  child: const Icon(Icons.menu, color: Colors.white, size: 28),
                 ),
-              ),
               const SizedBox(height: 20),
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _buildTextField(
-                        _userController,
-                        LanguageManager.instance.translate('lg_user'),
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 500),
+                      child: Column(
+                        children: [
+                          if (isTablet)
+                            _buildTabletRow(
+                              _buildTextField(
+                                _userController,
+                                LanguageManager.instance.translate('lg_user'),
+                              ),
+                              _buildTextField(
+                                _passwordController,
+                                LanguageManager.instance.translate(
+                                  'lg_password',
+                                ),
+                                isPassword: true,
+                              ),
+                            )
+                          else ...[
+                            _buildTextField(
+                              _userController,
+                              LanguageManager.instance.translate('lg_user'),
+                            ),
+                            _buildTextField(
+                              _passwordController,
+                              LanguageManager.instance.translate('lg_password'),
+                              isPassword: true,
+                            ),
+                          ],
+                          _buildTextField(
+                            _ipController,
+                            LanguageManager.instance.translate('ip'),
+                          ),
+                          if (isTablet)
+                            _buildTabletRow(
+                              _buildTextField(
+                                _portController,
+                                LanguageManager.instance.translate('lg_port'),
+                              ),
+                              _buildTextField(
+                                _screensController,
+                                LanguageManager.instance.translate('screens'),
+                              ),
+                            )
+                          else ...[
+                            _buildTextField(
+                              _portController,
+                              LanguageManager.instance.translate('lg_port'),
+                            ),
+                            _buildTextField(
+                              _screensController,
+                              LanguageManager.instance.translate('screens'),
+                            ),
+                          ],
+                          const SizedBox(height: 20),
+                          _buildConnectButton(),
+                        ],
                       ),
-                      _buildTextField(
-                        _passwordController,
-                        LanguageManager.instance.translate('lg_password'),
-                        isPassword: true,
-                      ),
-                      _buildTextField(
-                        _ipController,
-                        LanguageManager.instance.translate('ip'),
-                      ),
-                      _buildTextField(
-                        _portController,
-                        LanguageManager.instance.translate('lg_port'),
-                      ),
-                      _buildTextField(
-                        _screensController,
-                        LanguageManager.instance.translate('screens'),
-                      ),
-                      const SizedBox(height: 20),
-                      _buildConnectButton(),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -231,6 +286,16 @@ class _ConnectScreenState extends State<ConnectScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildTabletRow(Widget left, Widget right) {
+    return Row(
+      children: [
+        Expanded(child: left),
+        const SizedBox(width: 15),
+        Expanded(child: right),
+      ],
     );
   }
 

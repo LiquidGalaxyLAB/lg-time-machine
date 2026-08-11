@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'dart:io';
 import '../models/poi.dart';
 import '../services/language_manager.dart';
 import '../services/time_manager.dart';
 import '../services/lg_service.dart';
+import '../services/api_service.dart';
 import '../kmls/logo_kml.dart';
 import '../kmls/look_at_kml.dart';
 import '../kmls/statistics_overlay_kml.dart';
 import '../kmls/comparison_overlay_kml.dart';
+import '../kmls/Pois_Circle.dart';
 
 class POIDetailScreen extends StatefulWidget {
   final POI poi;
@@ -29,15 +33,260 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
   bool _isLoadingStatistics = false;
   bool _showingComparison = false;
   bool _isLoadingComparison = false;
+  bool _cooldownStatistics = false;
+  bool _cooldownComparison = false;
+  bool _cooldownOrbit = false;
+  late FlutterTts _flutterTts;
+  bool _isSpeaking = false;
+  String? _cachedFutureImagePath;
+  String? _cachedFutureText;
+  final TextEditingController _promptController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _checkFutureImage();
+    _initTts();
+    _checkFutureAssets();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _autoTravel();
+    });
+  }
+
+  Future<void> _autoTravel() async {
+    if (widget.isConnected) {
+      final logosKml = LogoKML.generate();
+      await LGService.instance.sendLogoKML(logosKml);
+
+      final circleKml = PoisCircleKML.generate(widget.poi);
+      await LGService.instance.sendKML(circleKml);
+
+      final lookAt = LookAtKML.generate(
+        widget.poi,
+        LGService.instance.screens,
+      );
+      await LGService.instance.sendQuery('flytoview=$lookAt');
+
+      await _showBalloonOnly();
+    }
+  }
+
+  Future<void> _showBalloonOnly() async {
+    if (!widget.isConnected) return;
+
+    final double timeValue = TimeManager.instance.timeValue;
+    final bool isPast = timeValue == 0.0;
+    final bool isPresent = timeValue == 1.0;
+    final bool isFuture = timeValue == 2.0;
+
+    String viewType = "";
+    String statsText = "";
+
+    if (isPast) {
+      viewType = "${LanguageManager.instance.translate('past')} VIEW";
+      statsText = widget.poi.statisticsTextPast;
+    } else if (isPresent) {
+      viewType = "${LanguageManager.instance.translate('present')} VIEW";
+      statsText = widget.poi.statisticsTextPresent;
+    } else if (isFuture) {
+      viewType = "${LanguageManager.instance.translate('future')} VIEW";
+      statsText = _cachedFutureText ?? "";
+    }
+
+    final String balloonKml = StatisticsOverlayKML.generate(
+      poi: widget.poi,
+      statisticsText: statsText,
+      viewType: viewType,
+    );
+    await LGService.instance.sendSlaveKML(3, balloonKml);
+  }
+
+  void _startStatisticsCooldown() {
+    if (mounted) setState(() => _cooldownStatistics = true);
+    Future.delayed(const Duration(milliseconds: 3500), () {
+      if (mounted) setState(() => _cooldownStatistics = false);
+    });
+  }
+
+  void _startComparisonCooldown() {
+    if (mounted) setState(() => _cooldownComparison = true);
+    Future.delayed(const Duration(milliseconds: 3500), () {
+      if (mounted) setState(() => _cooldownComparison = false);
+    });
+  }
+
+  Future<void> _toggleStatistics({bool forceShow = false}) async {
+    if (_isLoadingStatistics || _showingComparison || _cooldownStatistics) return;
+    if (!widget.isConnected) return;
+
+    final double timeValue = TimeManager.instance.timeValue;
+    final bool isPast = timeValue == 0.0;
+    final bool isPresent = timeValue == 1.0;
+    final bool isFuture = timeValue == 2.0;
+
+    if (isFuture && !_futureImageExists && !forceShow) return;
+
+    setState(() {
+      _isLoadingStatistics = true;
+    });
+
+    if (_showingStatistics && !forceShow) {
+      // Hide Chromium photo but KEEP balloon
+      await LGService.instance.stopBrowser(1);
+      await LGService.instance.stopBrowser(2);
+      if (LGService.instance.screens == 5) {
+        await LGService.instance.stopBrowser(4);
+        await LGService.instance.stopBrowser(5);
+      }
+
+      if (mounted) {
+        setState(() {
+          _showingStatistics = false;
+          _isLoadingStatistics = false;
+        });
+        _startStatisticsCooldown();
+      }
+    } else {
+      String? assetPath;
+      if (isPast) {
+        assetPath =
+        widget.poi.pastImages.isNotEmpty ? widget.poi.pastImages.first : null;
+      } else if (isPresent) {
+        assetPath =
+        widget.poi.presentImages.isNotEmpty
+            ? widget.poi.presentImages.first
+            : null;
+      } else if (isFuture) {
+        assetPath = _cachedFutureImagePath;
+      }
+
+      if (assetPath != null) {
+        final fileName = await LGService.instance.uploadPOIImage(
+          assetPath,
+          isExternal: isFuture,
+        );
+        if (fileName != null) {
+          final imageUrl = 'http://lg1:81/logos/$fileName';
+          final int totalScreens = LGService.instance.screens;
+
+          await LGService.instance.createStatisticsHTML(imageUrl);
+
+          if (totalScreens == 5) {
+            await LGService.instance.openBrowser(
+              5,
+              'http://lg1:81/statistics.html?screen=left',
+            );
+            await LGService.instance.openBrowser(
+              1,
+              'http://lg1:81/statistics.html?screen=center',
+            );
+            await LGService.instance.openBrowser(
+              2,
+              'http://lg1:81/statistics.html?screen=right',
+            );
+          } else if (totalScreens == 3) {
+            await LGService.instance.openBrowser(
+              1,
+              'http://lg1:81/statistics.html?screen=center',
+            );
+            await LGService.instance.openBrowser(
+              2,
+              'http://lg1:81/statistics.html?screen=right',
+            );
+          } else {
+            await LGService.instance.openBrowser(
+              1,
+              'http://lg1:81/statistics.html?screen=center',
+            );
+          }
+
+          if (mounted) {
+            setState(() {
+              _showingStatistics = true;
+              _isLoadingStatistics = false;
+            });
+            _startStatisticsCooldown();
+          }
+        } else {
+          if (mounted) {
+            setState(() => _isLoadingStatistics = false);
+            _startStatisticsCooldown();
+          }
+        }
+      } else {
+        if (mounted) {
+          setState(() => _isLoadingStatistics = false);
+          _startStatisticsCooldown();
+        }
+      }
+    }
+  }
+
+  void _initTts() {
+    _flutterTts = FlutterTts();
+
+    _flutterTts.setStartHandler(() {
+      setState(() {
+        _isSpeaking = true;
+      });
+    });
+
+    _flutterTts.setCompletionHandler(() {
+      setState(() {
+        _isSpeaking = false;
+      });
+    });
+
+    _flutterTts.setErrorHandler((msg) {
+      setState(() {
+        _isSpeaking = false;
+      });
+    });
+  }
+
+  Future<void> _speak() async {
+    if (_isSpeaking) {
+      await _flutterTts.stop();
+      setState(() {
+        _isSpeaking = false;
+      });
+      return;
+    }
+
+    String textToSpeak = "";
+    final double timeValue = TimeManager.instance.timeNotifier.value;
+    final String currentLang = LanguageManager.instance.currentLanguage;
+
+    if (_showingComparison) {
+      textToSpeak =
+      "${widget.poi.statisticsTextPast}. ${widget.poi.statisticsTextPresent}. ${widget.poi.comparisonSummary}";
+    } else if (_showingStatistics) {
+      if (timeValue == 0.0) {
+        textToSpeak = widget.poi.statisticsTextPast;
+      } else if (timeValue == 1.0) {
+        textToSpeak = widget.poi.statisticsTextPresent;
+      } else if (timeValue == 2.0 && _cachedFutureText != null) {
+        textToSpeak = _cachedFutureText!;
+      }
+    }
+
+    if (textToSpeak.isNotEmpty) {
+      String ttsLang = "en-US";
+      if (currentLang == 'es') ttsLang = "es-ES";
+      if (currentLang == 'ca') ttsLang = "ca-ES";
+
+      await _flutterTts.setLanguage(ttsLang);
+      await _flutterTts.setPitch(1.0);
+      await _flutterTts.speak(textToSpeak);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(LanguageManager.instance.translate('no_narration'))),
+      );
+    }
   }
 
   @override
   void dispose() {
+    _flutterTts.stop();
     if (LGService.instance.orbitPlaying) {
       LGService.instance.orbitStop();
     }
@@ -47,37 +296,83 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     if (_showingComparison) {
       LGService.instance.clearComparison();
     }
+    LGService.instance.clearKML();
     super.dispose();
   }
 
-  void _checkFutureImage() {
-    // In a real app, we would check if the file exists on disk
-  }
-
-  Future<void> _generateFutureImage() async {
-    setState(() {
-      _isGeneratingFuture = true;
-    });
-
-    // Simulate AI generation delay
-    await Future.delayed(const Duration(seconds: 3));
-
-    if (mounted) {
+  void _checkFutureAssets() async {
+    final lang = LanguageManager.instance.currentLanguage;
+    final path = await APIService.instance.getCachedFutureImage(widget.poi.name);
+    final text = await APIService.instance.getCachedFutureText(widget.poi.name, lang);
+    if (path != null) {
       setState(() {
-        _isGeneratingFuture = false;
+        _cachedFutureImagePath = path;
+        _cachedFutureText = text;
         _futureImageExists = true;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(LanguageManager.instance.translate('future_success')),
-          backgroundColor: Colors.green,
-        ),
+    }
+  }
+
+  Future<void> _generateFutureAssets() async {
+    final additivePrompt = _promptController.text;
+    final lang = LanguageManager.instance.currentLanguage;
+    setState(() {
+      _isGeneratingFuture = true;
+      // Clear existing assets for a fresh regeneration UX
+      _cachedFutureImagePath = null;
+      _cachedFutureText = null;
+      _futureImageExists = false;
+    });
+
+    try {
+      final results = await APIService.instance.generateFutureEstimation(
+        widget.poi.name,
+        lang,
+        additivePrompt: additivePrompt,
       );
+      final path = results['imagePath'];
+      final text = results['statisticsText'];
+
+      if (mounted) {
+        setState(() {
+          _isGeneratingFuture = false;
+          if (path != null) {
+            _cachedFutureImagePath = path;
+            _cachedFutureText = text;
+            _futureImageExists = true;
+          }
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(LanguageManager.instance.translate('future_success')),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isGeneratingFuture = false;
+          // Restore if possible? No, if it failed we leave it cleared or reload from cache.
+          _checkFutureAssets();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${LanguageManager.instance.translate('error_prefix')}: ${e.toString()}',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isTablet = size.width > 600;
+
     return ListenableBuilder(
       listenable: LGService.instance,
       builder: (context, _) {
@@ -97,20 +392,39 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                 child: SafeArea(
                   child: Column(
                     children: [
-                      _buildHeader(context, isConnected),
-                      _buildTitle(),
+                      _buildHeader(context, isConnected, isTablet),
+                      _buildTitle(isTablet),
                       Expanded(
                         child: SingleChildScrollView(
-                          child: Column(
+                          child:
+                          isTablet
+                              ? Row(
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
                             children: [
-                              _buildPOIImage(),
+                              Expanded(
+                                flex: 5,
+                                child: _buildPOIImage(isTablet),
+                              ),
+                              Expanded(
+                                flex: 4,
+                                child: _buildToolButtons(
+                                  isConnected,
+                                  isTablet,
+                                ),
+                              ),
+                            ],
+                          )
+                              : Column(
+                            children: [
+                              _buildPOIImage(isTablet),
                               const SizedBox(height: 20),
-                              _buildToolButtons(isConnected),
+                              _buildToolButtons(isConnected, isTablet),
                             ],
                           ),
                         ),
                       ),
-                      _buildTimelineSlider(),
+                      _buildTimelineSlider(isTablet),
                     ],
                   ),
                 ),
@@ -122,7 +436,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isConnected) {
+  Widget _buildHeader(BuildContext context, bool isConnected, bool isTablet) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Column(
@@ -130,7 +444,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
           Image.asset(
             'assets/images/Timeline/LogoApp_Menu.png',
             width: double.infinity,
-            height: 80,
+            height: isTablet ? 120 : 80,
             fit: BoxFit.contain,
           ),
           Row(
@@ -157,19 +471,22 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isConnected
+                  color:
+                  isConnected
                       ? const Color(0xFF8AFF8A).withValues(alpha: 0.2)
                       : const Color(0xFFFF8A8A).withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isConnected
+                    color:
+                    isConnected
                         ? const Color(0xFF8AFF8A).withValues(alpha: 0.4)
                         : const Color(0xFFFF8A8A).withValues(alpha: 0.4),
                   ),
                 ),
                 child: Icon(
                   Icons.wifi,
-                  color: isConnected
+                  color:
+                  isConnected
                       ? const Color(0xFF8AFF8A)
                       : const Color(0xFFFF8A8A),
                   size: 24,
@@ -182,20 +499,23 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     );
   }
 
-  Widget _buildTitle() {
+  Widget _buildTitle(bool isTablet) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 40.0 : 24.0,
+        vertical: 10.0,
+      ),
       child: Row(
         children: [
-          Container(width: 3, height: 24, color: Colors.white),
+          Container(width: 3, height: isTablet ? 32 : 24, color: Colors.white),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               'I ${widget.poi.name.toUpperCase()}',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
-                fontSize: 22,
+                fontSize: isTablet ? 32 : 22,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
               ),
@@ -207,7 +527,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     );
   }
 
-  Widget _buildPOIImage() {
+  Widget _buildPOIImage(bool isTablet) {
     return ValueListenableBuilder<double>(
       valueListenable: TimeManager.instance.timeNotifier,
       builder: (context, timeValue, child) {
@@ -217,21 +537,25 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
         bool isPast = timeValue == 0.0;
 
         if (isPast) {
-          assetPath = widget.poi.pastImages.isNotEmpty
+          assetPath =
+          widget.poi.pastImages.isNotEmpty
               ? widget.poi.pastImages.first
               : '';
         } else if (isPresent) {
-          assetPath = widget.poi.presentImages.isNotEmpty
+          assetPath =
+          widget.poi.presentImages.isNotEmpty
               ? widget.poi.presentImages.first
               : '';
         } else if (isFuture) {
-          assetPath = widget.poi.presentImages.isNotEmpty
-              ? widget.poi.presentImages.first
-              : '';
+          assetPath =
+              _cachedFutureImagePath ??
+                  (widget.poi.presentImages.isNotEmpty
+                      ? widget.poi.presentImages.first
+                      : '');
         }
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: EdgeInsets.symmetric(horizontal: isTablet ? 40.0 : 24.0),
           child: Column(
             children: [
               ClipRRect(
@@ -239,33 +563,26 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                 child: Stack(
                   children: [
                     assetPath.isNotEmpty
+                        ? (assetPath.startsWith('assets/')
                         ? Image.asset(
-                            assetPath,
-                            width: double.infinity,
-                            height: 220,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                                  width: double.infinity,
-                                  height: 220,
-                                  color: Colors.white10,
-                                  child: const Icon(
-                                    Icons.image_not_supported,
-                                    color: Colors.white24,
-                                    size: 50,
-                                  ),
-                                ),
-                          )
-                        : Container(
-                            width: double.infinity,
-                            height: 220,
-                            color: Colors.white10,
-                            child: const Icon(
-                              Icons.image_not_supported,
-                              color: Colors.white24,
-                              size: 50,
-                            ),
-                          ),
+                      assetPath,
+                      width: double.infinity,
+                      height: isTablet ? 400 : 220,
+                      fit: BoxFit.cover,
+                      errorBuilder:
+                          (context, error, stackTrace) =>
+                          _buildImageError(isTablet),
+                    )
+                        : Image.file(
+                      File(assetPath),
+                      width: double.infinity,
+                      height: isTablet ? 400 : 220,
+                      fit: BoxFit.cover,
+                      errorBuilder:
+                          (context, error, stackTrace) =>
+                          _buildImageError(isTablet),
+                    ))
+                        : _buildImageError(isTablet),
                     if (isFuture && _futureImageExists)
                       Positioned(
                         top: 10,
@@ -281,9 +598,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                           ),
                           child: Text(
                             LanguageManager.instance.translate('ai_generated'),
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.black,
-                              fontSize: 10,
+                              fontSize: isTablet ? 14 : 10,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -293,16 +610,20 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                 ),
               ),
               if (isFuture && _futureImageExists)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    '${LanguageManager.instance.translate('estimation_of')} ${widget.poi.name} in 2075',
-                    style: TextStyle(
-                      color: Colors.cyanAccent.withValues(alpha: 0.7),
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        '${LanguageManager.instance.translate('estimation_of')} ${widget.poi.name} ${LanguageManager.instance.translate('estimation_in_2100').toLowerCase()}',
+                        style: TextStyle(
+                          color: Colors.cyanAccent.withValues(alpha: 0.7),
+                          fontSize: isTablet ? 16 : 12,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
             ],
           ),
@@ -311,7 +632,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     );
   }
 
-  Widget _buildToolButtons(bool isConnected) {
+  Widget _buildToolButtons(bool isConnected, bool isTablet) {
     return ValueListenableBuilder<double>(
       valueListenable: TimeManager.instance.timeNotifier,
       builder: (context, timeValue, child) {
@@ -320,54 +641,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
         final bool isFuture = timeValue == 2.0;
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          padding: EdgeInsets.symmetric(horizontal: isTablet ? 40.0 : 24.0),
           child: Column(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildButton(
-                      LanguageManager.instance
-                          .translate('travel_lg')
-                          .toUpperCase(),
-                      icon: Icons.rocket_launch,
-                      onTap: _showingStatistics
-                          ? null
-                          : () async {
-                              if (isConnected) {
-                                final logosKml = LogoKML.generate();
-                                await LGService.instance.sendLogoKML(logosKml);
-                                final lookAt = LookAtKML.generate(
-                                  widget.poi,
-                                  LGService.instance.screens,
-                                );
-                                await LGService.instance.sendQuery(
-                                  'flytoview=$lookAt',
-                                );
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Traveling to ${widget.poi.name}...',
-                                    ),
-                                    backgroundColor: Colors.blue.withValues(
-                                      alpha: 0.8,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Please connect to Liquid Galaxy first',
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 15),
               Row(
                 children: [
@@ -375,152 +651,187 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                     Expanded(
                       child: _buildButton(
                         _showingComparison
-                            ? 'HIDE COMPARISON'
-                            : 'COMPARE WITH PRESENT',
+                            ? LanguageManager.instance.translate(
+                          'hide_comparison',
+                        )
+                            : LanguageManager.instance.translate(
+                          'compare_present',
+                        ),
                         color: _showingComparison ? Colors.red : Colors.blue,
                         isLoading: _isLoadingComparison,
+                        isTablet: isTablet,
                         onTap:
-                            (!isConnected ||
-                                _isLoadingComparison ||
-                                _showingStatistics)
+                        (!isConnected ||
+                            _isLoadingComparison ||
+                            _showingStatistics ||
+                            _cooldownComparison ||
+                            (isFuture && !_futureImageExists))
                             ? null
                             : () async {
-                                setState(() {
-                                  _isLoadingComparison = true;
-                                });
+                          setState(() {
+                            _isLoadingComparison = true;
+                          });
 
-                                if (_showingComparison) {
-                                  await LGService.instance.clearComparison();
-                                  await LGService.instance.sendLogoKML(
-                                    LogoKML.generate(),
-                                  );
-                                  if (mounted) {
-                                    setState(() {
-                                      _showingComparison = false;
-                                      _isLoadingComparison = false;
-                                    });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Comparison hidden'),
-                                        backgroundColor: Colors.blueAccent,
+                          if (_showingComparison) {
+                            await LGService.instance.clearComparison();
+                            await LGService.instance.sendLogoKML(
+                              LogoKML.generate(),
+                            );
+                            await _showBalloonOnly();
+                            if (mounted) {
+                              setState(() {
+                                _showingComparison = false;
+                                _isLoadingComparison = false;
+                              });
+                              _startComparisonCooldown();
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    LanguageManager.instance.translate(
+                                      'comparison_hidden',
+                                    ),
+                                  ),
+                                  backgroundColor: Colors.blueAccent,
+                                ),
+                              );
+                            }
+                          } else {
+                            String? pastPath;
+                            if (isPast) {
+                              pastPath =
+                              widget.poi.pastImages.isNotEmpty
+                                  ? widget.poi.pastImages.first
+                                  : null;
+                            } else if (isFuture) {
+                              pastPath = _cachedFutureImagePath;
+                            }
+
+                            final presentPath =
+                            widget.poi.presentImages.isNotEmpty
+                                ? widget.poi.presentImages.first
+                                : null;
+
+                            if (pastPath != null &&
+                                presentPath != null) {
+                              final pastName = await LGService.instance
+                                  .uploadPOIImage(
+                                pastPath,
+                                customName: isFuture ? 'comparison_future' : 'comparison_past',
+                                isExternal: isFuture,
+                              );
+                              final presentName = await LGService
+                                  .instance
+                                  .uploadPOIImage(
+                                presentPath,
+                                customName: 'comparison_present',
+                              );
+
+                              if (pastName != null &&
+                                  presentName != null) {
+                                final pastUrl =
+                                    'http://lg1:81/logos/$pastName';
+                                final presentUrl =
+                                    'http://lg1:81/logos/$presentName';
+
+                                await LGService.instance
+                                    .clearComparison();
+                                await LGService.instance
+                                    .createComparisonHTML(
+                                  pastUrl,
+                                  presentUrl,
+                                );
+
+                                final balloonKml = ComparisonOverlayKML
+                                    .generate(
+                                  poi: widget.poi,
+                                  futureStats: _cachedFutureText,
+                                  isFuture: isFuture,
+                                );
+                                await LGService.instance.sendSlaveKML(
+                                  3,
+                                  balloonKml,
+                                );
+
+                                // Orden: lg4, lg5 (PAST) | lg1, lg2 (PRESENT)
+                                // lg4: Left half of Past
+                                await LGService.instance.openBrowser(
+                                  4,
+                                  'http://lg1:81/comparison.html?mode=past&side=left',
+                                );
+                                // lg5: Right half of Past
+                                await LGService.instance.openBrowser(
+                                  5,
+                                  'http://lg1:81/comparison.html?mode=past&side=right',
+                                );
+                                // lg1: Left half of Present
+                                await LGService.instance.openBrowser(
+                                  1,
+                                  'http://lg1:81/comparison.html?mode=present&side=left',
+                                );
+                                // lg2: Right half of Present
+                                await LGService.instance.openBrowser(
+                                  2,
+                                  'http://lg1:81/comparison.html?mode=present&side=right',
+                                );
+
+                                if (mounted) {
+                                  setState(() {
+                                    _showingComparison = true;
+                                    _isLoadingComparison = false;
+                                  });
+                                  _startComparisonCooldown();
+                                  ScaffoldMessenger.of(
+                                    context,
+                                  ).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        LanguageManager.instance
+                                            .translate(
+                                          'comparison_success',
+                                        ),
                                       ),
-                                    );
-                                  }
-                                } else {
-                                  final pastPath =
-                                      widget.poi.pastImages.isNotEmpty
-                                      ? widget.poi.pastImages.first
-                                      : null;
-                                  final presentPath =
-                                      widget.poi.presentImages.isNotEmpty
-                                      ? widget.poi.presentImages.first
-                                      : null;
-
-                                  if (pastPath != null && presentPath != null) {
-                                    final pastName = await LGService.instance
-                                        .uploadPOIImage(
-                                          pastPath,
-                                          customName: 'comparison_past',
-                                        );
-                                    final presentName = await LGService.instance
-                                        .uploadPOIImage(
-                                          presentPath,
-                                          customName: 'comparison_present',
-                                        );
-
-                                    if (pastName != null &&
-                                        presentName != null) {
-                                      final pastUrl =
-                                          'http://lg1:81/logos/$pastName';
-                                      final presentUrl =
-                                          'http://lg1:81/logos/$presentName';
-
-                                      await LGService.instance
-                                          .clearComparison();
-                                      await LGService.instance
-                                          .createComparisonHTML(
-                                            pastUrl,
-                                            presentUrl,
-                                          );
-
-                                      final balloonKml =
-                                          ComparisonOverlayKML.generate(
-                                            poi: widget.poi,
-                                          );
-                                      await LGService.instance.sendSlaveKML(
-                                        3,
-                                        balloonKml,
-                                      );
-
-                                      // Orden: lg4, lg5 (PAST) | lg1, lg2 (PRESENT)
-                                      // lg4: Left half of Past
-                                      await LGService.instance.openBrowser(
-                                        4,
-                                        'http://lg1:81/comparison.html?mode=past&side=left',
-                                      );
-                                      // lg5: Right half of Past
-                                      await LGService.instance.openBrowser(
-                                        5,
-                                        'http://lg1:81/comparison.html?mode=past&side=right',
-                                      );
-                                      // lg1: Left half of Present
-                                      await LGService.instance.openBrowser(
-                                        1,
-                                        'http://lg1:81/comparison.html?mode=present&side=left',
-                                      );
-                                      // lg2: Right half of Present
-                                      await LGService.instance.openBrowser(
-                                        2,
-                                        'http://lg1:81/comparison.html?mode=present&side=right',
-                                      );
-
-                                      if (mounted) {
-                                        setState(() {
-                                          _showingComparison = true;
-                                          _isLoadingComparison = false;
-                                        });
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Comparison loaded successfully!',
-                                            ),
-                                            backgroundColor: Colors.green,
-                                          ),
-                                        );
-                                      }
-                                    } else {
-                                      if (mounted)
-                                        setState(
-                                          () => _isLoadingComparison = false,
-                                        );
-                                    }
-                                  } else {
-                                    if (mounted)
-                                      setState(
-                                        () => _isLoadingComparison = false,
-                                      );
-                                  }
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
                                 }
-                              },
+                              } else {
+                                if (mounted) {
+                                  setState(
+                                        () => _isLoadingComparison = false,
+                                  );
+                                  _startComparisonCooldown();
+                                }
+                              }
+                            } else {
+                              if (mounted) {
+                                setState(
+                                      () => _isLoadingComparison = false,
+                                );
+                                _startComparisonCooldown();
+                              }
+                            }
+                          }
+                        },
                       ),
                     ),
                     const SizedBox(width: 15),
                   ],
                   Expanded(
                     child: _buildButton(
-                      'AI NARRATION',
-                      onTap: _showingStatistics
-                          ? null
-                          : () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Starting AI Narration...'),
-                                  backgroundColor: Colors.blueAccent,
-                                ),
-                              );
-                            },
+                      _isSpeaking
+                          ? LanguageManager.instance.translate('stop_narration')
+                          : LanguageManager.instance.translate('ai_narration'),
+                      color: _isSpeaking ? Colors.red : Colors.blue,
+                      icon: _isSpeaking ? Icons.stop : Icons.record_voice_over,
+                      isTablet: isTablet,
+                      onTap:
+                      (_showingStatistics ||
+                          _showingComparison ||
+                          _isSpeaking)
+                          ? () => _speak()
+                          : null,
                     ),
                   ),
                 ],
@@ -534,55 +845,82 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                       builder: (context, _) {
                         final isOrbiting = LGService.instance.orbitPlaying;
                         return _buildButton(
-                          isOrbiting ? 'STOP ORBIT' : 'ORBIT AROUND',
+                          isOrbiting
+                              ? LanguageManager.instance.translate('stop_orbit')
+                              : LanguageManager.instance.translate(
+                            'orbit_around',
+                          ),
                           icon: isOrbiting ? Icons.stop_circle : Icons.public,
                           color: isOrbiting ? Colors.red : Colors.blue,
-                          onTap: _showingStatistics
+                          isTablet: isTablet,
+                          onTap:
+                          (_showingStatistics || _cooldownOrbit)
                               ? null
                               : () async {
-                                  if (isConnected) {
-                                    if (isOrbiting) {
-                                      await LGService.instance.orbitStop();
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Orbit stopped'),
-                                          backgroundColor: Colors.orange,
-                                        ),
-                                      );
-                                      return;
-                                    }
+                            if (isConnected) {
+                              setState(() {
+                                _cooldownOrbit = true;
+                              });
 
-                                    await LGService.instance.orbitPlay(
-                                      widget.poi.latitude,
-                                      widget.poi.longitude,
-                                      widget.poi.range /
-                                          LGService.instance.screens,
-                                      45,
-                                      initialBearing: widget.poi.heading,
-                                    );
+                              Future.delayed(const Duration(milliseconds: 3500), () {
+                                if (mounted) {
+                                  setState(() {
+                                    _cooldownOrbit = false;
+                                  });
+                                }
+                              });
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Starting orbit around ${widget.poi.name}...',
-                                        ),
-                                        backgroundColor: Colors.blue.withValues(
-                                          alpha: 0.8,
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Please connect to Liquid Galaxy first',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
+                              if (isOrbiting) {
+                                await LGService.instance.orbitStop();
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      LanguageManager.instance
+                                          .translate('orbit_stopped'),
+                                    ),
+                                    backgroundColor: Colors.orange,
+                                  ),
+                                );
+                                return;
+                              }
+
+                              await LGService.instance.orbitPlay(
+                                widget.poi.latitude,
+                                widget.poi.longitude,
+                                widget.poi.range /
+                                    LGService.instance.screens,
+                                45,
+                                initialBearing: widget.poi.heading,
+                              );
+
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '${LanguageManager.instance.translate('orbit_starting')} ${widget.poi.name}...',
+                                  ),
+                                  backgroundColor: Colors.blue.withValues(
+                                    alpha: 0.8,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    LanguageManager.instance.translate(
+                                      'connect_first',
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                         );
                       },
                     ),
@@ -591,139 +929,20 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                   Expanded(
                     child: _buildButton(
                       _showingStatistics
-                          ? 'HIDE STATISTICS'
-                          : 'SHOW STATISTICS',
+                          ? LanguageManager.instance.translate(
+                        'hide_statistics',
+                      )
+                          : '${LanguageManager.instance.translate('show_statistics')} (${LanguageManager.instance.translate(TimeManager.instance.getTimeState())})',
                       color: _showingStatistics ? Colors.orange : Colors.blue,
                       isLoading: _isLoadingStatistics,
+                      isTablet: isTablet,
                       onTap:
-                          (!isConnected ||
-                              isFuture ||
-                              _isLoadingStatistics ||
-                              _showingComparison)
+                      (_isLoadingStatistics ||
+                          _showingComparison ||
+                          _cooldownStatistics ||
+                          (isFuture && !_futureImageExists))
                           ? null
-                          : () async {
-                              setState(() {
-                                _isLoadingStatistics = true;
-                              });
-
-                              if (_showingStatistics) {
-                                await LGService.instance.clearStatistics();
-                                await LGService.instance.sendLogoKML(
-                                  LogoKML.generate(),
-                                );
-                                if (mounted) {
-                                  setState(() {
-                                    _showingStatistics = false;
-                                    _isLoadingStatistics = false;
-                                  });
-                                }
-                              } else {
-                                String? assetPath;
-                                if (isPast) {
-                                  assetPath = widget.poi.pastImages.isNotEmpty
-                                      ? widget.poi.pastImages.first
-                                      : null;
-                                } else if (isPresent) {
-                                  assetPath =
-                                      widget.poi.presentImages.isNotEmpty
-                                      ? widget.poi.presentImages.first
-                                      : null;
-                                }
-
-                                if (assetPath != null) {
-                                  final fileName = await LGService.instance
-                                      .uploadPOIImage(assetPath);
-                                  if (fileName != null) {
-                                    final imageUrl =
-                                        'http://lg1:81/logos/$fileName';
-                                    final int totalScreens =
-                                        LGService.instance.screens;
-
-                                    // 1. Limpiamos KMLs y navegadores previos
-                                    await LGService.instance.clearStatistics();
-
-                                    // 2. Creamos los HTMLs para el fondo (LG4, LG1, LG2)
-                                    await LGService.instance
-                                        .createStatisticsHTML(imageUrl);
-
-                                    final String statsText = isPast
-                                        ? widget.poi.statisticsTextPast
-                                        : widget.poi.statisticsTextPresent;
-
-                                    // 3. Generamos y enviamos el KML de la burbuja nativa a LG3 (Slave 3)
-                                    final String balloonKml =
-                                        StatisticsOverlayKML.generate(
-                                          poi: widget.poi,
-                                          imageUrl: imageUrl,
-                                          statisticsText: statsText,
-                                        );
-                                    await LGService.instance.sendSlaveKML(
-                                      3,
-                                      balloonKml,
-                                    );
-
-                                    // 4. Abrimos los navegadores para los fondos panorámicos
-                                    if (totalScreens == 5) {
-                                      // LG5 (Izquierda)
-                                      await LGService.instance.openBrowser(
-                                        5,
-                                        'http://lg1:81/statistics.html?screen=left',
-                                      );
-
-                                      // LG1 (Centro)
-                                      await LGService.instance.openBrowser(
-                                        1,
-                                        'http://lg1:81/statistics.html?screen=center',
-                                      );
-
-                                      // LG2 (Derecha)
-                                      await LGService.instance.openBrowser(
-                                        2,
-                                        'http://lg1:81/statistics.html?screen=right',
-                                      );
-                                    } else if (totalScreens == 3) {
-                                      // LG1 (Centro)
-                                      await LGService.instance.openBrowser(
-                                        1,
-                                        'http://lg1:81/statistics.html?screen=center',
-                                      );
-
-                                      // LG2 (Derecha - con logo)
-                                      await LGService.instance.openBrowser(
-                                        2,
-                                        'http://lg1:81/statistics.html?screen=right',
-                                      );
-                                      // LG3 tiene el globo de estadísticas (KML)
-                                    } else {
-                                      // Solo una pantalla
-                                      await LGService.instance.openBrowser(
-                                        1,
-                                        'http://lg1:81/statistics.html?screen=center',
-                                      );
-                                    }
-
-                                    if (mounted) {
-                                      setState(() {
-                                        _showingStatistics = true;
-                                        _isLoadingStatistics = false;
-                                      });
-                                    }
-                                  } else {
-                                    if (mounted) {
-                                      setState(() {
-                                        _isLoadingStatistics = false;
-                                      });
-                                    }
-                                  }
-                                } else {
-                                  if (mounted) {
-                                    setState(() {
-                                      _isLoadingStatistics = false;
-                                    });
-                                  }
-                                }
-                              }
-                            },
+                          : _toggleStatistics,
                     ),
                   ),
                 ],
@@ -736,18 +955,63 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                       child: _buildButton(
                         _futureImageExists
                             ? LanguageManager.instance.translate(
-                                'regenerate_future',
-                              )
+                          'regenerate_future',
+                        )
                             : LanguageManager.instance.translate(
-                                'generate_future',
-                              ),
+                          'generate_future',
+                        ),
                         icon: Icons.auto_awesome,
-                        onTap: (_isGeneratingFuture || _showingStatistics)
+                        isTablet: isTablet,
+                        onTap:
+                        (_isGeneratingFuture || _showingStatistics)
                             ? null
-                            : _generateFutureImage,
+                            : _generateFutureAssets,
                       ),
                     ),
                   ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0, bottom: 5.0),
+                  child: Text(
+                    LanguageManager.instance.translate('ai_disclaimer'),
+                    style: TextStyle(
+                      color: Colors.blueAccent,
+                      fontSize: isTablet ? 14 : 10,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
+                  ),
+                  child: TextField(
+                    controller: _promptController,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: isTablet ? 16 : 12,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: LanguageManager.instance.translate(
+                        'additive_prompt_hint',
+                      ),
+                      hintStyle: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        fontSize: isTablet ? 16 : 12,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 10,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                  ),
                 ),
                 if (_isGeneratingFuture)
                   const Padding(
@@ -768,12 +1032,13 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
   }
 
   Widget _buildButton(
-    String label, {
-    IconData? icon,
-    VoidCallback? onTap,
-    Color? color,
-    bool isLoading = false,
-  }) {
+      String label, {
+        IconData? icon,
+        VoidCallback? onTap,
+        Color? color,
+        bool isLoading = false,
+        bool isTablet = false,
+      }) {
     final bool isDisabled = onTap == null && !isLoading;
     final baseColor = color ?? Colors.blue;
     return GestureDetector(
@@ -781,7 +1046,10 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
       child: Opacity(
         opacity: isDisabled ? 0.4 : 1.0,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          padding: EdgeInsets.symmetric(
+            vertical: isTablet ? 16 : 12,
+            horizontal: 4,
+          ),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -791,15 +1059,16 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
             ),
             borderRadius: BorderRadius.circular(25),
             border: Border.all(color: baseColor.withValues(alpha: 0.4)),
-            boxShadow: isDisabled
+            boxShadow:
+            isDisabled
                 ? []
                 : [
-                    BoxShadow(
-                      color: baseColor.withValues(alpha: 0.2),
-                      blurRadius: 8,
-                      spreadRadius: 1,
-                    ),
-                  ],
+              BoxShadow(
+                color: baseColor.withValues(alpha: 0.2),
+                blurRadius: 8,
+                spreadRadius: 1,
+              ),
+            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -815,15 +1084,17 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                 ),
                 const SizedBox(width: 8),
               ] else if (icon != null) ...[
-                Icon(icon, color: Colors.white, size: 16),
+                Icon(icon, color: Colors.white, size: isTablet ? 20 : 16),
                 const SizedBox(width: 4),
               ],
               Flexible(
                 child: Text(
-                  isLoading ? 'LOADING...' : label,
-                  style: const TextStyle(
+                  isLoading
+                      ? LanguageManager.instance.translate('loading')
+                      : label,
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 10,
+                    fontSize: isTablet ? 14 : 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.3,
                   ),
@@ -840,7 +1111,20 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     );
   }
 
-  Widget _buildTimelineSlider() {
+  Widget _buildImageError(bool isTablet) {
+    return Container(
+      width: double.infinity,
+      height: isTablet ? 400 : 220,
+      color: Colors.white10,
+      child: Icon(
+        Icons.image_not_supported,
+        color: Colors.white24,
+        size: isTablet ? 80 : 50,
+      ),
+    );
+  }
+
+  Widget _buildTimelineSlider(bool isTablet) {
     return ValueListenableBuilder<double>(
       valueListenable: TimeManager.instance.timeNotifier,
       builder: (context, timeValue, child) {
@@ -848,89 +1132,109 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
           absorbing: _showingStatistics || _showingComparison,
           child: Opacity(
             opacity: (_showingStatistics || _showingComparison) ? 0.5 : 1.0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-                vertical: 10.0,
-              ),
-              margin: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _timeLabel(
-                        LanguageManager.instance
-                            .translate('past')
-                            .toUpperCase(),
-                        timeValue == 0,
-                        0,
-                      ),
-                      _timeLabel(
-                        LanguageManager.instance
-                            .translate('present')
-                            .toUpperCase(),
-                        timeValue == 1,
-                        1,
-                      ),
-                      _timeLabel(
-                        LanguageManager.instance
-                            .translate('future')
-                            .toUpperCase(),
-                        timeValue == 2,
-                        2,
-                      ),
-                    ],
+            child: Center(
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: isTablet ? 600 : double.infinity,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 10.0,
+                ),
+                margin: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.1),
                   ),
-                  const SizedBox(height: 2),
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: Colors.cyanAccent,
-                      inactiveTrackColor: Colors.white.withValues(alpha: 0.2),
-                      trackHeight: 4.0,
-                      thumbColor: Colors.white,
-                      thumbShape: const RoundSliderThumbShape(
-                        enabledThumbRadius: 10.0,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _timeLabel(
+                          LanguageManager.instance
+                              .translate('past')
+                              .toUpperCase(),
+                          timeValue == 0,
+                          0,
+                          isTablet,
+                        ),
+                        _timeLabel(
+                          LanguageManager.instance
+                              .translate('present')
+                              .toUpperCase(),
+                          timeValue == 1,
+                          1,
+                          isTablet,
+                        ),
+                        _timeLabel(
+                          LanguageManager.instance
+                              .translate('future')
+                              .toUpperCase(),
+                          timeValue == 2,
+                          2,
+                          isTablet,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: Colors.cyanAccent,
+                        inactiveTrackColor: Colors.white.withValues(
+                          alpha: 0.2,
+                        ),
+                        trackHeight: 4.0,
+                        thumbColor: Colors.white,
+                        thumbShape: const RoundSliderThumbShape(
+                          enabledThumbRadius: 10.0,
+                        ),
+                        overlayColor: Colors.cyanAccent.withValues(
+                          alpha: 0.3,
+                        ),
+                        overlayShape: const RoundSliderOverlayShape(
+                          overlayRadius: 20.0,
+                        ),
+                        tickMarkShape: const RoundSliderTickMarkShape(),
+                        activeTickMarkColor: Colors.cyanAccent,
+                        inactiveTickMarkColor: Colors.white.withValues(
+                          alpha: 0.3,
+                        ),
                       ),
-                      overlayColor: Colors.cyanAccent.withValues(alpha: 0.3),
-                      overlayShape: const RoundSliderOverlayShape(
-                        overlayRadius: 20.0,
-                      ),
-                      tickMarkShape: const RoundSliderTickMarkShape(),
-                      activeTickMarkColor: Colors.cyanAccent,
-                      inactiveTickMarkColor: Colors.white.withValues(
-                        alpha: 0.3,
+                      child: Container(
+                        height: 35,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.cyanAccent.withValues(
+                                alpha: 0.3,
+                              ),
+                              blurRadius: 15,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                        child: Slider(
+                          value: timeValue,
+                          min: 0,
+                          max: 2,
+                          divisions: 2,
+                          onChanged: (value) {
+                            TimeManager.instance.setTime(value);
+                            _showBalloonOnly();
+                            if (_showingStatistics) {
+                              _toggleStatistics(forceShow: true);
+                            }
+                          },
+                        ),
                       ),
                     ),
-                    child: Container(
-                      height: 35,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.cyanAccent.withValues(alpha: 0.3),
-                            blurRadius: 15,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                      child: Slider(
-                        value: timeValue,
-                        min: 0,
-                        max: 2,
-                        divisions: 2,
-                        onChanged: (value) {
-                          TimeManager.instance.setTime(value);
-                        },
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -939,7 +1243,12 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     );
   }
 
-  Widget _timeLabel(String label, bool isSelected, double value) {
+  Widget _timeLabel(
+      String label,
+      bool isSelected,
+      double value,
+      bool isTablet,
+      ) {
     return GestureDetector(
       onTap: () => TimeManager.instance.setTime(value),
       child: AnimatedContainer(
@@ -963,7 +1272,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                 ? Colors.white
                 : Colors.white.withValues(alpha: 0.5),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            fontSize: 9,
+            fontSize: isTablet ? 12 : 9,
             letterSpacing: 1.0,
             shadows: isSelected
                 ? [const Shadow(color: Colors.cyanAccent, blurRadius: 6)]

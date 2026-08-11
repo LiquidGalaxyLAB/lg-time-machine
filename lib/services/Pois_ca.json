@@ -1,0 +1,741 @@
+{
+  "Estats_Units": {
+    "Estàtua_de_la_Llibertat": {
+      "name": "Estàtua de la Llibertat",
+      "description": "Monument icònic a Liberty Island",
+      "statistics_text_present": "-Alçada: 93 m\n-Visitants: 3,2 milions/any\n-Material: Coure\n-Lloc UNESCO des de: 1984\n-Inauguració: 28 d'octubre de 1886",
+      "statistics_text_past": "-Regal: De França als EUA\n-Arquitecte: Frédéric Auguste Bartholdi\n-Color original: Marró apagat (coure)\n-Enginyeria: Estructura de Gustave Eiffel\n-Simbolisme: Il·lustració i Llibertat",
+      "past_comparison_summary": "D'un brillant regal de coure a un símbol de pàtina verda de la llibertat i la democràcia nord-americanes."
+    },
+    "Pont_Golden_Gate": {
+      "name": "Pont Golden Gate",
+      "description": "Famós pont penjant a San Francisco",
+      "statistics_text_present": "-Longitud: 2.737 m\n-Color: Taronja internacional\n-Trànsit diari: ~110.000 cotxes\n-Alçada de les torres: 227 m\n-Acabat: 1937",
+      "statistics_text_past": "-Construït: 1933–1937\n-Enginyer: Joseph Strauss\n-Estil: Elements Art Déco\n-Materials: 88.000 tones d'acer\n-Història: Va substituir el servei de transbordador",
+      "past_comparison_summary": "Una meravella de l'enginyeria dels anys 30 que es va convertir en la silueta més icònica de San Francisco."
+    },
+    "Monument_a_Lincoln": {
+      "name": "Monument a Lincoln",
+      "description": "Monument nacional que honora Abraham Lincoln",
+      "statistics_text_present": "-Alçada: 30 m\n-Columnes: 36 columnes dòriques\n-Alçada de l'estàtua: 5,8 m\n-Visitants: 7 milions/any\n-Estil: Temple dòric grec",
+      "statistics_text_past": "-Construït: 1914–1922\n-Arquitecte: Henry Bacon\n-Escultor de l'estàtua: Daniel Chester French\n-Lloc: Zona pantanosa recuperada\n-Dedicat: 30 de maig de 1922",
+      "past_comparison_summary": "Un solemne temple d'inspiració grega que s'alça sobre un antic pantà per honorar el llegat de la unitat nacional."
+    },
+    "Mont_Rushmore": {
+      "name": "Mont Rushmore",
+      "description": "Escultura massiva tallada a les Black Hills",
+      "statistics_text_present": "-Alçada dels caps: 18 m\n-Visitants: 2 milions/any\n-Estat: Dakota del Sud\n-Presidents: Washington, Jefferson, Roosevelt, Lincoln\n-Elevació: 1.745 m",
+      "statistics_text_past": "-Tallat: 1927–1941\n-Escultor: Gutzon Borglum\n-Mètode: 90% dinamita\n-Intenció original: Incloure cossos sencers\n-Treballadors: ~400",
+      "past_comparison_summary": "La transformació d'un penya-segat de granit en un tribut monumental al lideratge nord-americà."
+    },
+    "Gran_Canyó": {
+      "name": "Gran Canyó",
+      "description": "Immens canyó tallat pel riu Colorado",
+      "statistics_text_present": "-Profunditat: Més de 1.800 m\n-Amplada: Fins a 29 km\n-Visitants: 6 milions/any\n-Lloc UNESCO des de: 1979\n-Mida del parc: 4.926 km²",
+      "statistics_text_past": "-Formació: Fa 5–6 milions d'anys\n-Història nativa: Llar del poble Pueblo\n-Protecció: Monument Nacional el 1908\n-Primera exploració: Powell (1869)\n-Estatus: Parc Nacional el 1919",
+      "past_comparison_summary": "Milions d'anys d'història geològica revelats a través de la lenta erosió del riu Colorado."
+    },
+    "Empire_State_Building": {
+      "name": "Empire State Building",
+      "description": "Gratacel Art Déco a Midtown Manhattan",
+      "statistics_text_present": "-Alçada: 443 m\n-Plantes: 102\n-Acabat: 1931\n-Llums: Famoses pantalles LED\n-Estatus: Emblema de la ciutat de Nova York",
+      "statistics_text_past": "-Construït: En 410 dies (1930-1931)\n-Títol: El més alt del món fins al 1970\n-Sobrenom: 'Empty State Building' (Gran Depressió)\n-Estil: Icona Art Déco\n-Cost: 41 milions de dòlars",
+      "past_comparison_summary": "Un símbol de l'ambició nord-americana que es va aixecar ràpidament durant la Gran Depressió per definir l'horitzó de Nova York."
+    },
+    "Parc_Nacional_de_Yellowstone": {
+      "name": "Parc Nacional de Yellowstone",
+      "description": "El primer parc nacional del món",
+      "statistics_text_present": "-Àrea: 8.983 km²\n-Guèisers: Old Faithful\n-Visitants: 4,5 milions/any\n-Fauna: Óssos grizzly, bisons, llops\n-Aigües termals: Grand Prismatic",
+      "statistics_text_past": "-Establert: 1 de març de 1872\n-Signat per: Ulysses S. Grant\n-Geologia: Caldera gegant (supervolcà)\n-Història nativa: Terra dels Crow, Blackfeet, Bannock\n-Conservació: Primera gran reserva natural",
+      "past_comparison_summary": "Una natura preservada des del segle XIX com a santuari de vida salvatge i meravelles geotèrmiques."
+    }
+  },
+  "França": {
+    "Torre_Eiffel": {
+      "name": "Torre Eiffel",
+      "description": "Torre de gelosia de ferro a París",
+      "statistics_text_present": "-Alçada: 330 m\n-Visitants: 6 milions/any\n-Plantes: 3 nivells accessibles\n-Manteniment: Repintada cada 7 anys\n-Estatus: Icona global de França",
+      "statistics_text_past": "-Construïda: 1887–1889\n-Ocasió: Exposició Universal de 1889\n-Arquitecte: Stephen Sauvestre\n-Enginyer: Gustave Eiffel\n-Controvèrsia: Odiada inicialment per molts artistes",
+      "past_comparison_summary": "D'una peça d'exhibició temporal 'inútil' al símbol global de l'elegància francesa."
+    },
+    "Museu_del_Louvre": {
+      "name": "Museu del Louvre",
+      "description": "El museu d'art més gran del món",
+      "statistics_text_present": "-Visitants: 9 milions/any\n-Objectes: ~38.000 en exhibició\n-Addició de la piràmide: 1989\n-Superfície: 72.735 m²\n-Obra famosa: Mona Lisa",
+      "statistics_text_past": "-Orígens: Fortalesa medieval (segle XII)\n-Reconstruït: Com a palau reial (segle XVI)\n-Ús reial: Residència principal fins a Versalles\n-Obertura del museu: 1793\n-Arquitectura: Renaixement francès i Barroc",
+      "past_comparison_summary": "Evolució d'una fortalesa medieval defensiva al santuari d'art més visitat del món."
+    },
+    "Mont_Saint_Michel": {
+      "name": "Mont Saint-Michel",
+      "description": "Illa de marea i abadia a Normandia",
+      "statistics_text_present": "-Població: ~30 residents\n-Visitants: 3 milions/any\n-Lloc UNESCO des de: 1979\n-Accés: Nou pont acabat el 2014\n-Marees: Les més altes d'Europa",
+      "statistics_text_past": "-Fundada: L'abadia va començar al segle VIII\n-Defensa: Va sobreviure a la Guerra dels Cent Anys\n-Presó: Utilitzada com a presó durant la Revolució Francesa\n-Estratègic: Poble insular fortificat\n-Calçada: L'original era un camí de marea",
+      "past_comparison_summary": "Una illa fortalesa espiritual que va sobreviure segles de conflicte per convertir-se en una joia turística."
+    },
+    "Palau_de_Versalles": {
+      "name": "Palau de Versalles",
+      "description": "Antiga residència reial dels reis francesos",
+      "statistics_text_present": "-Habitacions: 2.300\n-Jardins: 800 hectàrees\n-Galeria dels Miralls: 73 m de llarg\n-Visitants: 8 milions/any\n-Lloc UNESCO des de: 1979",
+      "statistics_text_past": "-Orígens: Pavelló de caça (1623)\n-Expansió: Lluís XIV (El Rei Sol)\n-Trasllat de la cort: Es va convertir en seu del poder el 1682\n-Significat: Símbol de la Monarquia Absoluta\n-Revolució: Va deixar de ser residència reial el 1789",
+      "past_comparison_summary": "La transformació d'un modest pavelló de caça en el palau més opulent d'Europa."
+    },
+    "Catedral_de_Notre-Dame": {
+      "name": "Catedral de Notre-Dame",
+      "description": "Catedral catòlica medieval a París",
+      "statistics_text_present": "-Restauració: Després de l'incendi del 2019\n-Estil: Gòtic francès\n-Vitralls: Originals del segle XIII\n-Campana: 'Emmanuel' (13 tones)\n-Ubicació: Île de la Cité",
+      "statistics_text_past": "-Construïda: 1163–1345\n-Innovacions arquitectòniques: Arcbotants\n-Esdeveniment històric: Coronació de Napoleó (1804)\n-Restauració: Viollet-le-Duc (segle XIX)\n-Icona cultural: Novel·la de Victor Hugo (1831)",
+      "past_comparison_summary": "Una obra mestra gòtica que ha estat testimoni de segles d'història francesa, ressorgint actualment de l'incendi del 2019."
+    },
+    "Arc_de_Triomf": {
+      "name": "Arc de Triomf",
+      "description": "Monument al centre de la Place Charles de Gaulle",
+      "statistics_text_present": "-Alçada: 50 m\n-Tomba: Soldat Desconegut (1921)\n-Ubicació: Champs-Élysées\n-Visitants: 1,5 milions/any\n-Disseny: Neoclàssic",
+      "statistics_text_past": "-Encarregat: Napoleó el 1806\n-Finalització: 1836 (Lluís Felip)\n-Propòsit: Celebrar la victòria a Austerlitz\n-Relleus: 'La Partida dels Voluntaris'\n-Símbol: Unitat nacional francesa",
+      "past_comparison_summary": "Un arc triomfal que honora els qui van lluitar per França, ancorant la perspectiva més famosa de la ciutat."
+    },
+    "Pont_del_Gard": {
+      "name": "Pont del Gard",
+      "description": "Antic aqüeducte romà",
+      "statistics_text_present": "-Alçada: 48,8 m\n-Nivells: 3 pisos d'arcs\n-Lloc UNESCO des de: 1985\n-Material: Pedra calcària\n-Estatus: Pont romà millor conservat",
+      "statistics_text_past": "-Construït: Segle I dC\n-Propòsit: Aigua per a Nîmes\n-Construcció: Sense morter\n-Manteniment: Utilitzat fins al segle VI\n-Supervivència: Reutilitzat com a pont de peatge a l'edat mitjana",
+      "past_comparison_summary": "Una meravella de l'enginyeria romana que va subministrar aigua durant segles i encara es manté dreta com a icona estructural."
+    }
+  },
+  "Itàlia": {
+    "Colosseu": {
+      "name": "Colosseu",
+      "description": "Antic amfiteatre romà",
+      "statistics_text_present": "-Capacitat: ~50.000 persones\n-Estatus: Patrimoni de la Humanitat UNESCO\n-Material: Travertí, tosca i formigó revestit de maó\n-Visitants: 7 milions/any\n-Símbol: Emblema icònic de Roma",
+      "statistics_text_past": "-Acabat: 80 dC (Vespasià/Titus)\n-Jocs: Combats de gladiadors i batalles navals simulades\n-Façana: Originalment coberta de marbre\n-Danys: Terratrèmols i saquejadors de pedra\n-Hipogeu: Xarxa de túnels subterranis",
+      "past_comparison_summary": "La transformació de l'arena més grandiosa de l'Imperi Romà en un símbol preservat de l'antiguitat."
+    },
+    "Torre_Inclinada_de_Pisa": {
+      "name": "Torre Inclinada de Pisa",
+      "description": "Campanar independent",
+      "statistics_text_present": "-Alçada: 56 m\n-Inclinació: ~3,97 graus\n-Pes: ~14.500 tones\n-Esglaons: 294 o 296\n-Estabilitzada: Restauració important el 1990-2001",
+      "statistics_text_past": "-Construcció: Iniciada el 1173\n-Problema: Va començar a inclinar-se durant la construcció del segon pis\n-Sòl: Argila, fang i sorra inestables\n-Durada: Va trigar 199 anys a completar-se\n-Arquitecte: Desconegut (atribuït a Bonanno Pisano)",
+      "past_comparison_summary": "Un error arquitectònic accidental que es va convertir en un dels monuments més famosos del món."
+    },
+    "Panteó": {
+      "name": "Panteó",
+      "description": "Antic temple i església romana",
+      "statistics_text_present": "-Cúpula: La cúpula de formigó sense reforç més gran del món\n-Diàmetre: 43,3 m\n-Estatus: Església propietat de l'Estat (Basílica)\n-Tombes: Rafael i reis italians\n-Ús: Encara activa per a serveis religiosos",
+      "statistics_text_past": "-Encarregat: Marc Agripa (original)\n-Reconstruït: Adrià cap al 126 dC\n-Propòsit: Temple per a tots els déus romans\n-Conversió: Consagrat com a església el 609 dC\n-Òcul: L'única font de llum natural",
+      "past_comparison_summary": "Una obra mestra arquitectònica que ha romàs en ús continu durant gairebé 2.000 anys."
+    },
+    "Font_de_Trevi": {
+      "name": "Font de Trevi",
+      "description": "Font barroca al districte de Trevi",
+      "statistics_text_present": "-Alçada: 26,3 m\n-Amplada: 49,1 m\n-Aigua diària: 80.000 m³\n-Tradició: Llançar monedes (3.000€/dia)\n-Material: Pedra travertí",
+      "statistics_text_past": "-Construïda: 1732–1762\n-Arquitecte: Nicola Salvi\n-Aqüeducte: Font és l'Aqua Virgo (19 aC)\n-Estil: Barroc tardà\n-Escultura: Oceà al nínxol central",
+      "past_comparison_summary": "La font més espectacular de Roma, construïda sobre una antiga font d'aigua romana."
+    },
+    "Catedral_de_Milà": {
+      "name": "Catedral de Milà (Duomo di Milano)",
+      "description": "Catedral gòtica massiva",
+      "statistics_text_present": "-Capacitat: 40.000 persones\n-Estàtues: 3.400\n-Agulla: Madonnina (108 m)\n-Estil: Gòtic radiant\n-Material: Marbre de Candoglia",
+      "statistics_text_past": "-Iniciada: 1386\n-Acabada: 1965 (finalització oficial)\n-Construcció: Més de 600 anys\n-Suport: Gian Galeazzo Visconti\n-Façana: Barreja de gòtic i renaixentista",
+      "past_comparison_summary": "Un bosc d'agulles de marbre que va trigar sis segles a completar-se, dominant el cor de Milà."
+    },
+    "Fòrum_Romà": {
+      "name": "Fòrum Romà",
+      "description": "Plaça envoltada de ruïnes d'antics edificis governamentals",
+      "statistics_text_present": "-Lloc: Parc arqueològic\n-Ruïnes clau: Cúria Júlia, Temple de Saturn\n-Visitants: Combinat amb el Colosseu\n-Estatus: Cor de l'antiga Roma\n-Paisatge: Museu a l'aire lliure",
+      "statistics_text_past": "-Funció: Centre social, polític i comercial\n-Orígens: Segle VII aC (drenatge de pantà)\n-Apogeu: Era d'August i Trajà\n-Abandonament: Després de la caiguda de Roma\n-Redescobriment: Excavacions als segles XVIII-XIX",
+      "past_comparison_summary": "L'epicentre del món romà, transformat d'un bulliciós centre urbà en una evocadora ruïna."
+    },
+    "Pompeia": {
+      "name": "Pompeia",
+      "description": "Antiga ciutat romana preservada",
+      "statistics_text_present": "-Excavat: ~2/3 de la ciutat\n-Visitants: 2,5 milions/any\n-Lloc UNESCO des de: 1997\n-Ubicació: Prop de Nàpols\n-Clima: Mediterrani",
+      "statistics_text_past": "-Desastre: Erupció del Vesuvi l'any 79 dC\n-Sepultada: Sota 4-6 m de cendra\n-Població: ~11.000–20.000\n-Congelada: Vida capturada en ple instant\n-Redescobriment: 1748",
+      "past_comparison_summary": "Una instantània de la vida romana congelada en el temps pel poder catastròfic del Mont Vesuvi."
+    }
+  },
+  "Espanya": {
+    "Sagrada_Família": {
+      "name": "Sagrada Família",
+      "description": "Basílica catòlica",
+      "statistics_text_present": "-Alçada: 172,5 m\n-Visitants: 8–10 milions/any\n-Capacitat: ~15.000 persones\n-Visita mitjana: 2,5 h\n-Energia: Autosuficient",
+      "statistics_text_past": "-Iniciada: 1882\n-Arquitecte: Antoni Gaudí\n-Estil: Modernisme\n-Pressupost original: Donacions humils\n-Estat el 1900: Només iniciada la façana del Naixement",
+      "past_comparison_summary": "Una transició d'una obra visionària en construcció a una obra mestra arquitectònica de renom mundial."
+    },
+    "Plaça_Major_de_Salamanca": {
+      "name": "Plaça Major de Salamanca",
+      "description": "Plaça",
+      "statistics_text_present": "-Estil: Barroc churrigueresc\n-Superfície: 6.400 m²\n-Medallons: 88 rostres tallats\n-Arcs: 88 arcs semicirculars\n-Tradició: Punt de trobada d'estudiants",
+      "statistics_text_past": "-Construïda: 1729–1755\n-Arquitecte: Alberto Churriguera\n-Ús original: Curses de braus fins al 1854\n-Material: Pedra de Villamayor\n-Suport reial: Felip V",
+      "past_comparison_summary": "Evolució d'una plaça reial multifuncional i plaça de braus al cor social de la vida universitària."
+    },
+    "Catedral_de_Santiago_de_Compostel·la": {
+      "name": "Catedral de Santiago de Compostel·la",
+      "description": "Catedral",
+      "statistics_text_present": "-Pelegrins: >300.000/any\n-Atracció principal: Botafumeiro\n-Estil: Romànic, gòtic, barroc\n-Pes del Botafumeiro: 53 kg\n-Velocitat del Botafumeiro: 68 km/h",
+      "statistics_text_past": "-Consagrada: 1211\n-Pòrtic de la Glòria: Mestre Mateo\n-Origen: Descobriment de la tomba de Sant Jaume\n-Expansió: Façana barroca (segle XVIII)\n-Defensa: Torres tipus fortalesa",
+      "past_comparison_summary": "D'una fortalesa medieval defensiva i lloc de pelegrinatge a una icona religiosa barroca."
+    },
+    "Alhambra_de_Granada": {
+      "name": "Alhambra de Granada",
+      "description": "Complex de palau i fortalesa",
+      "statistics_text_present": "-Visitants: 2,7 milions/any\n-Superfície: 140.000 m²\n-Lloc UNESCO des de: 1984\n-Jardins: Generalife\n-Estatus: El més visitat d'Espanya",
+      "statistics_text_past": "-Iniciada: 1238 (Dinastia Nassarita)\n-Fundador: Muhammad I\n-Estil: Arquitectura morisca\n-Captura: 1492 pels Reis Catòlics\n-Addició: Palau de Carles V (1527)",
+      "past_comparison_summary": "La transformació d'una ciutadella reial nassarita en un complex monumental renaixentista espanyol."
+    },
+    "Palau_Reial_de_Madrid": {
+      "name": "Palau Reial de Madrid",
+      "description": "Palau Reial",
+      "statistics_text_present": "-Superfície: 135.000 m²\n-Habitacions: 3.418\n-Estatus: El més gran d'Europa per superfície\n-Visitants: 1,5 milions/any\n-Col·leccions: Stradivarius Palatinos",
+      "statistics_text_past": "-Construït: 1738–1755\n-Lloc: Antic Alcàsser morisc\n-Incendi: Va destruir el palau antic el 1734\n-Arquitectes: Juvarra i Sacchetti\n-Primer rei resident: Carles III el 1764",
+      "past_comparison_summary": "La reconstrucció després de l'incendi de 1734, reemplaçant l'antic Alcàsser pel palau més gran d'Europa."
+    },
+    "Mesquita-Catedral_de_Còrdova": {
+      "name": "Mesquita-Catedral de Còrdova",
+      "description": "Catedral històrica i antiga mesquita",
+      "statistics_text_present": "-Superfície: 23.400 m²\n-Arcs: 856 columnes\n-Lloc UNESCO des de: 1984\n-Estatus: Catedral de la Diòcesi\n-Estil: Islàmic i renaixentista",
+      "statistics_text_past": "-Orígens: Església visigòtica\n-Conversió a mesquita: 784 dC (Abd al-Rahman I)\n-Expansió: Al-Hakam II (Edat d'Or)\n-Reconquesta: Convertida en catedral el 1236\n-Renaixement: Nau afegida al segle XVI",
+      "past_comparison_summary": "Un híbrid arquitectònic que representa la història en capes de l'Espanya islàmica i cristiana."
+    },
+    "Park_Güell": {
+      "name": "Park Güell",
+      "description": "Sistema privatitzat de parcs públics compost per jardins i elements arquitectònics",
+      "statistics_text_present": "-Àrea: 17 hectàrees\n-Símbol: Salamandra de mosaic (El Drac)\n-Lloc UNESCO des de: 1984\n-Estil: Modernisme català\n-Ubicació: Turó del Carmel",
+      "statistics_text_past": "-Projecte: 1900–1914\n-Arquitecte: Antoni Gaudí\n-Client: Eusebi Güell\n-Objectiu original: Urbanització de luxe\n-Fracàs: Només es van construir dues cases",
+      "past_comparison_summary": "Un projecte immobiliari de luxe fallit que es va convertir en una obra mestra de disseny orgànic de fama mundial."
+    }
+  },
+  "Regne_Unit": {
+    "Big_Ben": {
+      "name": "Big Ben",
+      "description": "La Gran Campana del Gran Rellotge de Westminster",
+      "statistics_text_present": "-Esfera del rellotge: 7 m de diàmetre\n-Pes de la campana: 13,7 tones\n-Alçada de la torre: 96 m\n-Renovació: Acabada el 2022\n-Estatus: Símbol cultural del Regne Unit",
+      "statistics_text_past": "-Torre construïda: 1859\n-Arquitecte: Augustus Pugin\n-Estil: Revival gòtic\n-Nom original: Clock Tower\n-Reanomenada: Elizabeth Tower (2012)",
+      "past_comparison_summary": "El guardià fiable del temps de Londres des de mitjans del segle XIX."
+    },
+    "Tower_Bridge": {
+      "name": "Tower Bridge",
+      "description": "Pont combinat basculant i penjant",
+      "statistics_text_present": "-Longitud: 240 m\n-Alçada: 65 m\n-Creuaments diaris: 40.000\n-Energia: Elèctrica (des de 1976)\n-Estatus: Emblema icònic de Londres",
+      "statistics_text_past": "-Construït: 1886–1894\n-Enginyer: John Wolfe Barry\n-Energia original: Màquines de vapor\n-Disseny: Gòtic victorià\n-Elevacions: ~1.000 vegades a l'any",
+      "past_comparison_summary": "Excel·lència de l'enginyeria victoriana que permet als vaixells arribar al cor de la ciutat."
+    },
+    "Stonehenge": {
+      "name": "Stonehenge",
+      "description": "Monument prehistòric a Wiltshire",
+      "statistics_text_present": "-Pedres: Sarsen i bluestones\n-Lloc UNESCO des de: 1986\n-Visitants: 1,6 milions/any\n-Alineació: Posta/sortida del sol en solsticis\n-Estatus: Icona cultural britànica",
+      "statistics_text_past": "-Edat: 3000 aC a 2000 aC\n-Propòsit: Cementiri o calendari solar\n-Logística: Bluestones portades des de Gal·les (240 km)\n-Disseny: Fossat i mur circular\n-Erosió: Desgast natural durant 5.000 anys",
+      "past_comparison_summary": "Un misteriós lloc megalític que ha estat testimoni silenciós durant mil·lennis."
+    },
+    "Palau_de_Buckingham": {
+      "name": "Palau de Buckingham",
+      "description": "Residència londinenca i seu administrativa del monarca",
+      "statistics_text_present": "-Habitacions: 775\n-Personal: ~400 persones\n-Jardí: El jardí privat més gran de Londres\n-Esdeveniments: Canvi de Guàrdia\n-Bandera: Estendard Reial (si el Rei hi és present)",
+      "statistics_text_past": "-Original: Buckingham House (1703)\n-Expansió: Nash i Blore (segle XIX)\n-Oficial: Residència principal el 1837\n-Façana est: Afegida el 1847\n-Bombardeig: Va sobreviure als atacs aeris de la Segona Guerra Mundial",
+      "past_comparison_summary": "L'evolució d'una mansió del segle XVIII al símbol global de la Monarquia Britànica."
+    },
+    "Torre_de_Londres": {
+      "name": "Torre de Londres",
+      "description": "Castell històric a la riba nord del Tàmesi",
+      "statistics_text_present": "-Artefactes: Joies de la Corona\n-Guardians: Yeoman Warders (Beefeaters)\n-Visitants: 3 milions/any\n-Lloc UNESCO des de: 1988\n-Corbs: La llegenda diu que s'hi han de quedar",
+      "statistics_text_past": "-Fundada: 1066 (Guillem el Conqueridor)\n-Torre Blanca: 1078\n-Funcions: Palau, presó, arsenal, casa de la moneda, zoo\n-Infàmia: Presó d'Anna Bolena i Isabel I\n-Defensa: Fortificacions concèntriques",
+      "past_comparison_summary": "Una fortalesa reial que ha servit com a palau, presó i tresoreria durant gairebé un mil·lenni."
+    },
+    "Castell_d'Edimburg": {
+      "name": "Castell d'Edimburg",
+      "description": "Fortalesa històrica que domina l'horitzó d'Edimburg",
+      "statistics_text_present": "-Elevació: Castle Rock (volcà extint)\n-Tradició: Canó de la Una en Punt\n-Visitants: 2,2 milions/any\n-Destacat: Honors d'Escòcia (Joies de la Corona)\n-Estatus: Lloc més visitat d'Escòcia",
+      "statistics_text_past": "-Evidència d'ús: Segle II dC\n-Residència reial: Fins al 1633\n-Setges: El lloc més assetjat de Gran Bretanya\n-Capella de Santa Margarida: Edifici més antic d'Edimburg (segle XII)\n-Militar: Principal guarnició d'Escòcia",
+      "past_comparison_summary": "Una fortalesa formidable que ha definit la defensa i la història reial de la capital escocesa."
+    },
+    "Abadia_de_Westminster": {
+      "name": "Abadia de Westminster",
+      "description": "Gran església abacial, principalment gòtica",
+      "statistics_text_present": "-Coronacions: Cada monarca des de 1066\n-Enterraments: 17 monarques\n-Estil: Gòtic principalment del segle XIII\n-Racó dels Poetes: Memorials a escriptors del Regne Unit\n-Estatus: Peculiar Reial",
+      "statistics_text_past": "-Fundada: 960 dC (monjos benedictins)\n-Reconstruïda: Eduard el Confessor (segle XI)\n-Reconstrucció d'Enric III: Iniciada el 1245\n-Capella de la Mare de Déu: Afegida per Enric VII (1503)\n-Torres: Torres de Hawksmoor acabades el 1745",
+      "past_comparison_summary": "El lloc de coronació i darrer descans de reis, reines i grans britànics."
+    }
+  },
+  "Alemanya": {
+    "Porta_de_Brandenburg": {
+      "name": "Porta de Brandenburg",
+      "description": "Monument neoclàssic del segle XVIII a Berlín",
+      "statistics_text_present": "-Alçada: 26 m\n-Simbolisme: Unitat i pau\n-Estàtua: Quadriga (Deessa de la Victòria)\n-Ubicació: Pariser Platz\n-Estatus: Emblema més famós d'Alemanya",
+      "statistics_text_past": "-Construïda: 1788–1791 (Frederic Guillem II)\n-Arquitecte: Carl Gotthard Langhans\n-Guerra Freda: Ubicada en 'terra de ningú' al costat del Mur\n-Tancament: 1961–1989\n-Restauració: Després de la reunificació",
+      "past_comparison_summary": "D'un símbol de divisió durant la Guerra Freda a un far de la reunificació alemanya."
+    },
+    "Castell_de_Neuschwanstein": {
+      "name": "Castell de Neuschwanstein",
+      "description": "Palau historicista del segle XIX en un turó escarpat",
+      "statistics_text_present": "-Visitants: 1,4 milions/any\n-Habitacions: 15 acabades de més de 200\n-Influència: Castell de la Bella Dorment (Disney)\n-Ubicació: Baviera\n-Paisatge: Entorn alpí",
+      "statistics_text_past": "-Construït: 1869–1886\n-Encarregat per: Lluís II (el Rei dels Contes de Fades)\n-Propòsit: Retir personal i tribut a Wagner\n-Tecnologia moderna: Tenia aigua corrent i calefacció\n-Finalització: Lluís II va morir abans que es completés",
+      "past_comparison_summary": "El retir romàntic definitiu, construït per a un rei que desitjava escapar del món modern."
+    },
+    "Catedral_de_Colònia": {
+      "name": "Catedral de Colònia",
+      "description": "Catedral de Sant Pere i Maria",
+      "statistics_text_present": "-Alçada: 157 m (torres bessones)\n-Lloc UNESCO des de: 1996\n-Visitants: 20.000/dia\n-Tresor: Relicari dels Tres Reis\n-Estatus: Monument més visitat d'Alemanya",
+      "statistics_text_past": "-Iniciada: 1248\n-Aturada: Obres aturades el 1473 durant 400 anys\n-Finalització: 1880 (suport prussià)\n-Segona Guerra Mundial: Colpejada per 14 bombes, es va mantenir dreta\n-Estil: Influència del gòtic radiant francès",
+      "past_comparison_summary": "Un titan gòtic que va trigar més de 600 anys a assolir la seva forma final i imponent."
+    },
+    "Memorial_del_Mur_de_Berlín": {
+      "name": "Memorial del Mur de Berlín",
+      "description": "Lloc commemoratiu de la divisió de Berlín",
+      "statistics_text_present": "-Longitud de la secció: 1,4 km\n-Torre d'observació: Original preservada\n-Capella: Capella de la Reconciliació\n-Exposició a l'aire lliure: Marcadors commemoratius\n-Educació: Centre de Documentació",
+      "statistics_text_past": "-Mur construït: 13 d'agost de 1961\n-La 'Franja de la Mort': Zona fronterera fortificada\n-Longitud: 155 km al voltant de Berlín Occidental\n-Caiguda del Mur: 9 de novembre de 1989\n-Destrucció: La major part es va retirar el 1990",
+      "past_comparison_summary": "Un recordatori sobri d'una ciutat dividida, preservat com a tribut a la llibertat i la memòria."
+    },
+    "Edifici_del_Reichstag": {
+      "name": "Edifici del Reichstag",
+      "description": "Històric edifici a Berlín que allotja el parlament alemany",
+      "statistics_text_present": "-Cúpula: Cúpula de vidre de Norman Foster\n-Funció: Seu del Bundestag\n-Energia: Autosuficiència ecològica\n-Visitants: Visites amb alta seguretat\n-Ubicació: Prop de la Porta de Brandenburg",
+      "statistics_text_past": "-Inaugurat: 1894\n-Incendi del Reichstag: 1933 (va portar a l'expansió del poder nazi)\n-Segona Guerra Mundial: Greument danyat en la Batalla de Berlín\n-Guerra Freda: Prop del Mur, sense ús parlamentari\n-Restauració: Completada el 1999",
+      "past_comparison_summary": "Un edifici que reflecteix el turbulent segle XX d'Alemanya, ara amb una cúpula transparent de democràcia."
+    },
+    "Castell_de_Heidelberg": {
+      "name": "Castell de Heidelberg",
+      "description": "Castell renaixentista en ruïnes a la vall del Neckar",
+      "statistics_text_present": "-Destacat: Gran Bóta de Heidelberg (bóta de vi)\n-Terrassa: Vistes del casc antic\n-Jardins: Ruïnes de l'Hortus Palatinus\n-Estatus: Símbol del romanticisme alemany",
+      "statistics_text_past": "-Orígens: Segle XIII\n-Apogeu renaixentista: Expansions del segle XVI\n-Destrucció: Guerra dels Nou Anys (1689 i 1693)\n-Llamp: Colpejat el 1764, causant l'abandonament final\n-Preservació: Protegit com a ruïna romàntica des del segle XIX",
+      "past_comparison_summary": "Una de les estructures renaixentistes més importants al nord dels Alps, avui una ruïna poètica."
+    }
+  },
+  "Grècia": {
+    "Acròpolis_d'Atenes": {
+      "name": "Acròpolis d'Atenes",
+      "description": "Antiga ciutadella situada sobre un aflorament rocós",
+      "statistics_text_present": "-Lloc UNESCO des de: 1987\n-Visitants: 16.000/dia\n-Projectes principals: Restauració contínua del marbre\n-Estatus: Símbol de la civilització occidental\n-Elevació: 150 m",
+      "statistics_text_past": "-Habitada: Des del quart mil·lenni aC\n-Era de Pèricles: Edat d'Or (segle V aC)\n-Setge: Explosió de Morosini el 1687\n-Marbres: Retirada de Lord Elgin (1801)\n-Significat: Recinte sagrat dedicat a Atena",
+      "past_comparison_summary": "La ciutat alta d'Atenes, evolucionant d'una fortalesa micènica al punt àlgid de l'art grec clàssic."
+    },
+    "Partenó": {
+      "name": "Partenó",
+      "description": "Antic temple a l'Acròpolis d'Atenes",
+      "statistics_text_present": "-Columnes: 46 columnes dòriques exteriors\n-Material: Marbre pentèlic\n-Estatus: Edifici clàssic supervivent més important\n-Característiques: Il·lusions òptiques (èntasi)\n-Vistes: Visible des de tota Atenes",
+      "statistics_text_past": "-Acabat: 438 aC\n-Arquitectes: Ictino i Cal·lícrates\n-Escultor: Fídies\n-Conversions: Església bizantina, església catòlica, mesquita\n-Danys: Explosió de pólvora veneciana el 1687",
+      "past_comparison_summary": "Un temple de proporcions perfectes que ha sobreviscut com a església, mesquita i ruïna perdurable."
+    },
+    "Temple_de_Posidó": {
+      "name": "Temple de Posidó",
+      "description": "Antic temple grec al Cap Sounion",
+      "statistics_text_present": "-Ubicació: Dalt d'un penya-segat a 60 m sobre el mar\n-Columnes restants: 16\n-Posta de sol: Famós per les seves vistes sobre l'Egeu\n-Proximitat: 70 km d'Atenes\n-Material: Marbre local",
+      "statistics_text_past": "-Construït: 444–440 aC\n-Era: Contemporani del Partenó\n-Història: Grafit de Lord Byron (1810)\n-Sagrat: Dedicat al Déu del Mar\n-Disseny: Hexàstil perimetral",
+      "past_comparison_summary": "Un dramàtic santuari costaner que marca la punta més meridional de la península de l'Àtica."
+    },
+    "Delfos": {
+      "name": "Delfos",
+      "description": "Santuari d'Apol·lo i seu de l'Oracle",
+      "statistics_text_present": "-Lloc UNESCO des de: 1987\n-Elements clau: Temple d'Apol·lo, teatre, Tholos\n-Museu: L'Auriga de Delfos\n-Entorn: Vessants del mont Parnàs\n-Visitants: Destinació cultural important",
+      "statistics_text_past": "-Apogeu: Segles VI–IV aC\n-Rol: Centre religiós del món grec\n-L'Oracle: Pítia donant profecies\n-Jocs Pítics: Precursor dels Jocs Olímpics\n-Ómfal: Considerat el centre (melic) del món",
+      "past_comparison_summary": "L'oracle més prestigiós del món antic, situat en un paisatge muntanyós impressionant."
+    },
+    "Meteora": {
+      "name": "Meteora",
+      "description": "Complex monàstic construït sobre pilars naturals de gres",
+      "statistics_text_present": "-Monestirs actius: 6 (de 24 originals)\n-Lloc UNESCO des de: 1988\n-Accés: Esglaons tallats a la roca (moderns)\n-Turisme: Famós lloc de senderisme mundial\n-Estatus: Segon grup monàstic més important de Grècia",
+      "statistics_text_past": "-Orígens: Monjos ermitans al segle XI\n-Construcció de monestirs: Segle XIV (era bizantina)\n-Defensa: Inaccessible excepte per xarxes i escales\n-Creixement: Va prosperar durant l'ocupació otomana\n-Significat: Refugi segur per a la tradició ortodoxa",
+      "past_comparison_summary": "Retirs espirituals 'suspesos a l'aire', que oferien aïllament total durant segles."
+    },
+    "Palau_de_Cnossos": {
+      "name": "Palau de Cnossos",
+      "description": "El jaciment arqueològic més gran de l'Edat del Bronze a Creta",
+      "statistics_text_present": "-Entorn: Prop d'Heraklion, Creta\n-Destacat: Sala del Tron, frescos\n-Visitants: 1 milió/any\n-Reconstrucció: Treball controvertit de principis del segle XX\n-Estatus: Centre de la civilització minoica",
+      "statistics_text_past": "-Apogeu: 1700–1400 aC\n-Mitologia: Laberint i el Minotaure\n-Arquitectura: Multipisos, lampisteria, pous de llum\n-Abandonament: Al voltant del 1350 aC\n-Excavació: Sir Arthur Evans (1900)",
+      "past_comparison_summary": "El sofisticat palau laberíntic dels reis minoics, la primera civilització avançada d'Europa."
+    }
+  },
+  "Egipte": {
+    "Gran_Piràmide_de_Giza": {
+      "name": "Gran Piràmide de Giza",
+      "description": "La més antiga i gran de les piràmides del complex de Giza",
+      "statistics_text_present": "-Alçada: 138,5 m (originalment 146,6 m)\n-Blocs: ~2,3 milions de pedres\n-Lloc UNESCO des de: 1979\n-Visitants: 14 milions/any\n-Estatus: Última de les Set Meravelles",
+      "statistics_text_past": "-Construïda: ~2560 aC (Regne Antic)\n-Faraó: Kheops (Khufu)\n-Façana: Originalment coberta de pedra calcària blanca\n-Cim: Coronada amb un piramidió daurat\n-Construcció: Realitzada en ~20 anys",
+      "past_comparison_summary": "El punt àlgid de l'enginyeria antiga, que en el seu moment va brillar blanca sota el sol del desert."
+    },
+    "Gran_Esfinx_de_Giza": {
+      "name": "Gran Esfinx de Giza",
+      "description": "Estàtua de pedra calcària d'una esfinx reclinada",
+      "statistics_text_present": "-Longitud: 73 m\n-Alçada: 20 m\n-Amplada del rostre: 4 m\n-Restauració: Estabilització contínua\n-Orientació: Mira cap a l'est",
+      "statistics_text_past": "-Construïda: ~2500 aC\n-Subjecte: Probablement el faraó Kefrèn\n-Condició: Enterrada en sorra durant segles\n-Nas: Perdut abans del segle XVIII\n-Característiques: Originalment pintada (rastres de vermell/blau)",
+      "past_comparison_summary": "L'escultura monumental coneguda més antiga del món, custodiant les piràmides durant 4.500 anys."
+    },
+    "Temple_de_Karnak": {
+      "name": "Temple de Karnak",
+      "description": "Vast museu a l'aire lliure i lloc religiós",
+      "statistics_text_present": "-Àrea: 100 hectàrees\n-Sala Hipòstila: 134 columnes massives\n-Ubicació: Luxor (antiga Tebes)\n-Visitants: Principal lloc cultural egipci\n-Estatus: Segon lloc religiós més gran mai construït",
+      "statistics_text_past": "-Construït: 1971 aC – 30 aC\n-Creixement: Ampliat per ~30 faraons diferents\n-Déu: Dedicat principalment a Amon-Ra\n-Significat: Lloc de culte més important\n-Llac: Llac Sagrat per a la purificació",
+      "past_comparison_summary": "Una història arquitectònica acumulativa del poder d'Egipte, construïda al llarg de 1.500 anys."
+    },
+    "Abu_Simbel": {
+      "name": "Abu Simbel",
+      "description": "Dos temples monumentals tallats a la roca",
+      "statistics_text_present": "-Reubicació: Traslladat el 1968 (projecte de la Presa d'Aswan)\n-Temple principal: 4 estàtues colossals de Ramsès II\n-Lloc UNESCO: Part dels Monuments de Núbia\n-Alineació solar: 22 d'octubre i 22 de febrer\n-Ubicació: Prop de la frontera amb el Sudan",
+      "statistics_text_past": "-Construït: ~1264 aC\n-Commemora: La victòria de Ramsès II a Kadesh\n-Construcció: Tallat directament al penya-segat\n-Descobriment: Johann Ludwig Burckhardt (1813)\n-Dedicacions: A Ra-Horakhty, Amon i Ptah",
+      "past_comparison_summary": "La màxima expressió de l'ego reial, rescatada amb èxit de les aigües creixents del llac Nasser."
+    },
+    "Vall_dels_Reis": {
+      "name": "Vall dels Reis",
+      "description": "Vall on es van excavar tombes per als faraons",
+      "statistics_text_present": "-Tombes: 63 descobertes (KV1 a KV63)\n-Més famosa: Tutankamon (KV62)\n-Visitants: Límit alt per dia\n-Lloc UNESCO des de: 1979\n-Ubicació: Riba oest del Nil",
+      "statistics_text_past": "-Era: Regne Nou (1550–1070 aC)\n-Propòsit: Enterraments ocults per evitar el saqueig de tombes\n-Habitants: Ramsès I-X, Seti I, Tutankamon\n-Decoració: Intricades pintures murals (Llibre dels Morts)\n-Treball: Poble d'artesans de Deir el-Medina",
+      "past_comparison_summary": "Una ciutat oculta dels morts, dissenyada per protegir el viatge dels faraons cap a l'altra vida."
+    },
+    "Temple_de_Luxor": {
+      "name": "Temple de Luxor",
+      "description": "Gran complex de temples de l'Antic Egipte a la riba est",
+      "statistics_text_present": "-Avinguda: Avinguda de les Esfinxs (3 km cap a Karnak)\n-Mesquita: Abu Haggag (construïda a sobre)\n-Visita nocturna: Bellament il·luminat\n-Obelisc: Només en queda un (la seva parella és a París)\n-Estatus: Lloc de culte continu",
+      "statistics_text_past": "-Fundat: ~1400 aC\n-Constructors clau: Amenhotep III i Ramsès II\n-Funció: Centre del Festival d'Opet\n-Significat: Coronació de reis\n-Història: Va servir com a fort/campament romà",
+      "past_comparison_summary": "Un temple que s'ha mantingut en ús a través de les eres egípcia, grega, romana, cristiana i islàmica."
+    }
+  },
+  "Xina": {
+    "Gran_Muralla_Xinesa": {
+      "name": "Gran Muralla Xinesa",
+      "description": "Antiga sèrie de murs i fortificacions",
+      "statistics_text_present": "-Longitud: 21.196 km\n-Lloc UNESCO des de: 1987\n-Visitants: 10 milions/any (Badaling)\n-Material: Pedra, maó, terra picada\n-Estatus: Noves Set Meravelles del Món",
+      "statistics_text_past": "-Construïda: Segle VII aC – segle XVII dC\n-Dinastia principal: Ming (seccions millor preservades)\n-Propòsit: Protecció contra invasions del nord\n-Treball: Soldats, pagesos, presoners\n-Senyals: Fum i foc utilitzats per a la comunicació",
+      "past_comparison_summary": "Un sistema defensiu colossal que va evolucionar durant 2.000 anys fins convertir-se en el símbol de la resistència xinesa."
+    },
+    "Ciutat_Prohibida": {
+      "name": "Ciutat Prohibida",
+      "description": "Complex de palaus imperials al centre de Pequín",
+      "statistics_text_present": "-Àrea: 72 hectàrees\n-Edificis: 980 supervivents\n-Visitants: 19 milions/any (amb límit aplicat)\n-Lloc UNESCO des de: 1987\n-Estatus: El palau més gran del món",
+      "statistics_text_past": "-Construïda: 1406–1420 (Dinastia Ming)\n-Funció: Llar de 24 emperadors\n-Disseny: Arquitectura palatina tradicional xinesa\n-Color: Groc (imperial) i vermell (fortuna)\n-Accés: Restringit a la cort imperial durant 500 anys",
+      "past_comparison_summary": "D'un centre reclòs de poder imperial diví al museu més visitat del món."
+    },
+    "Exèrcit_de_Terracota": {
+      "name": "Exèrcit de Terracota",
+      "description": "Col·lecció d'escultures de terracota que representen els exèrcits de Qin Shi Huang",
+      "statistics_text_present": "-Figures: ~8.000 soldats, 130 carros\n-Ubicació: Xi'an\n-Lloc UNESCO des de: 1987\n-Descobriment: 1974 per pagesos locals\n-Estatus: Una de les majors troballes arqueològiques del segle XX",
+      "statistics_text_past": "-Creat: ~210 aC\n-Propòsit: Protegir el primer emperador a l'altra vida\n-Únic: Cada rostre és diferent\n-Original: Les figures estaven pintades de colors vius\n-Armament: Es van fer servir espases i ballestes de bronze reals",
+      "past_comparison_summary": "Un exèrcit subterrani silenciós que va romandre ocult durant dos mil·lennis per custodiar la tomba d'un emperador."
+    },
+    "Palau_d'Estiu": {
+      "name": "Palau d'Estiu",
+      "description": "Vast conjunt de llacs, jardins i palaus a Pequín",
+      "statistics_text_present": "-Àrea: 2,9 km² (3/4 és aigua)\n-Element principal: Llac Kunming i Turó de la Longevitat\n-Lloc UNESCO des de: 1998\n-Estil: Obra mestra del disseny de jardins xinesos\n-Estatus: Antic jardí imperial",
+      "statistics_text_past": "-Orígens: 1750 (Dinastia Qing)\n-Destrucció: 1860 per forces anglo-franceses\n-Reconstrucció: Emperadriu vídua Cixi (1888)\n-Simbolisme: Harmonia entre l'home i la natura\n-Característica: El Llarg Corredor (728 m de llarg)",
+      "past_comparison_summary": "El retir imperial definitiu, que reflecteix les altures estètiques de l'art de jardineria de la dinastia Qing."
+    },
+    "Temple_del_Cel": {
+      "name": "Temple del Cel",
+      "description": "Complex imperial d'edificis religiosos a Pequín",
+      "statistics_text_present": "-Edifici principal: Sala d'Oració per Bones Collites\n-Lloc UNESCO des de: 1998\n-Mida del parc: 2,7 km²\n-Geometria: Edificis circulars sobre bases quadrades\n-Estatus: Icona de l'arquitectura de Pequín",
+      "statistics_text_past": "-Construït: 1406–1420\n-Propòsit: Cerimònies anuals per bones collites\n-Simbolisme: Cercle (Cel) i Quadrat (Terra)\n-Mur de l'Eco: Famoses propietats acústiques\n-Imperial: Visitat per emperadors Ming i Qing",
+      "past_comparison_summary": "Un pont còsmic entre la Terra i el Cel, on els emperadors pregaven per la prosperitat de l'imperi."
+    },
+    "Palau_de_Potala": {
+      "name": "Palau de Potala",
+      "description": "Palau d'hivern dels Dalai Lames des del segle VII",
+      "statistics_text_present": "-Elevació: 3.700 m (Lhasa, Tibet)\n-Pisos: 13\n-Habitacions: Més de 1.000\n-Lloc UNESCO des de: 1994\n-Estatus: Emblema del budisme tibetà",
+      "statistics_text_past": "-Original: Construït per Songtsen Gampo el 637 dC\n-Actual: Estructura moderna iniciada el 1645 (5è Dalai Lama)\n-Parts: Palau Blanc (secular) i Palau Vermell (religiós)\n-Defensa: Murs de pedra massius de fins a 5 m de gruix\n-Tresors: Estupes daurades d'antics Dalai Lames",
+      "past_comparison_summary": "El cor espiritual i polític del Tibet, dominant Lhasa des de la Muntanya Vermella."
+    }
+  },
+  "Japó": {
+    "Mont_Fuji": {
+      "name": "Mont Fuji",
+      "description": "Estratovolcà actiu i el pic més alt del Japó",
+      "statistics_text_present": "-Alçada: 3.776 m\n-Lloc UNESCO des de: 2013\n-Escaladors: ~300.000/any\n-Classificació: Actiu (baix risc)\n-Estatus: Símbol sagrat del Japó",
+      "statistics_text_past": "-Formació: Fa ~100.000 anys\n-Última erupció: 1707 (erupció de Hoei)\n-Religiós: Objectiu de peregrinacions durant segles\n-Art: Motiu de les '36 vistes del Mont Fuji' d'Hokusai\n-Tradicional: Primera ascensió per un monjo anònim (663 dC)",
+      "past_comparison_summary": "Un pic volcànic atemporal que ha inspirat l'art i l'espiritualitat japonesa durant generacions."
+    },
+    "Fushimi_Inari-taisha": {
+      "name": "Fushimi Inari-taisha",
+      "description": "Santuari principal del déu Inari, famós per les seves milers de portes torii",
+      "statistics_text_present": "-Portes: Més de 10.000 toriis\n-Ubicació: Kyoto\n-Visitants: Un dels llocs més fotografiats del Japó\n-Missatger: Estàtues de guineu (Kitsune)\n-Accés: Sempre obert, entrada gratuïta",
+      "statistics_text_past": "-Fundat: 711 dC\n-Deïtat: Inari (déu de l'arròs i els negocis)\n-Torii: El costum de donar portes va començar al període Edo\n-Patrocini: Recolzat per comerciants i fabricants\n-Estructura: Santuari principal construït el 1499",
+      "past_comparison_summary": "Un camí de muntanya de portes vermelles, construït a través de segles de devoció de qui cercava prosperitat."
+    },
+    "Castell_de_Himeji": {
+      "name": "Castell de Himeji",
+      "description": "Complex de castell japonès al cim d'un turó a Himeji",
+      "statistics_text_present": "-Sobrenom: Castell de la Garsa Blanca\n-Lloc UNESCO des de: 1993\n-Edificis: 83 estructures originals\n-Estatus: Millor exemple preservat d'arquitectura de castell japonesa\n-Autenticitat: Mai destruït per guerra o incendi",
+      "statistics_text_past": "-Construït: Iniciat el 1333, ampliat per Hideyoshi (1581)\n-Defenses: Camins laberíntics, 21 portes, murs ocults\n-Material: Fusta i guix blanc\n-Segona Guerra Mundial: Va sobreviure miraculosament al bombardeig de Himeji\n-Simbolisme: Au elegant alçant el vol",
+      "past_comparison_summary": "Una fortalesa de fusta impecable que ha sobreviscut gairebé 700 anys d'història intacta."
+    },
+    "Kinkaku-ji": {
+      "name": "Kinkaku-ji",
+      "description": "Temple budista zen amb dos pisos coberts de pa d'or",
+      "statistics_text_present": "-Sobrenom: Pavelló Daurat\n-Ubicació: Kyoto\n-Lloc UNESCO des de: 1994\n-Entorn: Estany Mirall (Kyoko-chi)\n-Estatus: Icona de Kyoto",
+      "statistics_text_past": "-Construït: 1397 (com a vil·la per a Ashikaga Yoshimitsu)\n-Arquitectura: Tres estils diferents per pis\n-Tragèdia: Incendiat el 1950 per un monjo fanàtic\n-Restauració: Reconstruït el 1955 (s'hi va afegir pa d'or)\n-Zen: Convertit en temple després de la mort del shogun",
+      "past_comparison_summary": "Un impressionant reflex daurat de l'extravagància cultural i la simplicitat zen del període Muromachi."
+    },
+    "Santuari_d'Itsukushima": {
+      "name": "Santuari d'Itsukushima",
+      "description": "Santuari sintoista conegut per la seva porta torii 'flotant'",
+      "statistics_text_present": "-Ubicació: Illa de Miyajima\n-Lloc UNESCO des de: 1996\n-Alçada de la porta: 16 m\n-Marea alta: Sembla flotar sobre l'aigua\n-Estatus: Una de les 'Tres Vistes del Japó'",
+      "statistics_text_past": "-Fundat: 593 dC\n-Edificis actuals: Des de 1168 (Taira no Kiyomori)\n-Sagrat: Als plebeus no se'ls permetia estar a l'illa\n-Construcció: Edificat sobre pilots per protegir la terra sagrada\n-Porta: El torii actual data de 1875",
+      "past_comparison_summary": "Una obra mestra espiritual on l'arquitectura harmonitza perfectament amb el flux i reflux de la marea."
+    },
+    "Torre_de_Tòquio": {
+      "name": "Torre de Tòquio",
+      "description": "Torre de comunicacions i observació al districte de Minato",
+      "statistics_text_present": "-Alçada: 332,9 m\n-Color: Blanc i taronja internacional (seguretat aèria)\n-Visitants: 150 milions des de la seva obertura\n-Estatus: Símbol del renaixement de postguerra del Japó\n-Inspiració: Torre Eiffel",
+      "statistics_text_past": "-Construïda: 1958\n-Funció: Radiodifusió de TV i ràdio\n-Materials: 1/3 és ferralla de tancs nord-americans\n-Història: L'estructura més alta del Japó fins al 2010\n-Significat: Va encarnar el 'Miracle Econòmic'",
+      "past_comparison_summary": "La resposta de mitjan segle del Japó a la Torre Eiffel, simbolitzant la ràpida modernització d'una nació."
+    }
+  },
+  "Índia": {
+    "Taj_Mahal": {
+      "name": "Taj Mahal",
+      "description": "Mausoleu de marbre blanc ivori a la vora del riu Yamuna",
+      "statistics_text_present": "-Alçada: 73 m\n-Visitants: 7–8 milions/any\n-Lloc UNESCO des de: 1983\n-Estatus: Noves Set Meravelles del Món\n-Ubicació: Agra",
+      "statistics_text_past": "-Construït: 1632–1653\n-Encarregat per: Emperador Shah Jahan\n-Propòsit: Tomba per a la seva esposa Mumtaz Mahal\n-Arquitecte: Ustad Ahmad Lahauri\n-Artesans: ~20.000 treballadors",
+      "past_comparison_summary": "El monument més famós del món dedicat a l'amor, inalterat en la seva perfecció marmòria simètrica."
+    },
+    "Hawa_Mahal": {
+      "name": "Hawa Mahal",
+      "description": "Palau dels Vents a Jaipur",
+      "statistics_text_present": "-Finestres: 953 petits finestrals (Jharokhas)\n-Material: Gres rosa i vermell\n-Alçada: 15 m (5 pisos)\n-Estatus: Emblema de la 'Ciutat Rosa'\n-Forma: Corona del Senyor Krishna",
+      "statistics_text_past": "-Construït: 1799\n-Arquitecte: Lal Chand Ustad\n-Propòsit: Perquè les dames reials observessin el carrer sense ser vistes\n-Refrigeració: Efecte Venturi a través de les petites finestres\n-Estructura: Extensió del Palau de la Ciutat",
+      "past_comparison_summary": "Una intricada façana rosa dissenyada per deixar passar la brisa i el món davant la reclusió reial."
+    },
+    "Qutub_Minar": {
+      "name": "Qutub Minar",
+      "description": "Torre cònica de 73 metres d'alçada amb cinc pisos",
+      "statistics_text_present": "-Alçada: 72,5 m\n-Lloc UNESCO des de: 1993\n-Material: Gres vermell i marbre\n-Esglaons: 379 a l'interior (tancat al públic)\n-Estatus: Minaret de maó més alt del món",
+      "statistics_text_past": "-Iniciat: 1192 (Qutb-ud-din Aibak)\n-Acabat: Al llarg de segles per diferents governants\n-Complex: Conté el Pilar de Ferro de Delhi (segle IV)\n-Estil: Arquitectura indo-islàmica\n-Inscripcions: Versos de l'Alcorà tallats en pedra",
+      "past_comparison_summary": "Una torre de la victòria que va ser testimoni de l'ascens del domini islàmic a l'Índia al llarg de diversos segles."
+    },
+    "Temple_Daurat": {
+      "name": "Temple Daurat (Harmandir Sahib)",
+      "description": "El lloc espiritual més important del sikhisme",
+      "statistics_text_present": "-Ubicació: Amritsar\n-Visitants: 100.000/dia\n-Langar: La cuina gratuïta més gran del món\n-Material: Cobert amb 750 kg d'or pur\n-Estatus: Símbol d'igualtat i germanor",
+      "statistics_text_past": "-Fundat: 1577 (Guru Ram Das)\n-Disseny: 4 entrades (obert a totes les castes i credos)\n-Or: Afegit pel Maharajà Ranjit Singh (1830)\n-Sarovar: La piscina sagrada que envolta el temple\n-Reconstrucció: Reconstruït diverses vegades després d'invasions",
+      "past_comparison_summary": "Un santuari d'or i pau, que serveix menjars gratuïts a tothom com a testimoni de la igualtat humana."
+    },
+    "Fort_Amer": {
+      "name": "Fort Amer",
+      "description": "Gran complex de fortalesa situat en un turó a Amer, Rajasthan",
+      "statistics_text_present": "-Lloc UNESCO des de: 2013 (Forts de turó de Rajasthan)\n-Destacat: Sheesh Mahal (Palau dels Miralls)\n-Accés: Famós pels passeigs en elefant i jeep\n-Ubicació: A 11 km de Jaipur\n-Material: Gres groc i rosa",
+      "statistics_text_past": "-Construït: Iniciat el 1592 (Raja Man Singh I)\n-Estil: Influències rajput i mogol\n-Defenses: Llac Maota com a barrera natural\n-Interior: Patis opulents i frescos\n-Història: Capital del clan Kachwaha",
+      "past_comparison_summary": "Una majestuosa fortalesa al cim d'un turó que combina la defensa militar robusta amb un delicat interior artístic."
+    },
+    "Coves_d'Ajanta": {
+      "name": "Coves d'Ajanta",
+      "description": "Monuments budistes tallats a la roca",
+      "statistics_text_present": "-Nombre de coves: 30\n-Lloc UNESCO des de: 1983\n-Ubicació: Maharashtra\n-Destacat: Frescos i murals antics\n-Estatus: Obres mestres de l'art religiós budista",
+      "statistics_text_past": "-Període: Segle II aC – 480 dC\n-Oblidades: Abandonades i ocultes per la selva durant 1.300 anys\n-Descobriment: 1819 per un oficial britànic\n-Art: Contes Jataka representats en pintures\n-Mètode: Tallades al penya-segat de basalt",
+      "past_comparison_summary": "Una antiga galeria de fe budista, redescoberta per casualitat després de perdre's al bosc."
+    }
+  },
+  "Brasil": {
+    "Crist_Redemptor": {
+      "name": "Crist Redemptor",
+      "description": "Estàtua Art Déco de Jesucrist a Rio de Janeiro",
+      "statistics_text_present": "-Alçada: 30 m (38 m amb pedestal)\n-Envergadura de braços: 28 m\n-Ubicació: Muntanya Corcovado (710 m)\n-Estatus: Noves Set Meravelles del Món\n-Símbol: Emblema de Rio i Brasil",
+      "statistics_text_past": "-Construït: 1922–1931\n-Escultor: Paul Landowski\n-Material: Formigó armat i rajoles de talc\n-Inauguració: 12 d'octubre de 1931\n-Llamps: Colpejat sovint per la seva ubicació al cim de la muntanya",
+      "past_comparison_summary": "Un colossal guardià Art Déco que vigila Rio de Janeiro des dels cels."
+    },
+    "Pa_de_Sucre": {
+      "name": "Pa de Sucre",
+      "description": "Pic situat a Rio de Janeiro a la boca de la Badia de Guanabara",
+      "statistics_text_present": "-Alçada: 396 m\n-Accés: Telefèric amb parets de vidre (Bondinho)\n-Visitants: 1,5 milions/any\n-Lloc UNESCO des de: 2012 (categoria paisatge)\n-Vista: Panorama de 360 graus de la ciutat",
+      "statistics_text_past": "-Formació: Monòlit de granit i quars\n-Telefèric: Construït per primera vegada el 1912 (un dels més antics del món)\n-Nom: La seva forma s'assembla a motlles tradicionals de sucre\n-Estratègic: Punt de referència per a mariners que entraven a la badia\n-Història: Va ser testimoni de la fundació de Rio el 1565",
+      "past_comparison_summary": "Un monòlit geològic únic que ha ofert la millor vista urbana del món durant més d'un segle."
+    },
+    "Cascades_d'Iguaçu": {
+      "name": "Cascades d'Iguaçu",
+      "description": "Enormes cascades del riu Iguaçu a la frontera amb l'Argentina",
+      "statistics_text_present": "-Nombre de salts: 275\n-Lloc UNESCO des de: 1986\n-Caiguda més gran: Gola del Diable (82 m)\n-Amplada: 2,7 km\n-Visitants: 2 milions/any",
+      "statistics_text_past": "-Descobriment: Álvar Núñez Cabeza de Vaca (1541)\n-Parc: Parc Nacional creat el 1939\n-Natura: Santuari circumdant de la Selva Atlàntica\n-Mitologia: Creades per la ira d'un déu (llegenda de Naipí)\n-Comparació: Més altes que les del Niàgara, més amples que les Victoria",
+      "past_comparison_summary": "L'aclaparador poder de la natura mostrat a través del major sistema de cascades del món."
+    },
+    "Teatre_Amazones": {
+      "name": "Teatre Amazones",
+      "description": "Teatre d'òpera a Manaus, al cor de la selva amazònica",
+      "statistics_text_present": "-Ubicació: Manaus\n-Capacitat: 701 seients\n-Estil: Renaixentista revival\n-Cúpula: Coberta amb 36.000 rajoles ceràmiques (colors del Brasil)\n-Estatus: Joia de l'Amazònia",
+      "statistics_text_past": "-Construït: 1884–1896\n-Era: El boom del cautxú (Belle Époque)\n-Materials: Importats de tot Europa\n-Inauguració: 7 de gener de 1897\n-Significat: Cultura enmig de la selva",
+      "past_comparison_summary": "Un testimoni de la riquesa de l'era del cautxú, que va portar el luxe europeu a la selva."
+    },
+    "Catedral_de_Brasília": {
+      "name": "Catedral de Brasília",
+      "description": "Estructura hiperboloide que serveix de seu de l'Arxidiòcesi de Brasília",
+      "statistics_text_present": "-Arquitecte: Oscar Niemeyer\n-Columnes: 16 columnes de formigó (90 tones cadascuna)\n-Estil: Modernista\n-Visitants: 1 milió/any\n-Estatus: Obra mestra de l'arquitectura moderna",
+      "statistics_text_past": "-Acabada: 1970\n-Disseny: Elevant-se cap als cels\n-Interior: 3 escultures d'àngels suspeses\n-Llum: Sostre de vitralls en blau i verd\n-Significat: Part del projecte de la capital planificada",
+      "past_comparison_summary": "Un disseny circular revolucionari que va redefinir l'arquitectura religiosa a la nova capital del Brasil."
+    },
+    "Pelourinho": {
+      "name": "Pelourinho (Centre Històric de Salvador)",
+      "description": "Barri històric a Salvador de Bahia",
+      "statistics_text_present": "-Lloc UNESCO des de: 1985\n-Arquitectura: Edificis colonials portuguesos\n-Colors: Façanes de tons pastel\n-Cultura: Cor del patrimoni afrobrasiler\n-Activitats: Tambors d'Olodum, Capoeira",
+      "statistics_text_past": "-Orígens: 1549 (primera capital del Brasil)\n-Nom: Significa 'picota' (lloc de càstig d'esclaus)\n-Època daurada: Riquesa del comerç de sucre als segles XVII-XVIII\n-Església: São Francisco (famosa pel seu interior daurat)\n-Revitalització: Restauració important a la dècada de 1990",
+      "past_comparison_summary": "El vibrant i colorit bressol de la cultura brasilera, que reflecteix una història colonial complexa."
+    }
+  },
+  "Austràlia": {
+    "Òpera_de_Sydney": {
+      "name": "Òpera de Sydney",
+      "description": "Centre d'arts escèniques multisala al port de Sydney",
+      "statistics_text_present": "-Lloc UNESCO des de: 2007\n-Visitants: 10 milions/any\n-Rajoles: 1.056.006 rajoles ceràmiques sueques\n-Funcions: ~1.500 esdeveniments per any\n-Estatus: Icona arquitectònica del segle XX",
+      "statistics_text_past": "-Construïda: 1959–1973\n-Arquitecte: Jørn Utzon\n-Controvèrsia: Enormes sobrecostos i renúncia de l'arquitecte\n-Disseny: Petxines inspirades en grills de taronja\n-Inauguració: Reina Isabel II (1973)",
+      "past_comparison_summary": "L'obra mestra en forma de veles que va transformar el front marítim de Sydney en una icona mundial."
+    },
+    "Pont_del_Port_de_Sydney": {
+      "name": "Pont del Port de Sydney",
+      "description": "Pont d'arc d'acer a través del port de Sydney",
+      "statistics_text_present": "-Sobrenom: The Coathanger\n-Alçada: 134 m\n-Longitud: 1.149 m\n-Carrils: 8 vehiculars, 2 ferroviaris, 1 ciclista, 1 vianants\n-Activitat: BridgeClimb (popular activitat turística)",
+      "statistics_text_past": "-Construït: 1923–1932\n-Enginyer: John Bradfield\n-Reblons: 6 milions (col·locats a mà)\n-Era de la Depressió: Important font d'ocupació\n-Obertura: Cerimònia de tall de cinta (març de 1932)",
+      "past_comparison_summary": "Una gesta de l'enginyeria dels anys 30 que continua sent la robusta columna vertebral del transport de Sydney."
+    },
+    "Uluru": {
+      "name": "Uluru (Ayers Rock)",
+      "description": "Enorme monòlit de gres al Territori del Nord",
+      "statistics_text_present": "-Alçada: 348 m\n-Circumferència: 9,4 km\n-Lloc UNESCO des de: 1987\n-Canvi de color: Sembla brillar en vermell a la posta de sol\n-Estatus: Profundament sagrat per al poble Anangu",
+      "statistics_text_past": "-Edat: 550 milions d'anys\n-Propietaris tradicionals: Anangu (terra retornada el 1985)\n-Escalada: Tancada permanentment el 2019 (respecte a la cultura)\n-Art rupestre: Pintures antigues en coves al voltant de la base\n-Geologia: Monòlit de gres arcòsica",
+      "past_comparison_summary": "El cor espiritual d'Austràlia, dempeus com un monòlit silenciós durant mig milió d'anys."
+    },
+    "Gran_Barrera_de_Corall": {
+      "name": "Gran Barrera de Corall",
+      "description": "El sistema d'esculls de corall més gran del món",
+      "statistics_text_present": "-Longitud: 2.300 km\n-Esculls: ~2.900 esculls individuals\n-Lloc UNESCO des de: 1981\n-Fauna: 1.500 espècies de peixos, 30 espècies de balenes/dofins\n-Visibilitat: Visible des de l'espai exterior",
+      "statistics_text_past": "-Formació: ~20.000 anys (escull modern)\n-Indígena: Significatiu per als aborígens i els illencs de l'Estret de Torres\n-Història: L'Endeavour de Cook va encallar el 1770\n-Conservació: Protegit pel Parc Marí des de 1975\n-Amenaces: Esdeveniments de blanqueig per l'escalfament oceànic",
+      "past_comparison_summary": "Una obra mestra submarina vivent que ha florit durant mil·lennis, afrontant ara reptes moderns."
+    },
+    "Port_Arthur": {
+      "name": "Port Arthur",
+      "description": "Antic assentament penal i museu a l'aire lliure a Tasmània",
+      "statistics_text_present": "-Lloc UNESCO des de: 2010 (Llocs Penitenciaris)\n-Edificis: 30 ruïnes i cases restaurades\n-Estatus: Lloc penal més important d'Austràlia\n-Entorn: Península de Tasman\n-Visites de fantasmes: Famós per les seves caminades nocturnes",
+      "statistics_text_past": "-En funcionament: 1833–1877\n-Propòsit: Presó per a reincidents\n-Sistema: Presó separada (sistema de silenci)\n-Economia: Construcció naval i fusta\n-Conseqüències: Es va convertir en destinació turística a finals del segle XIX",
+      "past_comparison_summary": "Un recordatori esgarrifós però bonic dels orígens de la colònia penal d'Austràlia."
+    },
+    "Dotze_Apòstols": {
+      "name": "Dotze Apòstols",
+      "description": "Col·lecció de pilars de pedra calcària davant la costa del Parc Nacional Port Campbell",
+      "statistics_text_present": "-Ubicació: Great Ocean Road, Victòria\n-Pilars restants: 8 (altres es van esfondrar)\n-Alçada: Fins a 50 m\n-Turisme: Important lloc de tours en helicòpter\n-Estatus: Meravella natural icònica",
+      "statistics_text_past": "-Formació: Erosió per l'Oceà Austral (10-20 milions d'anys)\n-Nom original: Sow and Pigs\n-Reanomenat: A Dotze Apòstols a la dècada de 1920 (màrqueting)\n-Esfondraments: El col·lapse més recent d'un pilar important va ocórrer el 2005\n-Geologia: Pedra calcària del Miocè",
+      "past_comparison_summary": "Una costa dinàmica on l'oceà crea i destrueix constantment aquests majestuosos pilars de pedra."
+    }
+  },
+  "Mèxic": {
+    "Chichén_Itzá": {
+      "name": "Chichén Itzá",
+      "description": "Gran ciutat precolombina construïda pel poble maia",
+      "statistics_text_present": "-Lloc UNESCO des de: 1988\n-Visitants: 2,6 milions/any\n-Piràmide principal: El Castell (Temple de Kukulkan)\n-Estatus: Noves Set Meravelles del Món\n-Ubicació: Estat de Yucatán",
+      "statistics_text_past": "-Apogeu: ~600 dC a 1200 dC\n-Astronomia: La piràmide s'alinea amb les ombres de l'equinocci\n-Sacrificis: Cenot Sagrat (avenc)\n-Joc de pilota: El camp més gran de Mesoamèrica\n-Arquitectura: Influències Puuc i tolteca",
+      "past_comparison_summary": "Un sofisticat centre de la ciència i religió maia, recuperat de la selva."
+    },
+    "Teotihuacán": {
+      "name": "Teotihuacán",
+      "description": "Antiga ciutat mesoamericana coneguda per les seves piràmides",
+      "statistics_text_present": "-Estructures principals: Piràmide del Sol i Piràmide de la Lluna\n-Lloc UNESCO des de: 1987\n-Ubicació: A 40 km de Ciutat de Mèxic\n-Estatus: Lloc arqueològic més visitat de Mèxic\n-Avinguda: Calçada dels Morts",
+      "statistics_text_past": "-Apogeu: 1 dC a 500 dC (Població ~125.000+)\n-Misteri: Constructors desconeguts (els asteques van nomenar el lloc)\n-Piràmide del Sol: Una de les més grans del món\n-Abandonament: Al voltant del segle VII-VIII dC\n-Ritual: Centre d'un vast imperi multiètnic",
+      "past_comparison_summary": "El 'lloc on els déus van ser creats', una meravella urbana que precedeix els asteques per segles."
+    },
+    "Tulum": {
+      "name": "Tulum",
+      "description": "Ciutat emmurallada maia precolombina que funcionava com a port",
+      "statistics_text_present": "-Ubicació: Penya-segat costaner amb vista al Carib\n-Estatus: Popular lloc arqueològic vora la platja\n-Destacat: El Castell\n-Flora: Famós per les iguanes que viuen entre les ruïnes\n-Clima: Tropical",
+      "statistics_text_past": "-Apogeu: Segles XIII al XV\n-Funció: Important centre comercial (turquesa i jade)\n-Defensa: Envoltada per un mur de 7 m de gruix\n-Supervivència: Una de les últimes ciutats maies en caure (1518)\n-Astronomia: El Temple dels Frescos utilitzat per seguir el sol",
+      "past_comparison_summary": "Una pintoresca fortalesa maia que combinava el comerç marítim amb la defensa espiritual."
+    },
+    "Palau_de_Belles_Arts": {
+      "name": "Palau de Belles Arts",
+      "description": "El centre cultural més important de Ciutat de Mèxic",
+      "statistics_text_present": "-Estil: Exterior Art Nouveau, interior Art Déco\n-Murals: Rivera, Siqueiros, Orozco\n-Estatus: Teatre Nacional de Mèxic\n-Material: Marbre blanc de Carrara\n-Problema: S'enfonsa lentament al subsòl tou",
+      "statistics_text_past": "-Iniciat: 1904 (era de Porfirio Díaz)\n-Arquitecte: Adamo Boari\n-Interrupció: La Revolució Mexicana (va retardar 20 anys)\n-Finalització: 1934\n-Característica: Cortina de vidre feta per Tiffany",
+      "past_comparison_summary": "Un impressionant temple de marbre dedicat a l'art que va sobreviure a la revolució per convertir-se en l'ànima cultural de Mèxic."
+    },
+    "Castell_de_Chapultepec": {
+      "name": "Castell de Chapultepec",
+      "description": "Castell al cim d'un turó enmig del Bosc de Chapultepec",
+      "statistics_text_present": "-Funció: Museu Nacional d'Història\n-Ubicació: Cim del Turó de Chapultepec (lloc sagrat)\n-Visitants: Alta importància cultural\n-Estatus: Únic castell reial a Amèrica del Nord\n-Vistes: Amb vista al Paseo de la Reforma",
+      "statistics_text_past": "-Construït: 1785 (Virregnat de Nova Espanya)\n-Història: Acadèmia Militar (Batalla de Chapultepec 1847)\n-Imperial: Llar de l'emperador Maximilià I (1864)\n-Presidencial: Residència oficial fins al 1939\n-Arquitectura: Neoclàssica i neoromànica",
+      "past_comparison_summary": "D'un palau virregnal a una residència imperial i ara guardià de la història de Mèxic."
+    },
+    "Palenque": {
+      "name": "Palenque",
+      "description": "Ciutat-estat maia al sud de Mèxic que va florir al segle VII",
+      "statistics_text_present": "-Lloc UNESCO des de: 1987\n-Ubicació: Selva de Chiapas\n-Destacat: Temple de les Inscripcions\n-Estatus: Famós per la seva elegància arquitectònica\n-Excavació: Només ~10% de la ciutat és visible",
+      "statistics_text_past": "-Apogeu: 226 aC – 799 dC\n-Rei: Pakal el Gran (va regnar 68 anys)\n-Descobriment: La tomba de Pakal es va trobar el 1952\n-Art: Els relleus maies més sofisticats\n-Aigua: Sofisticat sistema d'aqüeductes",
+      "past_comparison_summary": "Una obra mestra embolcallada en la selva de l'arquitectura i els registres històrics maies."
+    }
+  },
+  "Perú": {
+    "Machu_Picchu": {
+      "name": "Machu Picchu",
+      "description": "Ciutadella inca del segle XV ubicada a la Serralada Oriental",
+      "statistics_text_present": "-Elevació: 2.430 m\n-Visitants: ~1,5 milions/any\n-Lloc UNESCO des de: 1983\n-Estatus: Noves Set Meravelles del Món\n-Accés: Tren fins a Aguas Calientes",
+      "statistics_text_past": "-Construïda: ~1450 (Imperi Inca)\n-Propòsit: Finca per a l'emperador Pachacútec\n-Tècnica: Carreu (murs de pedra seca)\n-Abandonament: 1572 (després de la conquesta espanyola)\n-Redescobriment: Hiram Bingham (1911)",
+      "past_comparison_summary": "La 'Ciutat Perduda dels Inques', una impressionant mostra d'enginyeria de muntanya i alineació astronòmica."
+    },
+    "Sacsayhuamán": {
+      "name": "Sacsayhuamán",
+      "description": "Ciutadella als afores nord de la ciutat de Cusco",
+      "statistics_text_present": "-Ubicació: 3.700 m d'elevació\n-Atracció principal: Gegantins murs en zigzag\n-Pedres: La més gran pesa més de 120 tones\n-Estatus: Símbol de l'arquitectura militar inca\n-Esdeveniment: Festival de l'Inti Raymi (24 de juny)",
+      "statistics_text_past": "-Iniciat: Segle XV (expansió de Pachacútec)\n-Funció: Fortalesa i centre cerimonial\n-Construcció: Pedres entrellaçades amb precisió, sense morter\n-Setge: Lloc d'una batalla sagnant el 1536\n-Destrucció: Els espanyols la van utilitzar com a pedrera",
+      "past_comparison_summary": "Un colossal misteri de pedra on enormes blocs encaixen amb precisió quirúrgica."
+    },
+    "Línies_de_Nazca": {
+      "name": "Línies de Nazca",
+      "description": "Grup de gegantins geoglifs formats al sòl del desert de Nazca",
+      "statistics_text_present": "-Lloc UNESCO des de: 1994\n-Figures: Colibrí, mico, aranya, còndor\n-Longitud: Fins a 370 m per figura\n-Accés: Millor apreciades des de vols en avioneta\n-Àrea: 450 km²",
+      "statistics_text_past": "-Creades: 500 aC – 500 dC\n-Mètode: Retirant còdols rogencs per revelar sòl gris\n-Propòsit: Calendari religiós o astronòmic (teories)\n-Preservació: Clima hiperàrid (sense vent ni pluja)\n-Redescobriment: 1927 per Toribio Mejía Xesspe",
+      "past_comparison_summary": "Gegantins dibuixos antics al desert que només es poden apreciar plenament des del cel."
+    },
+    "Plaça_d'Armes_de_Cusco": {
+      "name": "Plaça d'Armes (Cusco)",
+      "description": "La plaça central del centre històric de Cusco",
+      "statistics_text_present": "-Destacat: Catedral del Cusco i Església de La Compañía\n-Activitat: Cor social de la ciutat\n-Arquitectura: Colonial espanyola sobre fonaments inques\n-Estatus: Lloc Patrimoni de la Humanitat UNESCO (ciutat completa)",
+      "statistics_text_past": "-Era inca: Coneguda com Huacaypata (Lloc de Dol)\n-Significat: Centre religiós i administratiu de l'imperi\n-Era espanyola: Es van construir esglésies sobre palaus inques\n-Història: Lloc d'execució de Túpac Amaru II (1781)\n-Evolució: De camp sagrat inca a plaça colonial",
+      "past_comparison_summary": "L'epicentre de l'Imperi Inca, on catedrals colonials s'alcen ara sobre els fonaments de temples solars."
+    },
+    "Huaca_Pucllana": {
+      "name": "Huaca Pucllana",
+      "description": "Piràmide d'adobe i fang ubicada al districte de Miraflores a Lima",
+      "statistics_text_present": "-Estructura: Gran piràmide de 7 nivells esglaonats\n-Ubicació: Centre urbà modern de Lima\n-Material: Milions de maons d'adobe tipus 'llibreria'\n-Estatus: Important centre cerimonial\n-Característica: Restaurant d'alta gamma amb vista a les ruïnes",
+      "statistics_text_past": "-Període: 200 dC – 700 dC (Cultura Lima)\n-Tècnica: Col·locació vertical de maons (resistent a terratrèmols)\n-Funció: Rituals religiosos i administració\n-Successió: Utilitzada posteriorment per les cultures Wari i Ychsma\n-Enterraments: Mòmies trobades als nivells superiors",
+      "past_comparison_summary": "Una antiga piràmide de terra que contrasta sorprenentment amb els gratacels moderns de Lima."
+    },
+    "Chan_Chan": {
+      "name": "Chan Chan",
+      "description": "La ciutat d'adobe més gran del món",
+      "statistics_text_present": "-Lloc UNESCO des de: 1986 (llista en perill)\n-Àrea: 20 km²\n-Ubicació: Prop de Trujillo\n-Característica: Intricats relleus de peixos i ocells\n-Clima: Desert costaner àrid",
+      "statistics_text_past": "-Capital: Regne Chimú\n-Apogeu: ~850 dC a 1470 dC\n-Població: ~30.000–60.000\n-Conquesta: Capturada pels inques el 1470\n-Aigua: Sofisticat sistema de pous i canals",
+      "past_comparison_summary": "La vasta capital de to daurat dels Chimú, desgastant-se lentament al vent del desert."
+    }
+  },
+  "Canadà": {
+    "Torre_CN": {
+      "name": "Torre CN",
+      "description": "Torre de comunicacions i observació de formigó al centre de Toronto",
+      "statistics_text_present": "-Alçada: 553,3 m\n-Visitants: 1,5 milions/any\n-Característica: Terra de vidre i EdgeWalk\n-Il·luminació: Sistema LED programable\n-Estatus: Una de les modernes Set Meravelles del Món",
+      "statistics_text_past": "-Construïda: 1973–1976\n-Encarregada per: Canadian National Railway\n-Propòsit: Resoldre problemes de senyal a causa de gratacels\n-Rècord: Estructura independent més alta durant 32 anys\n-Enginyeria: Mètode de construcció per encofrat lliscant",
+      "past_comparison_summary": "Una meravella de l'enginyeria dels anys 70 que defineix l'horitzó de Toronto i l'orgull canadenc."
+    },
+    "Parc_Nacional_de_Banff": {
+      "name": "Parc Nacional de Banff",
+      "description": "El parc nacional més antic del Canadà, ubicat a les Muntanyes Rocalloses",
+      "statistics_text_present": "-Àrea: 6.641 km²\n-Destacats: Llac Louise, Llac Moraine\n-Visitants: 4 milions/any\n-Lloc UNESCO des de: 1984\n-Poble: Banff (el més alt del Canadà)",
+      "statistics_text_past": "-Establert: 1885\n-Orígens: Descobriment de les aigües termals de Cave and Basin\n-Ferrocarril: Desenvolupat per Canadian Pacific Railway\n-Conservació: Primer gran parc nord-americà\n-Fauna: Refugi d'óssos grizzly, ants i llops",
+      "past_comparison_summary": "Un paradís muntanyós preservat des del segle XIX com la joia de la natura salvatge del Canadà."
+    },
+    "Château_Frontenac": {
+      "name": "Château Frontenac",
+      "description": "Gran hotel a la ciutat de Quebec",
+      "statistics_text_present": "-Estil: Château-esc\n-Habitacions: 610\n-Estatus: Hotel més fotografiat del món\n-Ubicació: Old Quebec (Ciutat Alta)\n-Reconeixement: Lloc Històric Nacional del Canadà",
+      "statistics_text_past": "-Inaugurat: 1893\n-Arquitecte: Bruce Price\n-Client: Canadian Pacific Railway\n-Història: Seu de les Conferències de Quebec (Segona Guerra Mundial)\n-Disseny: Inspirat en els castells del renaixement francès",
+      "past_comparison_summary": "Un majestuós hotel tipus castell que ancora l'horitzó històric del Canadà francès."
+    },
+    "Peggys_Cove": {
+      "name": "Peggy's Cove",
+      "description": "Petita comunitat rural i far a Nova Escòcia",
+      "statistics_text_present": "-Destacat: Far de Peggy's Point\n-Geologia: Enormes aflorament de granit\n-Població: ~30 residents permanents\n-Activitat: Pesca i turisme\n-Estatus: Paisatge emblemàtic de les Marítimes canadenques",
+      "statistics_text_past": "-Fundada: 1811 (com a poble pesquer)\n-Far: Estructura actual construïda el 1914\n-Llegenda: Anomenada per una supervivent d'un naufragi\n-Vida: Centrada en la pesca de llagosta\n-Tradició: Un dels pobles més pintats del Canadà",
+      "past_comparison_summary": "Un rústic poble pesquer assotat pel vent que s'ha convertit en la cara de les Marítimes canadenques."
+    },
+    "Turó_del_Parlament": {
+      "name": "Turó del Parlament",
+      "description": "El cor polític i cultural d'Ottawa",
+      "statistics_text_present": "-Edifici principal: Centre Block (actualment en renovació)\n-Torre: Torre de la Pau (92 m)\n-Esdeveniments: Celebracions del Dia del Canadà\n-Estil: Revival gòtic\n-Reconeixement: Lloc Històric Nacional",
+      "statistics_text_past": "-Orígens: Barrack Hill (base militar)\n-Construcció: Iniciada el 1859\n-Tragèdia: Gran incendi de 1916 (va destruir l'edifici original)\n-Reconstrucció: Acabada el 1927\n-Simbolisme: La biblioteca va ser l'única part salvada de l'incendi",
+      "past_comparison_summary": "La digna seu de la democràcia canadenca, ressorgint de les cendres d'un incendi el 1916."
+    },
+    "Cascades_del_Niagara": {
+      "name": "Cascades del Niagara",
+      "description": "Grup de tres cascades a l'extrem sud del congost del Niagara",
+      "statistics_text_present": "-Cascada principal: Horseshoe Falls (costat canadenc)\n-Alçada: 51 m\n-Energia: Important font d'hidroelectricitat\n-Turisme: Maid of the Mist / City Cruises\n-Visitants: 12 milions/any (costat canadenc)",
+      "statistics_text_past": "-Formació: Fa ~12.000 anys (retrocés glacial)\n-Història: Lloc estratègic a la Guerra de 1812\n-Gestes: Primer descens en barril (Annie Edson Taylor, 1901)\n-Erosió: Es mou riu amunt ~1 m per any (natural)\n-Conservació: Esforços del parc internacional des de 1885",
+      "past_comparison_summary": "Una força natural atronadora que ha captivat exploradors i temeraris durant segles."
+    }
+  }
+}

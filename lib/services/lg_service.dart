@@ -1,6 +1,7 @@
 import 'package:dartssh2/dartssh2.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -11,6 +12,10 @@ class LGService extends ChangeNotifier {
   SSHClient? _client;
   bool _isConnected = false;
   bool get isConnected => _isConnected;
+
+  String? _lastKml;
+  String? _lastTimeKml;
+  final Map<int, String> _lastSlaveKml = {};
   int get screens => _screens;
   String? _host;
   String? get host => _host;
@@ -19,6 +24,8 @@ class LGService extends ChangeNotifier {
   String? _password;
   int _screens = 3;
   String? _username;
+  bool _isPreCaching = false;
+  Future<void>? _reconnectFuture;
 
   Future<bool> connect({
     required String host,
@@ -53,16 +60,10 @@ class LGService extends ChangeNotifier {
       notifyListeners();
       debugPrint('LGService: Conexión establecida con éxito');
 
-      // Limpiar y asegurar directorios con permisos totales
-      await execute('echo $_password | sudo -S mkdir -p /var/www/html/logos');
+      // Limpiar y asegurar directorios con una sola llamada combinada
       await execute(
-        'echo $_password | sudo -S chmod -R 777 /var/www/html/logos',
+        'echo $_password | sudo -S bash -c "mkdir -p /var/www/html/logos /var/www/html/kml && chmod -R 777 /var/www/html && rm -f /var/www/html/logos/statistics.png"',
       );
-      await execute(
-        'echo $_password | sudo -S rm -f /var/www/html/logos/statistics.png',
-      ); // Eliminar basura previa
-      await execute('echo $_password | sudo -S mkdir -p /var/www/html/kml');
-      await execute('echo $_password | sudo -S chmod -R 777 /var/www/html/kml');
 
       // Configurar refrescos automáticos en todas las pantallas
       await setRefresh();
@@ -77,11 +78,22 @@ class LGService extends ChangeNotifier {
   }
 
   Future<void> reconnect() async {
+    if (_reconnectFuture != null) return _reconnectFuture;
     if (_host == null ||
         _port == null ||
         _username == null ||
         _password == null)
       return;
+
+    _reconnectFuture = _reconnectInternal();
+    try {
+      await _reconnectFuture;
+    } finally {
+      _reconnectFuture = null;
+    }
+  }
+
+  Future<void> _reconnectInternal() async {
     try {
       final socket = await SSHSocket.connect(
         _host!,
@@ -121,6 +133,7 @@ class LGService extends ChangeNotifier {
     try {
       final session = await _client!.execute(command);
       final result = await utf8.decodeStream(session.stdout);
+      await session.done;
       return result;
     } catch (e) {
       debugPrint('LGService: Execution error for "$command": $e');
@@ -135,77 +148,125 @@ class LGService extends ChangeNotifier {
   }
 
   Future<void> sendKML(String kml) async {
+    if (_lastKml == kml) return;
+    _lastKml = kml;
     await execute("cat <<'EOF' > /var/www/html/kmls.kml\n$kml\nEOF");
     await _setKmlTxt();
   }
 
   Future<void> sendTimeKML(String kml) async {
+    if (_lastTimeKml == kml) return;
+    _lastTimeKml = kml;
     await execute("cat <<'EOF' > /var/www/html/time.kml\n$kml\nEOF");
     await _setTimeKmlTxt();
   }
 
   Future<void> sendSlaveKML(int slaveNo, String kml) async {
-    await execute('echo $_password | sudo -S mkdir -p /var/www/html/kml');
-    await execute('echo $_password | sudo -S chmod -R 777 /var/www/html/kml');
+    if (_lastSlaveKml[slaveNo] == kml) return;
+    _lastSlaveKml[slaveNo] = kml;
     await execute(
       "cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.kml\n$kml\nEOF",
     );
+    await _setSlaveKmlTxt(slaveNo);
+  }
+
+  Future<void> _setSlaveKmlTxt(int slaveNo) async {
+    final version = DateTime.now().millisecondsSinceEpoch;
+    final kmlContent = '''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <NetworkLink>
+      <Link>
+        <href>http://lg1:81/kml/slave_$slaveNo.kml?v=$version</href>
+      </Link>
+    </NetworkLink>
+  </Document>
+</kml>''';
+    await execute("cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.txt\n$kmlContent\nEOF");
   }
 
   Future<void> sendLogoKML(String kml) async {
-    // En tu configuración de 5 pantallas, LG4 es el objetivo (slave_4).
-    // En uno de 3 pantallas, LG2 es el objetivo (slave_2).
     int slaveNo = _screens == 5 ? 4 : 2;
     await sendSlaveKML(slaveNo, kml);
   }
 
-  Future<void> uploadAssets() async {
+  Future<void> uploadLogos() async {
     if (!_isConnected || _client == null || _password == null) return;
 
-    final assets = [
-      {'path': 'assets/images/KMLs/Logo/Logos.png', 'name': 'Logos.png'},
-    ];
-
     try {
-      // 1. Crear el directorio y dar permisos totales usando sudo
-      await execute('echo $_password | sudo -S mkdir -p /var/www/html/logos');
-      await execute(
-        'echo $_password | sudo -S chmod -R 777 /var/www/html/logos',
-      );
-
       final sftp = await _client!.sftp();
-
-      for (var asset in assets) {
-        try {
-          final byteData = await rootBundle.load(asset['path']!);
-          final bytes = byteData.buffer.asUint8List();
-          final remotePath = '/var/www/html/logos/${asset['name']}';
-
-          final file = await sftp.open(
-            remotePath,
-            mode:
-                SftpFileOpenMode.create |
-                SftpFileOpenMode.write |
-                SftpFileOpenMode.truncate,
-          );
-          await file.write(Stream.value(bytes));
-          await file.close();
-          debugPrint('LGService: cargado ${asset['name']} en $remotePath');
-        } catch (e) {
-          debugPrint('LGService: Error subiendo ${asset['name']}: $e');
-        }
-      }
+      await _uploadSftpFile(
+        sftp,
+        'assets/images/KMLs/Logo/Logos.png',
+        '/var/www/html/logos/Logos.png',
+      );
     } catch (e) {
-      debugPrint('LGService: Error de SFTP: $e');
+      debugPrint('LGService: Error uploading logos: $e');
     }
   }
 
-  Future<String?> uploadPOIImage(String assetPath, {String? customName}) async {
+  Future<void> preCachePOIImages(List<String> poiAssetPaths) async {
+    if (!_isConnected || _client == null || _password == null || _isPreCaching) return;
+
+    _isPreCaching = true;
+    final currentClient = _client;
+
+    try {
+      final sftp = await currentClient!.sftp();
+      for (var assetPath in poiAssetPaths) {
+        // Verify if we are still connected and using the same client
+        if (!_isConnected || _client != currentClient || _client?.isClosed == true) break;
+
+        final fileName = assetPath.split('/').last;
+        final remotePath = '/var/www/html/logos/$fileName';
+
+        try {
+          // Check if file already exists to avoid redundant uploads and potential conflicts
+          await sftp.stat(remotePath);
+          continue;
+        } catch (_) {
+          // File does not exist, proceed with upload
+        }
+
+        await _uploadSftpFile(sftp, assetPath, remotePath);
+        // Small delay to allow other SSH commands to multiplex through if needed
+        await Future.delayed(const Duration(milliseconds: 50));
+      }
+    } catch (e) {
+      debugPrint('LGService: Error in background pre-caching: $e');
+    } finally {
+      _isPreCaching = false;
+    }
+  }
+
+  Future<void> _uploadSftpFile(dynamic sftp, String localPath, String remotePath) async {
+    try {
+      final byteData = await rootBundle.load(localPath);
+      final bytes = byteData.buffer.asUint8List();
+      final file = await sftp.open(
+        remotePath,
+        mode: SftpFileOpenMode.create | SftpFileOpenMode.write | SftpFileOpenMode.truncate,
+      );
+      await file.write(Stream.value(bytes));
+      await file.close();
+      debugPrint('LGService: Uploaded $remotePath');
+    } catch (e) {
+      debugPrint('LGService: Failed to upload $localPath: $e');
+    }
+  }
+
+  Future<String?> uploadPOIImage(String assetPath, {String? customName, bool isExternal = false}) async {
     if (!_isConnected || _client == null || _password == null) return null;
 
     try {
-      final byteData = await rootBundle.load(assetPath);
-      final bytes = byteData.buffer.asUint8List();
+      Uint8List bytes;
+      if (isExternal) {
+        final file = File(assetPath);
+        bytes = await file.readAsBytes();
+      } else {
+        final byteData = await rootBundle.load(assetPath);
+        bytes = byteData.buffer.asUint8List();
+      }
 
       // Detectamos la extensión real del archivo (jpg o png)
       final extension = assetPath.split('.').last.toLowerCase();
@@ -214,30 +275,19 @@ class LGService extends ChangeNotifier {
           : 'statistics.$extension';
       final remotePath = '/var/www/html/logos/$fileName';
 
-      // Eliminamos versiones anteriores del mismo nombre para evitar conflictos de extensión
-      if (customName == null) {
-        await execute(
-          'echo $_password | sudo -S rm -f /var/www/html/logos/statistics.jpg',
-        );
-        await execute(
-          'echo $_password | sudo -S rm -f /var/www/html/logos/statistics.png',
-        );
-      } else {
-        await execute(
-          'echo $_password | sudo -S rm -f /var/www/html/logos/$customName.jpg',
-        );
-        await execute(
-          'echo $_password | sudo -S rm -f /var/www/html/logos/$customName.png',
-        );
-      }
+      // Combined RM command to save SSH channels and prevent SSHChannelOpenError
+      final String rmBase = customName ?? 'statistics';
+      await execute(
+        'echo $_password | sudo -S rm -f /var/www/html/logos/$rmBase.jpg /var/www/html/logos/$rmBase.png',
+      );
 
       final sftp = await _client!.sftp();
       final file = await sftp.open(
         remotePath,
         mode:
-            SftpFileOpenMode.create |
-            SftpFileOpenMode.write |
-            SftpFileOpenMode.truncate,
+        SftpFileOpenMode.create |
+        SftpFileOpenMode.write |
+        SftpFileOpenMode.truncate,
       );
       await file.write(Stream.value(bytes));
       await file.close();
@@ -293,7 +343,7 @@ class LGService extends ChangeNotifier {
   Future<void> createStatisticsHTML(String imageUrl) async {
     final bool isThreeScreen = _screens == 3;
     final htmlContent =
-        '''
+    '''
 <!DOCTYPE html>
 <html>
 <head>
@@ -364,7 +414,7 @@ class LGService extends ChangeNotifier {
 
   Future<void> createComparisonHTML(String pastUrl, String presentUrl) async {
     final htmlContent =
-        '''
+    '''
 <!DOCTYPE html>
 <html>
 <head>
@@ -444,6 +494,7 @@ class LGService extends ChangeNotifier {
   }
 
   Future<void> clearSlaveKML(int slaveNo) async {
+    _lastSlaveKml.remove(slaveNo);
     String blank = '''<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document></Document>
@@ -455,16 +506,32 @@ class LGService extends ChangeNotifier {
 
   Future<void> _setKmlTxt() async {
     final version = DateTime.now().millisecondsSinceEpoch;
-    final kmlContent =
-        "echo 'http://lg1:81/kmls.kml?v=$version' > /var/www/html/kmls.txt";
-    await execute(kmlContent);
+    final kmlContent = '''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <NetworkLink>
+      <Link>
+        <href>http://lg1:81/kmls.kml?v=$version</href>
+      </Link>
+    </NetworkLink>
+  </Document>
+</kml>''';
+    await execute("cat <<'EOF' > /var/www/html/kmls.txt\n$kmlContent\nEOF");
   }
 
   Future<void> _setTimeKmlTxt() async {
     final version = DateTime.now().millisecondsSinceEpoch;
-    final kmlContent =
-        "echo 'http://lg1:81/time.kml?v=$version' > /var/www/html/kmls.txt";
-    await execute(kmlContent);
+    final kmlContent = '''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <NetworkLink>
+      <Link>
+        <href>http://lg1:81/time.kml?v=$version</href>
+      </Link>
+    </NetworkLink>
+  </Document>
+</kml>''';
+    await execute("cat <<'EOF' > /var/www/html/time.txt\n$kmlContent\nEOF");
   }
 
   Future<void> sendQuery(String query) async {
@@ -473,16 +540,20 @@ class LGService extends ChangeNotifier {
 
   bool _orbitPlaying = false;
   bool get orbitPlaying => _orbitPlaying;
+
+  Future<void> stopMovement() async {
+    await sendQuery('exittour=true');
+  }
   Timer? _orbitTimer;
   String? _lastOrbitPosition;
 
   String orbitLookAtLinear(
-    double latitude,
-    double longitude,
-    double zoom,
-    double tilt,
-    double bearing,
-  ) {
+      double latitude,
+      double longitude,
+      double zoom,
+      double tilt,
+      double bearing,
+      ) {
     final lookAt =
         '<gx:duration>0.3</gx:duration><gx:flyToMode>smooth</gx:flyToMode><LookAt>'
         '<longitude>$longitude</longitude><latitude>$latitude</latitude>'
@@ -495,13 +566,13 @@ class LGService extends ChangeNotifier {
   }
 
   Future<void> flyToOrbit(
-    String context,
-    double latitude,
-    double longitude,
-    double zoom,
-    double tilt,
-    double bearing,
-  ) async {
+      String context,
+      double latitude,
+      double longitude,
+      double zoom,
+      double tilt,
+      double bearing,
+      ) async {
     try {
       final String lookAt = orbitLookAtLinear(
         latitude,
@@ -518,12 +589,12 @@ class LGService extends ChangeNotifier {
   }
 
   Future<bool> orbitPlay(
-    double latitude,
-    double longitude,
-    double zoom,
-    double tilt, {
-    double initialBearing = 0,
-  }) async {
+      double latitude,
+      double longitude,
+      double zoom,
+      double tilt, {
+        double initialBearing = 0,
+      }) async {
     if (_orbitPlaying) {
       return false;
     }
@@ -537,6 +608,24 @@ class LGService extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // First, fly to the initial position to ensure we are at the coordinates
+      final String initialLookAt = orbitLookAtLinear(
+        latitude,
+        longitude,
+        zoom,
+        tilt,
+        initialBearing,
+      ).replaceAll(
+        '<gx:duration>0.3</gx:duration>',
+        '<gx:duration>4.0</gx:duration>',
+      );
+
+      await sendQuery('flytoview=$initialLookAt');
+      // Wait for the flyto to finish before starting the orbit rotation
+      await Future.delayed(const Duration(milliseconds: 4000));
+
+      if (!_orbitPlaying) return true;
+
       const int steps = 60;
       const int stepDuration = 400; // ms
       // Calculate starting step from initial bearing
@@ -544,8 +633,8 @@ class LGService extends ChangeNotifier {
       bool isMoving = false;
 
       _orbitTimer = Timer.periodic(const Duration(milliseconds: stepDuration), (
-        timer,
-      ) async {
+          timer,
+          ) async {
         if (!_orbitPlaying) {
           timer.cancel();
           return;
@@ -600,27 +689,54 @@ class LGService extends ChangeNotifier {
   }
 
   Future<void> clearKML() async {
-    await execute("echo '' > /var/www/html/kmls.kml");
+    _lastKml = null;
+    _lastTimeKml = null;
+    _lastSlaveKml.clear();
+
+    if (_orbitPlaying) {
+      orbitStop();
+    }
+
+    // Combined command to stop movement and clear KML files for efficiency
+    int logoSlave = _screens == 5 ? 4 : 2;
+    String clearSlavesCmd = "";
+    for (int i = 1; i <= _screens; i++) {
+      if (i != logoSlave) {
+        clearSlavesCmd += "echo '<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document></Document></kml>' > /var/www/html/kml/slave_$i.kml; ";
+      }
+    }
+
+    await execute(
+        "echo 'exittour=true' > /tmp/query.txt; "
+            "echo '' > /var/www/html/kmls.kml; "
+            "echo '' > /var/www/html/time.kml; "
+            "$clearSlavesCmd"
+    );
+
+    // Refresh the TXT wrappers
     await _setKmlTxt();
+    await _setTimeKmlTxt();
+    for (int i = 1; i <= _screens; i++) {
+      if (i != logoSlave) {
+        await _setSlaveKmlTxt(i);
+      }
+    }
+
+    // Stop browsers on all screens
+    for (int i = 1; i <= _screens; i++) {
+      stopBrowser(i);
+    }
   }
 
   Future<void> clearTime() async {
+    _lastTimeKml = null;
     await execute("echo '' > /var/www/html/time.kml");
     await _setTimeKmlTxt();
   }
 
   Future<void> clearLogos() async {
-    String blank = '''<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2">
-  <Document></Document>
-</kml>''';
-    await execute("mkdir -p /var/www/html/kml");
-    // Limpiamos todos los esclavos posibles para asegurar que no queden logos residuales
-    for (var i = 1; i <= _screens; i++) {
-      await execute(
-        "cat <<'EOF' > /var/www/html/kml/slave_$i.kml\n$blank\nEOF",
-      );
-    }
+    int logoSlave = _screens == 5 ? 4 : 2;
+    await clearSlaveKML(logoSlave);
   }
 
   Future<void> relaunch() async {
@@ -631,7 +747,7 @@ class LGService extends ChangeNotifier {
 
     for (var i = _screens; i >= 1; i--) {
       final relaunchCommand =
-          """RELAUNCH_CMD="\\
+      """RELAUNCH_CMD="\\
 if [ -f /etc/init/lxdm.conf ]; then
   export SERVICE=lxdm
 elif [ -f /etc/init/lightdm.conf ]; then
@@ -679,40 +795,45 @@ fi
 
   Future<void> setRefresh() async {
     if (_password == null) return;
+    final user = _username ?? 'lg';
     try {
-      for (var i = 1; i <= _screens; i++) {
-        // Rutas directas para asegurar la configuración
-        final paths = [
-          '/home/lg/earth/kml/myplaces.kml',
-          '/home/lg/earth/kml/slave/myplaces.kml',
-          '/home/lg/.googleearth/instance-1/myplaces.kml',
-        ];
+      final paths = [
+        '/home/$user/earth/kml/myplaces.kml',
+        '/home/$user/earth/kml/slave/myplaces.kml',
+        '/home/$user/.googleearth/instance-1/myplaces.kml',
+      ];
 
+      List<Future> futures = [];
+      for (var i = 1; i <= _screens; i++) {
         final host = i == 1 ? 'localhost' : 'lg1';
         final globalUrl = 'http://$host:81/kmls.txt';
-        final slaveUrl = 'http://$host:81/kml/slave_$i.kml';
+        final timeUrl = 'http://$host:81/time.txt';
+        final slaveUrl = 'http://$host:81/kml/slave_$i.txt';
 
-        for (var path in paths) {
-          String script =
-              """
-            if [ -f $path ]; then
-              # Eliminar entradas previas para evitar duplicidad o basura
-              sed -i '/slave_$i.kml/d' $path
-              sed -i '/kmls.txt/d' $path
-              # Insertar nuevos NetworkLinks antes del cierre del Documento
-              sed -i '/<\\/Document>/i <NetworkLink><name>global_$i</name><Link><href>$globalUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' $path
-              sed -i '/<\\/Document>/i <NetworkLink><name>slave_$i</name><Link><href>$slaveUrl</href><refreshMode>onChange</refreshMode></Link></NetworkLink>' $path
-            fi
-          """;
+        String script = "for path in ${paths.join(' ')}; do "
+            "if [ -f \$path ]; then "
+            "sed -i '/global_[0-9]/d' \$path; "
+            "sed -i '/time_[0-9]/d' \$path; "
+            "sed -i '/slave_[0-9]/d' \$path; "
+            "sed -i '/kmls.txt/d' \$path; "
+            "sed -i '/time.txt/d' \$path; "
+            "sed -i '/slave_.*\\.txt/d' \$path; "
+            "sed -i '/slave_.*\\.kml/d' \$path; "
+            "sed -i '/<\\/Document>/i <NetworkLink><name>global_$i</name><Link><href>$globalUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' \$path; "
+            "sed -i '/<\\/Document>/i <NetworkLink><name>time_$i</name><Link><href>$timeUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' \$path; "
+            "sed -i '/<\\/Document>/i <NetworkLink><name>slave_$i</name><Link><href>$slaveUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' \$path; "
+            "fi; done";
 
-          String execCmd = "echo '$_password' | sudo -S bash -c \"$script\"";
-          if (i == 1) {
-            await execute(execCmd);
-          } else {
-            await execute('sshpass -p $_password ssh -t lg$i "$execCmd"');
-          }
+        String execCmd = "echo '$_password' | sudo -S bash -c \"\$script\"";
+        if (i == 1) {
+          futures.add(execute(execCmd));
+        } else {
+          futures.add(execute(
+            "sshpass -p '$_password' ssh -n -o StrictHostKeyChecking=no $user@lg$i \"\$execCmd\"",
+          ));
         }
       }
+      await Future.wait(futures);
       debugPrint('LGService: Refresco configurado e inyectado correctamente.');
     } catch (e) {
       debugPrint('LGService: Error crítico en setRefresh: $e');
@@ -726,8 +847,10 @@ fi
         String path = i == 1
             ? '~/earth/kml/myplaces.kml'
             : '~/earth/kml/slave/myplaces.kml';
-        // Eliminamos las etiquetas de refresco
+        // Eliminamos las etiquetas de refresco y posibles restos de configuraciones anteriores
         final cmd =
+            "echo '$_password' | sudo -S sed -i '/global_$i/d; /time_$i/d; /slave_$i/d; /kmls.txt/d; /time.txt/d; /slave_.*\\.kml/d; /slave_.*\\.txt/d' $path; "
+            "echo '$_password' | sudo -S sed -i 's@<refreshMode>onChange</refreshMode>@@g' $path; "
             "echo '$_password' | sudo -S sed -i 's@<refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval>@@g' $path";
         await execute('sshpass -p $_password ssh -t lg$i "$cmd"');
       }

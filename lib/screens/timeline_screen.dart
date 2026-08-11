@@ -31,11 +31,13 @@ class _TimelineScreenState extends State<TimelineScreen> {
     super.initState();
     _loadCountries();
     _searchController.addListener(_filterCountries);
+    LanguageManager.instance.languageNotifier.addListener(_filterCountries);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    LanguageManager.instance.languageNotifier.removeListener(_filterCountries);
     super.dispose();
   }
 
@@ -51,13 +53,19 @@ class _TimelineScreenState extends State<TimelineScreen> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredCountries = _countries.where((country) {
-        return country.name.toLowerCase().contains(query);
+        final translatedName = LanguageManager.instance.translate(
+          country.name.toLowerCase().replaceAll(' ', '_'),
+        ).toLowerCase();
+        return translatedName.contains(query);
       }).toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isTablet = size.width > 600;
+
     return ValueListenableBuilder<String>(
       valueListenable: LanguageManager.instance.languageNotifier,
       builder: (context, lang, child) {
@@ -71,55 +79,66 @@ class _TimelineScreenState extends State<TimelineScreen> {
               ),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: widget.onMenuToggle,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.menu,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: LanguageManager.instance.translate(
-                          'search_countries',
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.6),
-                        ),
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: Colors.white.withValues(alpha: 0.6),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white.withValues(alpha: 0.15),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide(
+                  if (!isTablet) ...[
+                    GestureDetector(
+                      onTap: widget.onMenuToggle,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                          border: Border.all(
                             color: Colors.white.withValues(alpha: 0.2),
                           ),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                        child: const Icon(
+                          Icons.menu,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                  Expanded(
+                    child: Center(
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxWidth: isTablet ? 600 : double.infinity,
+                        ),
+                        child: TextField(
+                          controller: _searchController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: LanguageManager.instance.translate(
+                              'search_countries',
+                            ),
+                            hintStyle: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.6),
+                            ),
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: Colors.white.withValues(alpha: 0.6),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white.withValues(alpha: 0.15),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.2),
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 0,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -127,159 +146,140 @@ class _TimelineScreenState extends State<TimelineScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            // Country List
+            // Country Grid/List
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: _filteredCountries.length,
-                itemBuilder: (context, index) {
-                  final country = _filteredCountries[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.05),
-                      ),
-                    ),
-                    child: ListTile(
-                      visualDensity: VisualDensity.compact,
-                      leading: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Colors.white.withValues(alpha: 0.2),
-                        child: Text(
-                          country.flag,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                      title: Text(
-                        country.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                      trailing: const Icon(
-                        Icons.chevron_right,
-                        color: Colors.white70,
-                        size: 20,
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => POIScreen(
-                              country: country,
-                              isConnected: widget.isConnected,
+              child:
+                  isTablet
+                      ? GridView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 4,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
+                        itemCount: _filteredCountries.length,
+                        itemBuilder: (context, index) {
+                          return _buildCountryItem(_filteredCountries[index]);
+                        },
+                      )
+                      : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: _filteredCountries.length,
+                        itemBuilder: (context, index) {
+                          return _buildCountryItem(_filteredCountries[index]);
+                        },
+                      ),
             ),
             // Timeline Slider
             ValueListenableBuilder<double>(
               valueListenable: TimeManager.instance.timeNotifier,
               builder: (context, timeValue, child) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 10.0,
-                  ),
-                  margin: const EdgeInsets.only(
-                    left: 16.0,
-                    right: 16.0,
-                    bottom: 5.0,
-                    top: 5.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                return Center(
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: isTablet ? 600 : double.infinity,
                     ),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _timeLabel(
-                            LanguageManager.instance
-                                .translate('past')
-                                .toUpperCase(),
-                            timeValue == 0,
-                            0,
-                          ),
-                          _timeLabel(
-                            LanguageManager.instance
-                                .translate('present')
-                                .toUpperCase(),
-                            timeValue == 1,
-                            1,
-                          ),
-                          _timeLabel(
-                            LanguageManager.instance
-                                .translate('future')
-                                .toUpperCase(),
-                            timeValue == 2,
-                            2,
-                          ),
-                        ],
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 10.0,
+                    ),
+                    margin: const EdgeInsets.only(
+                      left: 16.0,
+                      right: 16.0,
+                      bottom: 5.0,
+                      top: 5.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.1),
                       ),
-                      const SizedBox(height: 2),
-                      SliderTheme(
-                        data: SliderTheme.of(context).copyWith(
-                          activeTrackColor: Colors.cyanAccent,
-                          inactiveTrackColor: Colors.white.withValues(
-                            alpha: 0.2,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _timeLabel(
+                              LanguageManager.instance
+                                  .translate('past')
+                                  .toUpperCase(),
+                              timeValue == 0,
+                              0,
+                              isTablet,
+                            ),
+                            _timeLabel(
+                              LanguageManager.instance
+                                  .translate('present')
+                                  .toUpperCase(),
+                              timeValue == 1,
+                              1,
+                              isTablet,
+                            ),
+                            _timeLabel(
+                              LanguageManager.instance
+                                  .translate('future')
+                                  .toUpperCase(),
+                              timeValue == 2,
+                              2,
+                              isTablet,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            activeTrackColor: Colors.cyanAccent,
+                            inactiveTrackColor: Colors.white.withValues(
+                              alpha: 0.2,
+                            ),
+                            trackHeight: 4.0,
+                            thumbColor: Colors.white,
+                            thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 10.0,
+                            ),
+                            overlayColor: Colors.cyanAccent.withValues(
+                              alpha: 0.3,
+                            ),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 20.0,
+                            ),
+                            tickMarkShape: const RoundSliderTickMarkShape(),
+                            activeTickMarkColor: Colors.cyanAccent,
+                            inactiveTickMarkColor: Colors.white.withValues(
+                              alpha: 0.3,
+                            ),
                           ),
-                          trackHeight: 4.0,
-                          thumbColor: Colors.white,
-                          thumbShape: const RoundSliderThumbShape(
-                            enabledThumbRadius: 10.0,
-                          ),
-                          overlayColor: Colors.cyanAccent.withValues(
-                            alpha: 0.3,
-                          ),
-                          overlayShape: const RoundSliderOverlayShape(
-                            overlayRadius: 20.0,
-                          ),
-                          tickMarkShape: const RoundSliderTickMarkShape(),
-                          activeTickMarkColor: Colors.cyanAccent,
-                          inactiveTickMarkColor: Colors.white.withValues(
-                            alpha: 0.3,
+                          child: Container(
+                            height: 35,
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.cyanAccent.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  blurRadius: 15,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: Slider(
+                              value: timeValue,
+                              min: 0,
+                              max: 2,
+                              divisions: 2,
+                              onChanged: (value) {
+                                TimeManager.instance.setTime(value);
+                              },
+                            ),
                           ),
                         ),
-                        child: Container(
-                          height: 35,
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.cyanAccent.withValues(alpha: 0.3),
-                                blurRadius: 15,
-                                spreadRadius: 1,
-                              ),
-                            ],
-                          ),
-                          child: Slider(
-                            value: timeValue,
-                            min: 0,
-                            max: 2,
-                            divisions: 2,
-                            onChanged: (value) {
-                              TimeManager.instance.setTime(value);
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
@@ -290,7 +290,52 @@ class _TimelineScreenState extends State<TimelineScreen> {
     );
   }
 
-  Widget _timeLabel(String label, bool isSelected, double value) {
+  Widget _buildCountryItem(Country country) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: ListTile(
+        visualDensity: VisualDensity.compact,
+        leading: CircleAvatar(
+          radius: 16,
+          backgroundColor: Colors.white.withValues(alpha: 0.2),
+          child: Text(country.flag, style: const TextStyle(fontSize: 16)),
+        ),
+        title: Text(
+          LanguageManager.instance.translate(country.name.toLowerCase().replaceAll(' ', '_')),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+        trailing: const Icon(Icons.chevron_right, color: Colors.white70, size: 20),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => POIScreen(
+                    country: country,
+                    isConnected: widget.isConnected,
+                  ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _timeLabel(
+    String label,
+    bool isSelected,
+    double value,
+    bool isTablet,
+  ) {
     return GestureDetector(
       onTap: () => TimeManager.instance.setTime(value),
       child: AnimatedContainer(
@@ -314,7 +359,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                 ? Colors.white
                 : Colors.white.withValues(alpha: 0.5),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            fontSize: 9,
+            fontSize: isTablet ? 12 : 9,
             letterSpacing: 1.0,
             shadows: isSelected
                 ? [const Shadow(color: Colors.cyanAccent, blurRadius: 6)]

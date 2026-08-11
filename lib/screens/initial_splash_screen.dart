@@ -32,7 +32,8 @@ class _InitialSplashScreenState extends State<InitialSplashScreen> {
       body: Center(
         child: Image.asset(
           'assets/images/Timeline/LogoDisplayScreen.png',
-          width: MediaQuery.of(context).size.width * 0.6,
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: MediaQuery.of(context).size.height * 0.9,
           fit: BoxFit.contain,
         ),
       ),

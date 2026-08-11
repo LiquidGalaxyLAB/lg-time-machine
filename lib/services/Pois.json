@@ -20,6 +20,34 @@
       "statistics_text_present": "-Height: 30 m\n-Columns: 36 Doric columns\n-Statue height: 5.8 m\n-Visitors: 7 million/year\n-Style: Greek Doric temple",
       "statistics_text_past": "-Built: 1914–1922\n-Architect: Henry Bacon\n-Statue Sculptor: Daniel Chester French\n-Site: Reclaimed swampland\n-Dedicated: May 30, 1922",
       "past_comparison_summary": "A solemn Greek-inspired temple rising from marshland to honor the legacy of national unity."
+    },
+    "Mount_Rushmore": {
+      "name": "Mount Rushmore",
+      "description": "Massive sculpture carved into the Black Hills",
+      "statistics_text_present": "-Heads height: 18 m\n-Visitors: 2 million/year\n-State: South Dakota\n-Presidents: Washington, Jefferson, Roosevelt, Lincoln\n-Elevation: 1,745 m",
+      "statistics_text_past": "-Carved: 1927–1941\n-Sculptor: Gutzon Borglum\n-Method: 90% Dynamite\n-Original intent: Full bodies included\n-Workers: ~400",
+      "past_comparison_summary": "The transformation of a granite cliff into a monumental tribute to American leadership."
+    },
+    "Grand_Canyon": {
+      "name": "Grand Canyon",
+      "description": "Immense canyon carved by the Colorado River",
+      "statistics_text_present": "-Depth: Over 1,800 m\n-Width: Up to 29 km\n-Visitors: 6 million/year\n-UNESCO Site since: 1979\n-Park size: 4,926 km²",
+      "statistics_text_past": "-Formation: 5–6 million years ago\n-Native history: Home to Pueblo people\n-Protection: National Monument in 1908\n-First exploration: Powell (1869)\n-Status: National Park in 1919",
+      "past_comparison_summary": "Millions of years of geological history revealed through the slow erosion of the Colorado River."
+    },
+    "Empire_State_Building": {
+      "name": "Empire State Building",
+      "description": "Art Deco skyscraper in Midtown Manhattan",
+      "statistics_text_present": "-Height: 443 m\n-Floors: 102\n-Completed: 1931\n-Lights: Famous LED displays\n-Status: Landmark of New York City",
+      "statistics_text_past": "-Built: 410 days (1930-1931)\n-Title: World's tallest until 1970\n-Nickname: 'Empty State Building' (Great Depression)\n-Style: Art Deco icon\n-Cost: $41 million",
+      "past_comparison_summary": "A symbol of American ambition that rose rapidly during the Great Depression to define the NYC skyline."
+    },
+    "Yellowstone_National_Park": {
+      "name": "Yellowstone National Park",
+      "description": "The world's first national park",
+      "statistics_text_present": "-Area: 8,983 km²\n-Geysers: Old Faithful\n-Visitors: 4.5 million/year\n-Fauna: Grizzly bears, bison, wolves\n-Hot springs: Grand Prismatic",
+      "statistics_text_past": "-Established: March 1, 1872\n-Signed by: Ulysses S. Grant\n-Geology: Giant caldera (supervolcano)\n-Native History: Crow, Blackfeet, Bannock land\n-Conservation: First major nature reserve",
+      "past_comparison_summary": "A wilderness preserved since the 19th century as a sanctuary for wildlife and geothermal wonders."
     }
   },
   "France": {
@@ -43,6 +71,34 @@
       "statistics_text_present": "-Population: ~30 residents\n-Visitors: 3 million/year\n-UNESCO Site since: 1979\n-Access: New bridge completed in 2014\n-Tides: Highest in Europe",
       "statistics_text_past": "-Founded: Abbey started in 8th C\n-Defense: Survived Hundred Years' War\n-Prison: Used as jail during French Revolution\n-Strategic: Fortified island village\n-Causeway: Original was a tidal path",
       "past_comparison_summary": "A spiritual island fortress that survived centuries of conflict to become a tourist jewel."
+    },
+    "Palace_of_Versailles": {
+      "name": "Palace of Versailles",
+      "description": "Former royal residence of the French Kings",
+      "statistics_text_present": "-Rooms: 2,300\n-Gardens: 800 hectares\n-Hall of Mirrors: 73 m long\n-Visitors: 8 million/year\n-UNESCO Site since: 1979",
+      "statistics_text_past": "-Origins: Hunting lodge (1623)\n-Expansion: Louis XIV (The Sun King)\n-Court Move: Became seat of power in 1682\n-Significance: Absolute Monarchy symbol\n-Revolution: Ceased as royal residence in 1789",
+      "past_comparison_summary": "The transformation of a modest hunting lodge into the most opulent palace in Europe."
+    },
+    "Notre-Dame_Cathedral": {
+      "name": "Notre-Dame Cathedral",
+      "description": "Medieval Catholic cathedral in Paris",
+      "statistics_text_present": "-Restoration: Post-2019 fire\n-Style: French Gothic\n-Rose Windows: 13th century originals\n-Bell: 'Emmanuel' (13 tons)\n-Location: Île de la Cité",
+      "statistics_text_past": "-Built: 1163–1345\n-Architectural innovations: Flying buttresses\n-Historical event: Napoleon's coronation (1804)\n-Restoration: Viollet-le-Duc (19th century)\n-Cultural icon: Victor Hugo's novel (1831)",
+      "past_comparison_summary": "A Gothic masterpiece that has witnessed centuries of French history, currently rising again from the 2019 fire."
+    },
+    "Arc_de_Triomphe": {
+      "name": "Arc de Triomphe",
+      "description": "Monument at the center of Place Charles de Gaulle",
+      "statistics_text_present": "-Height: 50 m\n-Tomb: Unknown Soldier (1921)\n-Location: Champs-Élysées\n-Visitors: 1.5 million/year\n-Design: Neoclassical",
+      "statistics_text_past": "-Commissioned: Napoleon in 1806\n-Completion: 1836 (Louis-Philippe)\n-Purpose: Celebrate victory at Austerlitz\n-Reliefs: 'The Departure of the Volunteers'\n-Symbol: French national unity",
+      "past_comparison_summary": "A triumphal arch honoring those who fought for France, anchoring the city's most famous perspective."
+    },
+    "Pont_du_Gard": {
+      "name": "Pont du Gard",
+      "description": "Ancient Roman aqueduct bridge",
+      "statistics_text_present": "-Height: 48.8 m\n-Levels: 3 tiers of arches\n-UNESCO Site since: 1985\n-Material: Shelled limestone\n-Status: Best-preserved Roman bridge",
+      "statistics_text_past": "-Built: 1st century AD\n-Purpose: Water for Nîmes\n-Construction: Built without mortar\n-Maintenance: Used until 6th century\n-Survives: Repurposed as a toll bridge in Middle Ages",
+      "past_comparison_summary": "A marvel of Roman engineering that provided water for centuries and remains standing as a structural icon."
     }
   },
   "Italy": {
@@ -66,6 +122,34 @@
       "statistics_text_present": "-Dome: World's largest unreinforced concrete dome\n-Diameter: 43.3 m\n-Status: State-owned church (Basilica)\n-Tombs: Raphael and Italian Kings\n-Occasion: Still active for religious services",
       "statistics_text_past": "-Commissioned: Marcus Agrippa (original)\n-Rebuilt: Hadrian in ~126 AD\n-Purpose: Temple for all Roman gods\n-Conversion: Consecrated as church in 609 AD\n-Oculus: The only source of natural light",
       "past_comparison_summary": "An architectural masterpiece that has remained in continuous use for nearly 2,000 years."
+    },
+    "Trevi_Fountain": {
+      "name": "Trevi Fountain",
+      "description": "Baroque fountain in the Trevi district",
+      "statistics_text_present": "-Height: 26.3 m\n-Width: 49.1 m\n-Daily water: 80,000 m³\n-Tradition: Tossing coins (3,000€/day)\n-Material: Travertine stone",
+      "statistics_text_past": "-Built: 1732–1762\n-Architect: Nicola Salvi\n-Aqueduct: Source is Aqua Virgo (19 BC)\n-Style: Late Baroque\n-Sculpture: Oceanus in the central niche",
+      "past_comparison_summary": "Rome's most spectacular fountain, built over an ancient Roman water source."
+    },
+    "Milan_Cathedral": {
+      "name": "Milan Cathedral (Duomo di Milano)",
+      "description": "Massive Gothic cathedral",
+      "statistics_text_present": "-Capacity: 40,000 people\n-Statues: 3,400\n-Spire: Madonnina (108 m)\n-Style: Rayonnant Gothic\n-Material: Candoglia marble",
+      "statistics_text_past": "-Started: 1386\n-Completed: 1965 (official finish)\n-Construction: Over 600 years\n-Support: Gian Galeazzo Visconti\n-Facade: Mix of Gothic and Renaissance",
+      "past_comparison_summary": "A forest of marble spires that took six centuries to complete, dominating Milan's heart."
+    },
+    "Roman_Forum": {
+      "name": "Roman Forum",
+      "description": "Plaza surrounded by ruins of ancient government buildings",
+      "statistics_text_present": "-Site: Archeological park\n-Key ruins: Curia Julia, Temple of Saturn\n-Visitors: Combined with Colosseum\n-Status: Heart of ancient Rome\n-Landscape: Open-air museum",
+      "statistics_text_past": "-Function: Social, political, and commercial center\n-Origins: 7th century BC (marsh drainage)\n-Peak: Era of Augustus and Trajan\n-Abandonment: After fall of Rome\n-Re-discovery: Excavations in 18th-19th century",
+      "past_comparison_summary": "The epicenter of the Roman world, transformed from a bustling city center into a evocative ruin."
+    },
+    "Pompeii": {
+      "name": "Pompeii",
+      "description": "Preserved ancient Roman city",
+      "statistics_text_present": "-Excavated: ~2/3 of the city\n-Visitors: 2.5 million/year\n-UNESCO Site since: 1997\n-Location: Near Naples\n-Climate: Mediterranean",
+      "statistics_text_past": "-Disaster: Vesuvius eruption in 79 AD\n-Buried: Under 4-6 m of ash\n-Population: ~11,000–20,000\n-Frozen: Life captured in mid-moment\n-Rediscovery: 1748",
+      "past_comparison_summary": "A snapshot of Roman life frozen in time by the catastrophic power of Mount Vesuvius."
     }
   },
   "Spain": {
@@ -103,6 +187,555 @@
       "statistics_text_present": "-Floor area: 135,000 m²\n-Rooms: 3,418\n-Status: Largest in Europe by floor area\n-Visitors: 1.5 million/year\n-Collections: Stradivarius Palatinos",
       "statistics_text_past": "-Built: 1738–1755\n-Site: Former Moorish Alcázar\n-Fire: Destroyed old palace in 1734\n-Architects: Juvarra & Sacchetti\n-First Royal: Charles III in 1764",
       "past_comparison_summary": "The reconstruction after the 1734 fire, replacing the old Alcázar with Europe's largest palace."
+    },
+    "Mosque–Cathedral_of_Córdoba": {
+      "name": "Mosque–Cathedral of Córdoba",
+      "description": "Historical cathedral and former mosque",
+      "statistics_text_present": "-Surface: 23,400 m²\n-Arches: 856 columns\n-UNESCO Site since: 1984\n-Status: Cathedral of the Diocese\n-Style: Islamic & Renaissance",
+      "statistics_text_past": "-Origins: Visigoth church\n-Mosque conversion: 784 AD (Abd al-Rahman I)\n-Expansion: Al-Hakam II (Golden Age)\n-Reconquista: Converted to cathedral in 1236\n-Renaissance: Nave added in the 16th century",
+      "past_comparison_summary": "An architectural hybrid representing the layered history of Islamic and Christian Spain."
+    },
+    "Park_Güell": {
+      "name": "Park Güell",
+      "description": "Privatized system of public parks composed of gardens and architectural elements",
+      "statistics_text_present": "-Area: 17 hectares\n-Symbol: Mosaic salamander (El Drac)\n-UNESCO Site since: 1984\n-Style: Catalan Modernism\n-Location: Carmel Hill",
+      "statistics_text_past": "-Project: 1900–1914\n-Architect: Antoni Gaudí\n-Client: Eusebi Güell\n-Original aim: Luxury housing estate\n-Failure: Only two houses built",
+      "past_comparison_summary": "A failed luxury real estate project that became a world-famous public masterpiece of organic design."
+    }
+  },
+  "United Kingdom": {
+    "Big_Ben": {
+      "name": "Big Ben",
+      "description": "The Great Bell of the Great Clock of Westminster",
+      "statistics_text_present": "-Clock face: 7 m diameter\n-Bell weight: 13.7 tons\n-Tower height: 96 m\n-Renovation: Completed 2022\n-Status: Cultural symbol of the UK",
+      "statistics_text_past": "-Tower built: 1859\n-Architect: Augustus Pugin\n-Style: Gothic Revival\n-Original name: Clock Tower\n-Renamed: Elizabeth Tower (2012)",
+      "past_comparison_summary": "The reliable guardian of London's time since the mid-19th century."
+    },
+    "Tower_Bridge": {
+      "name": "Tower Bridge",
+      "description": "Combined bascule and suspension bridge",
+      "statistics_text_present": "-Length: 240 m\n-Height: 65 m\n-Daily crossings: 40,000\n-Power: Electric (since 1976)\n-Status: Iconic London landmark",
+      "statistics_text_past": "-Built: 1886–1894\n-Engineer: John Wolfe Barry\n-Original power: Steam engines\n-Design: Victorian Gothic\n-Lifts: ~1,000 times per year",
+      "past_comparison_summary": "Victorian engineering excellence that allows ships to reach the heart of the city."
+    },
+    "Stonehenge": {
+      "name": "Stonehenge",
+      "description": "Prehistoric monument in Wiltshire",
+      "statistics_text_present": "-Stones: Sarsen and bluestones\n-UNESCO Site since: 1986\n-Visitors: 1.6 million/year\n-Alignment: Solstice sunset/sunrise\n-Status: British cultural icon",
+      "statistics_text_past": "-Age: 3000 BC to 2000 BC\n-Purpose: Burial ground or solar calendar\n-Logistics: Bluestones from Wales (240 km away)\n-Design: Circular ditch and bank\n-Erosion: Natural weathering over 5,000 years",
+      "past_comparison_summary": "A mysterious megalithic site that has stood as a silent witness for millennia."
+    },
+    "Buckingham_Palace": {
+      "name": "Buckingham Palace",
+      "description": "London residence and administrative headquarters of the monarch",
+      "statistics_text_present": "-Rooms: 775\n-Staff: ~400 people\n-Garden: Largest private garden in London\n-Events: Changing of the Guard\n-Flag: Royal Standard (if King is home)",
+      "statistics_text_past": "-Original: Buckingham House (1703)\n-Expansion: Nash & Blore (19th century)\n-Official: Primary residence in 1837\n-East Front: Added in 1847\n-Bombing: Survived WWII air raids",
+      "past_comparison_summary": "The evolution of a 18th-century townhouse into the global symbol of the British Monarchy."
+    },
+    "Tower_of_London": {
+      "name": "Tower of London",
+      "description": "Historic castle on the north bank of the Thames",
+      "statistics_text_present": "-Artifacts: Crown Jewels\n-Guardians: Yeoman Warders (Beefeaters)\n-Visitors: 3 million/year\n-UNESCO Site since: 1988\n-Ravens: Legend says they must stay",
+      "statistics_text_past": "-Founded: 1066 (William the Conqueror)\n-White Tower: 1078\n-Functions: Palace, prison, armory, mint, zoo\n-Infamy: Prison for Anne Boleyn & Elizabeth I\n-Defense: Concentric fortifications",
+      "past_comparison_summary": "A royal fortress that has served as a palace, prison, and treasury for nearly a millennium."
+    },
+    "Edinburgh_Castle": {
+      "name": "Edinburgh_Castle",
+      "description": "Historic fortress dominating the skyline of Edinburgh",
+      "statistics_text_present": "-Elevation: Castle Rock (extinct volcano)\n-Tradition: One O'Clock Gun\n-Visitors: 2.2 million/year\n-Highlights: Honors of Scotland (Crown Jewels)\n-Status: Scotland's most visited site",
+      "statistics_text_past": "-Evidence of use: 2nd century AD\n-Royal residence: Until 1633\n-Sieges: Most besieged place in Britain\n-St Margaret's Chapel: Oldest building in Edinburgh (12th C)\n-Military: Main garrison in Scotland",
+      "past_comparison_summary": "A formidable stronghold that has defined the Scottish capital's defense and royal history."
+    },
+    "Westminster_Abbey": {
+      "name": "Westminster Abbey",
+      "description": "Large, mainly Gothic abbey church",
+      "statistics_text_present": "-Coronations: Every monarch since 1066\n-Burials: 17 monarchs\n-Style: Mainly 13th-century Gothic\n-Poets' Corner: Memorials to UK writers\n-Status: Royal Peculiar",
+      "statistics_text_past": "-Founded: 960 AD (Benedictine monks)\n-Rebuilt: Edward the Confessor (1060s)\n-Henry III's reconstruction: Starting in 1245\n-Lady Chapel: Added by Henry VII (1503)\n-Towers: Hawksmoor towers finished in 1745",
+      "past_comparison_summary": "The coronation site and final resting place of kings, queens, and great Britons."
+    }
+  },
+  "Germany": {
+    "Brandenburg_Gate": {
+      "name": "Brandenburg Gate",
+      "description": "18th-century neoclassical monument in Berlin",
+      "statistics_text_present": "-Height: 26 m\n-Symbolism: Unity and Peace\n-Statue: Quadriga (Goddess of Victory)\n-Location: Pariser Platz\n-Status: Most famous landmark in Germany",
+      "statistics_text_past": "-Built: 1788–1791 (Frederick William II)\n-Architect: Carl Gotthard Langhans\n-Cold War: Located in 'No Man's Land' by the Wall\n-Closure: 1961–1989\n-Restoration: Post-reunification",
+      "past_comparison_summary": "From a symbol of division during the Cold War to a beacon of German reunification."
+    },
+    "Neuschwanstein_Castle": {
+      "name": "Neuschwanstein Castle",
+      "description": "19th-century historicist palace on a rugged hill",
+      "statistics_text_present": "-Visitors: 1.4 million/year\n-Rooms: 15 finished out of 200+\n-Influence: Sleeping Beauty Castle (Disney)\n-Location: Bavaria\n-Landscape: Alpine setting",
+      "statistics_text_past": "-Built: 1869–1886\n-Commissioned: Ludwig II (The Fairytale King)\n-Purpose: Personal retreat and Wagner tribute\n-Modern tech: Had running water and heating\n-Completion: Ludwig died before it was finished",
+      "past_comparison_summary": "The ultimate romantic retreat, built for a king who wished to escape the modern world."
+    },
+    "Cologne_Cathedral": {
+      "name": "Cologne Cathedral",
+      "description": "Cathedral of Saint Peter and Mary",
+      "statistics_text_present": "-Height: 157 m (twin spires)\n-UNESCO Site since: 1996\n-Visitors: 20,000/day\n-Treasury: Shrine of the Three Kings\n-Status: Germany's most visited landmark",
+      "statistics_text_past": "-Started: 1248\n-Halt: Work stopped in 1473 for 400 years\n-Completion: 1880 (Prussian support)\n-WWII: Hit by 14 bombs, still stood\n-Style: French Rayonnant Gothic influence",
+      "past_comparison_summary": "A Gothic titan that took over 600 years to reach its final, awe-inspiring form."
+    },
+    "Berlin_Wall_Memorial": {
+      "name": "Berlin Wall Memorial",
+      "description": "Commemorative site for the division of Berlin",
+      "statistics_text_present": "-Section length: 1.4 km\n-Observation tower: Original preserved\n-Chapel: Chapel of Reconciliation\n-Outdoor exhibition: Memorial markers\n-Education: Documentation Center",
+      "statistics_text_past": "-Wall Built: August 13, 1961\n-The 'Death Strip': Fortified border zone\n-Length: 155 km around West Berlin\n-Wall Fall: November 9, 1989\n-Destruction: Most was removed in 1990",
+      "past_comparison_summary": "A sobering reminder of a city divided, preserved as a tribute to freedom and memory."
+    },
+    "Reichstag_Building": {
+      "name": "Reichstag Building",
+      "description": "Historic edifice in Berlin housing the German parliament",
+      "statistics_text_present": "-Dome: Glass dome by Norman Foster\n-Function: Seat of the Bundestag\n-Energy: Ecological self-sufficiency\n-Visitors: High security tours\n-Location: Near Brandenburg Gate",
+      "statistics_text_past": "-Opened: 1894\n-Reichstag Fire: 1933 (led to Nazi power expansion)\n-WWII: Severely damaged during Battle of Berlin\n-Cold War: Near the Wall, not used for parliament\n-Restoration: Completed 1999",
+      "past_comparison_summary": "A building that reflects Germany's turbulent 20th century, now featuring a transparent dome of democracy."
+    },
+    "Heidelberg_Castle": {
+      "name": "Heidelberg Castle",
+      "description": "Ruined Renaissance castle in the Neckar valley",
+      "statistics_text_present": "-Highlight: Great Heidelberg Tun (wine vat)\n-Terrace: Views of the Old Town\n-Gardens: Hortus Palatinus ruins\n-Status: Symbol of German Romanticism",
+      "statistics_text_past": "-Origins: 13th century\n-Renaissance Peak: 16th century expansions\n-Destruction: Nine Years' War (1689 & 1693)\n-Lightning: Struck in 1764, causing final abandonment\n-Preservation: Protected as a romantic ruin since 19th C",
+      "past_comparison_summary": "One of the most important Renaissance structures north of the Alps, now a poetic ruin."
+    }
+  },
+  "Greece": {
+    "Acropolis_of_Athens": {
+      "name": "Acropolis of Athens",
+      "description": "Ancient citadel located on a rocky outcrop",
+      "statistics_text_present": "-UNESCO Site since: 1987\n-Visitors: 16,000/day\n-Major projects: Ongoing marble restoration\n-Status: Symbol of Western Civilization\n-Elevation: 150 m",
+      "statistics_text_past": "-Inhabited: Since 4th millennium BC\n-Pericles' Era: Golden Age (5th C BC)\n-Siege: Morosini's explosion in 1687\n-Marbles: Lord Elgin's removal (1801)\n-Significance: Sacred precinct to Athena",
+      "past_comparison_summary": "The high city of Athens, evolving from a mycenaean fortress to the peak of classical Greek art."
+    },
+    "Parthenon": {
+      "name": "Parthenon",
+      "description": "Former temple on the Athenian Acropolis",
+      "statistics_text_present": "-Columns: 46 outer Doric columns\n-Material: Pentelic marble\n-Status: Most important surviving classical building\n-Features: Optical illusions (entasis)\n-Views: Visible from all over Athens",
+      "statistics_text_past": "-Completed: 438 BC\n-Architects: Ictinus and Callicrates\n-Sculptor: Phidias\n-Conversions: Byzantine church, Catholic church, Mosque\n-Damage: 1687 Venetian gunpowder explosion",
+      "past_comparison_summary": "A temple of perfect proportions that has survived as a church, mosque, and enduring ruins."
+    },
+    "Temple_of_Poseidon": {
+      "name": "Temple of Poseidon",
+      "description": "Ancient Greek temple at Cape Sounion",
+      "statistics_text_present": "-Location: Atop a cliff 60 m above sea\n-Remaining columns: 16\n-Sunset: Famous for views over the Aegean\n-Proximity: 70 km from Athens\n-Material: Local marble",
+      "statistics_text_past": "-Built: 444–440 BC\n-Era: Contemporary with Parthenon\n-History: Graffito of Lord Byron (1810)\n-Sacred: Dedicated to the God of the Sea\n-Design: Hexastyle peripteral",
+      "past_comparison_summary": "A dramatic coastal sanctuary marking the southernmost tip of the Attic peninsula."
+    },
+    "Delphi": {
+      "name": "Delphi",
+      "description": "Sanctuary of Apollo and site of the Oracle",
+      "statistics_text_present": "-UNESCO Site since: 1987\n-Key features: Temple of Apollo, Theater, Tholos\n-Museum: Delphi Charioteer\n-Setting: Slopes of Mount Parnassus\n-Visitors: Major cultural destination",
+      "statistics_text_past": "-Peak: 6th–4th century BC\n-Role: Religious center of the Greek world\n-The Oracle: Pythia giving prophecies\n-Pythian Games: Precursor to Olympics\n-Omphalos: Considered the center (navel) of the world",
+      "past_comparison_summary": "The most prestigious oracle in the ancient world, nestled in a stunning mountain landscape."
+    },
+    "Meteora": {
+      "name": "Meteora",
+      "description": "Monastery complex built on natural sandstone rock pillars",
+      "statistics_text_present": "-Active monasteries: 6 (out of original 24)\n-UNESCO Site since: 1988\n-Access: Steps carved into rock (modern)\n-Tourism: World-famous hiking site\n-Status: Second most important monastic group in Greece",
+      "statistics_text_past": "-Origins: Hermit monks in 11th century\n-Monastery building: 14th century (Byzantine era)\n-Defense: Inaccessible except by nets and ladders\n-Growth: Flourished during Ottoman occupation\n-Significance: Safe haven for Orthodox tradition",
+      "past_comparison_summary": "Spiritual retreats 'suspended in the air', offering total isolation for centuries."
+    },
+    "Palace_of_Knossos": {
+      "name": "Palace of Knossos",
+      "description": "Largest Bronze Age archaeological site on Crete",
+      "statistics_text_present": "-Setting: Near Heraklion, Crete\n-Highlights: Throne Room, Frescoes\n-Visitors: 1 million/year\n-Reconstruction: Controversial early 20th C work\n-Status: Center of Minoan civilization",
+      "statistics_text_past": "-Peak: 1700–1400 BC\n-Mythology: Labyrinth and the Minotaur\n-Architecture: Multi-story, plumbing, light wells\n-Abandonment: Around 1350 BC\n-Excavation: Sir Arthur Evans (1900)",
+      "past_comparison_summary": "The sophisticated labyrinthine palace of the Minoan kings, the first advanced civilization in Europe."
+    }
+  },
+  "Egypt": {
+    "Great_Pyramid_of_Giza": {
+      "name": "Great Pyramid of Giza",
+      "description": "Oldest and largest of the pyramids in the Giza complex",
+      "statistics_text_present": "-Height: 138.5 m (originally 146.6 m)\n-Blocks: ~2.3 million stones\n-UNESCO Site since: 1979\n-Visitors: 14 million/year\n-Status: Last of the Seven Wonders",
+      "statistics_text_past": "-Built: ~2560 BC (Old Kingdom)\n-Pharaoh: Khufu (Cheops)\n-Facade: Originally covered in white limestone\n-Peak: Capped with a gold pyramidion\n-Construction: Built over ~20 years",
+      "past_comparison_summary": "The pinnacle of ancient engineering, once shining brilliant white under the desert sun."
+    },
+    "Great_Sphinx_of_Giza": {
+      "name": "Great Sphinx of Giza",
+      "description": "Limestone statue of a reclining sphinx",
+      "statistics_text_present": "-Length: 73 m\n-Height: 20 m\n-Face width: 4 m\n-Restoration: Ongoing stabilization\n-Orientation: Faces due east",
+      "statistics_text_past": "-Built: ~2500 BC\n-Subject: Likely Pharaoh Khafre\n-Condition: Buried in sand for centuries\n-Nose: Lost before the 18th century\n-Features: Originally painted (traces of red/blue)",
+      "past_comparison_summary": "The world's oldest known monumental sculpture, guarding the pyramids for 4,500 years."
+    },
+    "Karnak_Temple": {
+      "name": "Karnak Temple",
+      "description": "Vast open-air museum and religious site",
+      "statistics_text_present": "-Area: 100 hectares\n-Hypostyle Hall: 134 massive columns\n-Location: Luxor (Ancient Thebes)\n-Visitors: Top Egyptian cultural site\n-Status: Second largest religious site ever",
+      "statistics_text_past": "-Built: 1971 BC – 30 BC\n-Growth: Expanded by ~30 different Pharaohs\n-God: Dedicated mainly to Amun-Ra\n-Significance: Most important place of worship\n-Lake: Sacred Lake for purification",
+      "past_comparison_summary": "A cumulative architectural history of Egypt's power, built over 1,500 years."
+    },
+    "Abu_Simbel": {
+      "name": "Abu Simbel",
+      "description": "Two massive rock-cut temples",
+      "statistics_text_present": "-Relocation: Moved in 1968 (Aswan Dam project)\n-Main Temple: 4 colossal statues of Ramses II\n-UNESCO Site: Part of Nubian Monuments\n-Sun Alignment: Oct 22 and Feb 22\n-Location: Near the border with Sudan",
+      "statistics_text_past": "-Built: ~1264 BC\n-Commemorated: Ramses II's victory at Kadesh\n-Construction: Carved directly into the cliff\n-Discovery: Johann Ludwig Burckhardt (1813)\n-Dedications: To Ra-Horakhty, Amun, and Ptah",
+      "past_comparison_summary": "The ultimate display of royal ego, successfully saved from the rising waters of Lake Nasser."
+    },
+    "Valley_of_the_Kings": {
+      "name": "Valley of the Kings",
+      "description": "Valley where tombs were excavated for pharaohs",
+      "statistics_text_present": "-Tombs: 63 discovered (KV1 to KV63)\n-Most famous: Tutankhamun (KV62)\n-Visitors: High limit per day\n-UNESCO Site since: 1979\n-Location: West Bank of the Nile",
+      "statistics_text_past": "-Era: New Kingdom (1550–1070 BC)\n-Purpose: Hidden burials to avoid grave robbery\n-Inhabitants: Ramses I-X, Seti I, Tutankhamun\n-Decoration: Intricate wall paintings (Book of Dead)\n-Labor: Deir el-Medina artisans village",
+      "past_comparison_summary": "A hidden city of the dead, designed to protect the pharaohs' journey to the afterlife."
+    },
+    "Luxor_Temple": {
+      "name": "Luxor Temple",
+      "description": "Large Ancient Egyptian temple complex on the East Bank",
+      "statistics_text_present": "-Avenue: Avenue of Sphinxes (3 km to Karnak)\n-Mosque: Abu Haggag (built on top)\n-Night visit: Beautifully illuminated\n-Obelisk: Only one left (companion in Paris)\n-Status: Continuous place of worship",
+      "statistics_text_past": "-Founded: ~1400 BC\n-Key builders: Amenhotep III and Ramses II\n-Function: Opet Festival center\n-Significance: Coronation of Kings\n-History: Served as a Roman fortress/camp",
+      "past_comparison_summary": "A temple that has stayed in use through Egyptian, Greek, Roman, Christian, and Islamic eras."
+    }
+  },
+  "China": {
+    "Great_Wall_of_China": {
+      "name": "Great Wall of China",
+      "description": "Ancient series of walls and fortifications",
+      "statistics_text_present": "-Length: 21,196 km\n-UNESCO Site since: 1987\n-Visitors: 10 million/year (Badaling)\n-Material: Stone, brick, tamped earth\n-Status: New 7 Wonders of the World",
+      "statistics_text_past": "-Built: 7th century BC – 17th century AD\n-Main Dynasty: Ming (most preserved sections)\n-Purpose: Protection against northern invasions\n-Labor: Soldiers, peasants, prisoners\n-Signal: Smoke and fire used for communication",
+      "past_comparison_summary": "A colossal defensive system that evolved over 2,000 years to become the symbol of Chinese endurance."
+    },
+    "Forbidden_City": {
+      "name": "Forbidden City",
+      "description": "Imperial palace complex in central Beijing",
+      "statistics_text_present": "-Area: 72 hectares\n-Buildings: 980 surviving\n-Visitors: 19 million/year (cap applied)\n-UNESCO Site since: 1987\n-Status: World's largest palace complex",
+      "statistics_text_past": "-Built: 1406–1420 (Ming Dynasty)\n-Function: Home of 24 Emperors\n-Design: Traditional Chinese palatial architecture\n-Color: Yellow (Imperial) and Red (Fortune)\n-Access: Restricted to the imperial court for 500 years",
+      "past_comparison_summary": "From a secluded center of divine imperial power to the world's most visited museum."
+    },
+    "Terracotta_Army": {
+      "name": "Terracotta Army",
+      "description": "Collection of terracotta sculptures depicting the armies of Qin Shi Huang",
+      "statistics_text_present": "-Figures: ~8,000 soldiers, 130 chariots\n-Location: Xi'an\n-UNESCO Site since: 1987\n-Discovery: 1974 by local farmers\n-Status: One of the greatest 20th C archaeological finds",
+      "statistics_text_past": "-Created: ~210 BC\n-Purpose: Protect the first Emperor in the afterlife\n-Unique: Every face is different\n-Original: Figures were brightly painted\n-Weaponry: Real bronze swords and crossbows used",
+      "past_comparison_summary": "An underground silent army that remained hidden for two millennia to guard an emperor's tomb."
+    },
+    "Summer_Palace": {
+      "name": "Summer Palace",
+      "description": "Vast ensemble of lakes, gardens and palaces in Beijing",
+      "statistics_text_present": "-Area: 2.9 km² (3/4 is water)\n-Main feature: Kunming Lake & Longevity Hill\n-UNESCO Site since: 1998\n-Style: Masterpiece of Chinese garden design\n-Status: Former imperial garden",
+      "statistics_text_past": "-Origins: 1750 (Qing Dynasty)\n-Destruction: 1860 by Anglo-French forces\n-Reconstruction: Empress Dowager Cixi (1888)\n-Symbolism: Harmony between man and nature\n-Feature: The Long Corridor (728 m long)",
+      "past_comparison_summary": "The ultimate imperial retreat, reflecting the aesthetic heights of the Qing dynasty's garden arts."
+    },
+    "Temple_of_Heaven": {
+      "name": "Temple of Heaven",
+      "description": "Imperial complex of religious buildings in Beijing",
+      "statistics_text_present": "-Main building: Hall of Prayer for Good Harvests\n-UNESCO Site since: 1998\n-Park size: 2.7 km²\n-Geometry: Circular buildings on square bases\n-Status: Icon of Beijing architecture",
+      "statistics_text_past": "-Built: 1406–1420\n-Purpose: Annual ceremonies for good harvest\n-Symbolism: Circle (Heaven) and Square (Earth)\n-Echo Wall: Famous acoustic properties\n-Imperial: Visited by Emperors of Ming & Qing",
+      "past_comparison_summary": "A cosmic bridge between Earth and Heaven, where emperors once prayed for the prosperity of the empire."
+    },
+    "Potala_Palace": {
+      "name": "Potala Palace",
+      "description": "Winter palace of the Dalai Lamas since the 7th century",
+      "statistics_text_present": "-Elevation: 3,700 m (Lhasa, Tibet)\n-Floors: 13\n-Rooms: Over 1,000\n-UNESCO Site since: 1994\n-Status: Landmark of Tibetan Buddhism",
+      "statistics_text_past": "-Original: Built by Songtsen Gampo in 637 AD\n-Current: Modern structure started 1645 (5th Dalai Lama)\n-Parts: White Palace (secular) & Red Palace (religious)\n-Defense: Massive stone walls up to 5 m thick\n-Treasures: Golden stupas of past Dalai Lamas",
+      "past_comparison_summary": "The spiritual and political heart of Tibet, towering over Lhasa from the Red Mountain."
+    }
+  },
+  "Japan": {
+    "Mount_Fuji": {
+      "name": "Mount Fuji",
+      "description": "Active stratovolcano and Japan's highest peak",
+      "statistics_text_present": "-Height: 3,776 m\n-UNESCO Site since: 2013\n-Climbers: ~300,000/year\n-Classification: Active (low risk)\n-Status: Sacred symbol of Japan",
+      "statistics_text_past": "-Formation: ~100,000 years ago\n-Last eruption: 1707 (Hoei eruption)\n-Religious: Goal of pilgrimages for centuries\n-Art: Subject of Hokusai's '36 Views of Mt. Fuji'\n-Traditional: First ascent by an anonymous monk (663 AD)",
+      "past_comparison_summary": "A timeless volcanic peak that has inspired Japanese art and spirituality for generations."
+    },
+    "Fushimi_Inari-taisha": {
+      "name": "Fushimi Inari-taisha",
+      "description": "Head shrine of the god Inari, famous for thousands of torii gates",
+      "statistics_text_present": "-Gates: Over 10,000 Torii\n-Location: Kyoto\n-Visitors: One of Japan's most photographed sites\n-Messenger: Fox (Kitsune) statues\n-Access: Always open, free entry",
+      "statistics_text_past": "-Founded: 711 AD\n-Deity: Inari (God of rice and business)\n-Torii: Custom of donating gates started in Edo period\n-Patronage: Supported by merchants and manufacturers\n-Structure: Main shrine built in 1499",
+      "past_comparison_summary": "A mountain path of vermillion gates, built through centuries of devotion by those seeking prosperity."
+    },
+    "Himeji_Castle": {
+      "name": "Himeji Castle",
+      "description": "Hilltop Japanese castle complex in Himeji",
+      "statistics_text_present": "-Nickname: White Heron Castle\n-UNESCO Site since: 1993\n-Buildings: 83 original structures\n-Status: Best preserved example of Japanese castle architecture\n-Authenticity: Never destroyed by war or fire",
+      "statistics_text_past": "-Built: Started 1333, expanded by Hideyoshi (1581)\n-Defenses: Maze-like paths, 21 gates, hidden walls\n-Material: Wood and white plaster\n-WWII: Survived bombing of Himeji (miraculously)\n-Symbolism: Elegant bird taking flight",
+      "past_comparison_summary": "A pristine wooden fortress that has survived nearly 700 years of history untouched."
+    },
+    "Kinkaku-ji": {
+      "name": "Kinkaku-ji",
+      "description": "Zen Buddhist temple with two floors covered in gold leaf",
+      "statistics_text_present": "-Nickname: Golden Pavilion\n-Location: Kyoto\n-UNESCO Site since: 1994\n-Surrounding: Mirror Pond (Kyoko-chi)\n-Status: Icon of Kyoto",
+      "statistics_text_past": "-Built: 1397 (as villa for Ashikaga Yoshimitsu)\n-Architecture: Three distinct styles per floor\n-Tragedy: Burned down in 1950 by a fanatic monk\n-Restoration: Rebuilt in 1955 (gold leaf added)\n-Zen: Converted to temple after Shogun's death",
+      "past_comparison_summary": "A stunning golden reflection of the Muromachi period's cultural extravagance and Zen simplicity."
+    },
+    "Itsukushima_Shrine": {
+      "name": "Itsukushima Shrine",
+      "description": "Shinto shrine known for its 'floating' torii gate",
+      "statistics_text_present": "-Location: Miyajima Island\n-UNESCO Site since: 1996\n-Gate height: 16 m\n-High tide: Appears to float on water\n-Status: One of the 'Three Views of Japan'",
+      "statistics_text_past": "-Founded: 593 AD\n-Current buildings: From 1168 (Taira no Kiyomori)\n-Sacred: Commoners weren't allowed on the island\n-Construction: Built on piers to protect sacred land\n-Gate: Current torii dates from 1875",
+      "past_comparison_summary": "A spiritual masterpiece where the architecture harmonizes perfectly with the ebb and flow of the tide."
+    },
+    "Tokyo_Tower": {
+      "name": "Tokyo Tower",
+      "description": "Communications and observation tower in the Minato district",
+      "statistics_text_present": "-Height: 332.9 m\n-Color: White and International Orange (aviation safety)\n-Visitors: 150 million since opening\n-Status: Symbol of Japan's post-war rebirth\n-Inspiration: Eiffel Tower",
+      "statistics_text_past": "-Built: 1958\n-Function: TV and radio broadcasting\n-Materials: 1/3 is scrap metal from US tanks\n-History: Tallest structure in Japan until 2010\n-Significance: Embodied the 'Economic Miracle'",
+      "past_comparison_summary": "Japan's mid-century response to the Eiffel Tower, symbolizing a nation's rapid modernization."
+    }
+  },
+  "India": {
+    "Taj_Mahal": {
+      "name": "Taj Mahal",
+      "description": "Ivory-white marble mausoleum on the Yamuna river",
+      "statistics_text_present": "-Height: 73 m\n-Visitors: 7–8 million/year\n-UNESCO Site since: 1983\n-Status: New 7 Wonders of the World\n-Location: Agra",
+      "statistics_text_past": "-Built: 1632–1653\n-Commissioned: Emperor Shah Jahan\n-Purpose: Tomb for wife Mumtaz Mahal\n-Architect: Ustad Ahmad Lahauri\n-Artisan: ~20,000 workers",
+      "past_comparison_summary": "The world's most famous monument to love, unchanged in its symmetrical marble perfection."
+    },
+    "Hawa_Mahal": {
+      "name": "Hawa Mahal",
+      "description": "Palace of the Winds in Jaipur",
+      "statistics_text_present": "-Windows: 953 small casements (Jharokhas)\n-Material: Pink and red sandstone\n-Height: 15 m (5 stories)\n-Status: Landmark of the 'Pink City'\n-Shape: Crown of Lord Krishna",
+      "statistics_text_past": "-Built: 1799\n-Architect: Lal Chand Ustad\n-Purpose: For royal ladies to observe the street unseen\n-Cooling: Venturi effect through small windows\n-Structure: Extension of the City Palace",
+      "past_comparison_summary": "An intricate pink facade designed to let the breeze and the world pass by royal seclusion."
+    },
+    "Qutub_Minar": {
+      "name": "Qutub Minar",
+      "description": "73-meter high tapering tower of five storeys",
+      "statistics_text_present": "-Height: 72.5 m\n-UNESCO Site since: 1993\n-Material: Red sandstone and marble\n-Steps: 379 inside (closed to public)\n-Status: Tallest brick minaret in the world",
+      "statistics_text_past": "-Started: 1192 (Qutb-ud-din Aibak)\n-Completed: Over centuries by different rulers\n-Complex: Contains Iron Pillar of Delhi (4th C)\n-Style: Indo-Islamic architecture\n-Inscriptions: Quranic verses carved in stone",
+      "past_comparison_summary": "A victory tower that witnessed the rise of Islamic rule in India over several centuries."
+    },
+    "Golden_Temple": {
+      "name": "Golden Temple (Harmandir Sahib)",
+      "description": "The preeminent spiritual site of Sikhism",
+      "statistics_text_present": "-Location: Amritsar\n-Visitors: 100,000/day\n-Langar: World's largest free kitchen\n-Material: Covered in 750 kg of pure gold\n-Status: Symbol of equality and brotherhood",
+      "statistics_text_past": "-Founded: 1577 (Guru Ram Das)\n-Design: 4 entrances (open to all castes/creeds)\n-Gold: Added by Maharaja Ranjit Singh (1830)\n-Sarovar: The sacred pool surrounding the temple\n-Reconstruction: Rebuilt several times after invasions",
+      "past_comparison_summary": "A sanctuary of gold and peace, serving free meals to all as a testament to human equality."
+    },
+    "Amer_Fort": {
+      "name": "Amer Fort",
+      "description": "Large fort complex located on a hill in Amer, Rajasthan",
+      "statistics_text_present": "-UNESCO Site since: 2013 (Hill Forts of Rajasthan)\n-Highlight: Sheesh Mahal (Mirror Palace)\n-Access: Famous for elephant and jeep rides\n-Location: 11 km from Jaipur\n-Material: Yellow and pink sandstone",
+      "statistics_text_past": "-Built: Started 1592 (Raja Man Singh I)\n-Style: Rajput and Mughal influences\n-Defenses: Maota Lake providing natural barrier\n-Interior: Opulent courtyards and frescoes\n-History: Capital of the Kachwaha clan",
+      "past_comparison_summary": "A majestic hilltop fortress blending rugged military defense with delicate artistic interior."
+    },
+    "Ajanta_Caves": {
+      "name": "Ajanta Caves",
+      "description": "Rock-cut Buddhist cave monuments",
+      "statistics_text_present": "-Number of caves: 30\n-UNESCO Site since: 1983\n-Location: Maharashtra\n-Highlight: Ancient frescoes and murals\n-Status: Masterpieces of Buddhist religious art",
+      "statistics_text_past": "-Period: 2nd century BC – 480 AD\n-Forgotten: Abandoned and hidden by jungle for 1,300 years\n-Discovery: 1819 by a British officer\n-Art: Jataka tales depicted in paintings\n-Method: Carved into the basalt cliff side",
+      "past_comparison_summary": "An ancient gallery of Buddhist faith, rediscovered by chance after being lost to the forest."
+    }
+  },
+  "Brazil": {
+    "Christ_the_Redeemer": {
+      "name": "Christ the Redeemer",
+      "description": "Art Deco statue of Jesus Christ in Rio de Janeiro",
+      "statistics_text_present": "-Height: 30 m (38 m with pedestal)\n-Arms span: 28 m\n-Location: Corcovado Mountain (710 m)\n-Status: New 7 Wonders of the World\n-Symbol: Icon of Rio and Brazil",
+      "statistics_text_past": "-Built: 1922–1931\n-Sculptor: Paul Landowski\n-Material: Reinforced concrete and soapstone tiles\n-Inauguration: Oct 12, 1931\n-Lightning: Frequently struck due to mountain peak",
+      "past_comparison_summary": "A colossal Art Deco guardian watching over Rio de Janeiro from the heavens."
+    },
+    "Sugarloaf_Mountain": {
+      "name": "Sugarloaf Mountain",
+      "description": "Peak situated in Rio de Janeiro at the mouth of Guanabara Bay",
+      "statistics_text_present": "-Height: 396 m\n-Access: Glass-walled cable car (Bondinho)\n-Visitors: 1.5 million/year\n-UNESCO Site since: 2012 (Landscape category)\n-View: 360-degree panorama of the city",
+      "statistics_text_past": "-Formation: Granite and quartz monolith\n-Cable Car: First built in 1912 (one of the world's oldest)\n-Naming: Shape resembles traditional sugar molds\n-Strategic: Landmark for sailors entering the bay\n-History: Witnessed the founding of Rio in 1565",
+      "past_comparison_summary": "A unique geological monolith that has offered the world's best urban view for over a century."
+    },
+    "Iguacu_Falls": {
+      "name": "Iguaçu Falls",
+      "description": "Massive waterfalls of the Iguaçu River on the border with Argentina",
+      "statistics_text_present": "-Number of drops: 275\n-UNESCO Site since: 1986\n-Greatest drop: Devil's Throat (82 m)\n-Width: 2.7 km\n-Visitors: 2 million/year",
+      "statistics_text_past": "-Discovery: Álvar Núñez Cabeza de Vaca (1541)\n-Park: National Park created in 1939\n-Nature: Surrounding Atlantic Forest sanctuary\n-Mythology: Created by a god's rage (Naipí legend)\n-Comparison: Taller than Niagara, wider than Victoria",
+      "past_comparison_summary": "Nature's overwhelming power displayed through the world's largest waterfall system."
+    },
+    "Amazon_Theatre": {
+      "name": "Amazon Theatre (Teatro Amazonas)",
+      "description": "Opera house in Manaus, in the heart of the Amazon rainforest",
+      "statistics_text_present": "-Location: Manaus\n-Capacity: 701 seats\n-Style: Renaissance Revival\n-Dome: Covered in 36,000 ceramic tiles (Brazilian colors)\n-Status: Jewel of the Amazon",
+      "statistics_text_past": "-Built: 1884–1896\n-Era: The Rubber Boom (Belle Époque)\n-Materials: Imported from all over Europe\n-Inauguration: Jan 7, 1897\n-Significance: Culture in the middle of the jungle",
+      "past_comparison_summary": "A testament to the wealth of the rubber era, bringing European luxury to the rainforest."
+    },
+    "Cathedral_of_Brasilia": {
+      "name": "Cathedral of Brasília",
+      "description": "Hyperboloid structure serving as the seat of the Archdiocese of Brasília",
+      "statistics_text_present": "-Architect: Oscar Niemeyer\n-Columns: 16 concrete columns (90 tons each)\n-Style: Modernist\n-Visitors: 1 million/year\n-Status: Masterpiece of modern architecture",
+      "statistics_text_past": "-Completed: 1970\n-Design: Reaching up to the heavens\n-Interior: 3 hanging angel sculptures\n-Light: Stained glass roof in blue and green\n-Significance: Part of the planned capital project",
+      "past_comparison_summary": "A revolutionary circular design that redefined religious architecture in Brazil's new capital."
+    },
+    "Pelourinho": {
+      "name": "Pelourinho (Historic Centre of Salvador)",
+      "description": "Historic neighborhood in Salvador, Bahia",
+      "statistics_text_present": "-UNESCO Site since: 1985\n-Architecture: Portuguese colonial buildings\n-Colors: Pastel-colored facades\n-Culture: Heart of Afro-Brazilian heritage\n-Activities: Olodum drummers, Capoeira",
+      "statistics_text_past": "-Origins: 1549 (Brazil's first capital)\n-Name: Means 'Pillory' (site of slave punishment)\n-Golden Age: 17th–18th century sugar trade wealth\n-Church: São Francisco (famous for gold interior)\n-Revitalization: Major restoration in the 1990s",
+      "past_comparison_summary": "The vibrant, colorful cradle of Brazilian culture, reflecting a complex colonial history."
+    }
+  },
+  "Australia": {
+    "Sydney_Opera_House": {
+      "name": "Sydney Opera House",
+      "description": "Multi-venue performing arts centre in Sydney Harbour",
+      "statistics_text_present": "-UNESCO Site since: 2007\n-Visitors: 10 million/year\n-Tiles: 1,056,006 Swedish ceramic tiles\n-Performance: ~1,500 events per year\n-Status: 20th century architectural icon",
+      "statistics_text_past": "-Built: 1959–1973\n-Architect: Jørn Utzon\n-Controversy: Huge budget overruns and architect resignation\n-Design: Shells inspired by orange segments\n-Inauguration: Queen Elizabeth II (1973)",
+      "past_comparison_summary": "The sail-shaped masterpiece that transformed Sydney's waterfront into a world icon."
+    },
+    "Sydney_Harbour_Bridge": {
+      "name": "Sydney Harbour Bridge",
+      "description": "Steel through arch bridge across Sydney Harbour",
+      "statistics_text_present": "-Nickname: The Coathanger\n-Height: 134 m\n-Length: 1,149 m\n-Lanes: 8 road, 2 rail, 1 cycle, 1 foot\n-Activity: BridgeClimb (popular tourist activity)",
+      "statistics_text_past": "-Built: 1923–1932\n-Engineer: John Bradfield\n-Rivets: 6 million (hand-driven)\n-Depression era: Major source of employment\n-Opening: Cut ribbon ceremony (March 1932)",
+      "past_comparison_summary": "An engineering feat of the 1930s that remains the sturdy backbone of Sydney's transport."
+    },
+    "Uluru": {
+      "name": "Uluru (Ayers Rock)",
+      "description": "Massive sandstone monolith in the Northern Territory",
+      "statistics_text_present": "-Height: 348 m\n-Circumference: 9.4 km\n-UNESCO Site since: 1987\n-Color change: Appears to glow red at sunset\n-Status: Deeply sacred to Anangu people",
+      "statistics_text_past": "-Age: 550 million years\n-Traditional owners: Anangu (land returned in 1985)\n-Climbing: Permanently closed in 2019 (respect for culture)\n-Rock Art: Ancient paintings in caves around the base\n-Geology: Arkose sandstone monolith",
+      "past_comparison_summary": "The spiritual heart of Australia, standing as a silent monolith for half a billion years."
+    },
+    "Great_Barrier_Reef": {
+      "name": "Great Barrier Reef",
+      "description": "The world's largest coral reef system",
+      "statistics_text_present": "-Length: 2,300 km\n-Reefs: ~2,900 individual reefs\n-UNESCO Site since: 1981\n-Fauna: 1,500 fish species, 30 whale/dolphin species\n-Visibility: Visible from outer space",
+      "statistics_text_past": "-Formation: ~20,000 years (modern reef)\n-Indigenous: Significant to Aboriginal and Torres Strait Islanders\n-History: Cook's Endeavour grounded in 1770\n-Conservation: Protected by Marine Park since 1975\n-Threats: Bleaching events due to ocean warming",
+      "past_comparison_summary": "A living underwater masterpiece that has flourished for millennia, now facing modern challenges."
+    },
+    "Port_Arthur": {
+      "name": "Port Arthur",
+      "description": "Former convict settlement and open-air museum in Tasmania",
+      "statistics_text_present": "-UNESCO Site since: 2010 (Convict Sites)\n-Buildings: 30 ruins and restored homes\n-Status: Australia's most significant convict site\n-Setting: Tasman Peninsula\n-Ghost Tours: Famous for evening walks",
+      "statistics_text_past": "-Operating: 1833–1877\n-Purpose: Prison for repeat offenders\n-System: Separate Prison (silent system)\n-Economy: Ship building and timber\n-Aftermath: Became a tourist destination in late 19th C",
+      "past_comparison_summary": "A chilling but beautiful reminder of Australia's penal colony origins."
+    },
+    "Twelve_Apostles": {
+      "name": "Twelve Apostles",
+      "description": "Collection of limestone stacks off the shore of Port Campbell National Park",
+      "statistics_text_present": "-Location: Great Ocean Road, Victoria\n-Remaining stacks: 8 (others collapsed)\n-Height: Up to 50 m\n-Tourism: Major helicopter tour site\n-Status: Iconic natural wonder",
+      "statistics_text_past": "-Formation: Erosion by Southern Ocean (10-20m years)\n-Original Name: Sow and Pigs\n-Renamed: To Twelve Apostles in the 1920s (marketing)\n-Collapses: Most recent major stack fell in 2005\n-Geology: Miocene limestone",
+      "past_comparison_summary": "A dynamic coastline where the ocean constantly creates and destroys these majestic stone pillars."
+    }
+  },
+  "Mexico": {
+    "Chichen_Itza": {
+      "name": "Chichen Itza",
+      "description": "Large pre-Columbian city built by the Maya people",
+      "statistics_text_present": "-UNESCO Site since: 1988\n-Visitors: 2.6 million/year\n-Main Pyramid: El Castillo (Temple of Kukulcan)\n-Status: New 7 Wonders of the World\n-Location: Yucatán State",
+      "statistics_text_past": "-Peak: ~600 AD to 1200 AD\n-Astronomy: Pyramid aligns with equinox shadows\n-Sacrifices: Sacred Cenote (sinkhole)\n-Ball Game: Largest ball court in Mesoamerica\n-Architecture: Puuc and Toltec influences",
+      "past_comparison_summary": "A sophisticated center of Mayan science and religion, reclaimed from the jungle."
+    },
+    "Teotihuacan": {
+      "name": "Teotihuacan",
+      "description": "Ancient Mesoamerican city known for its pyramids",
+      "statistics_text_present": "-Main structures: Pyramid of the Sun & Pyramid of the Moon\n-UNESCO Site since: 1987\n-Location: 40 km from Mexico City\n-Status: Most visited archaeological site in Mexico\n-Avenue: Avenue of the Dead",
+      "statistics_text_past": "-Peak: 1 AD to 500 AD (Population ~125,000+)\n-Mystery: Builders unknown (Aztecs named the site)\n-Sun Pyramid: One of the largest in the world\n-Abandonment: Around 7th–8th century AD\n-Ritual: Center of a vast multi-ethnic empire",
+      "past_comparison_summary": "The 'Place where Gods were created', an urban marvel that predates the Aztecs by centuries."
+    },
+    "Tulum": {
+      "name": "Tulum",
+      "description": "Pre-Columbian Mayan walled city serving as a port",
+      "statistics_text_present": "-Location: Coastal cliff overlooking the Caribbean\n-Status: Popular beach-side archaeological site\n-Highlight: El Castillo (The Castle)\n-Flora: Famous for iguanas living in ruins\n-Climate: Tropical",
+      "statistics_text_past": "-Peak: 13th to 15th centuries\n-Function: Major trading hub (turquoise and jade)\n-Defense: Enclosed by a 7 m thick wall\n-Survival: One of the last Mayan cities to fall (1518)\n-Astronomy: Temple of the Frescoes used for tracking sun",
+      "past_comparison_summary": "A picturesque Mayan fortress that combined maritime trade with spiritual defense."
+    },
+    "Palacio_de_Bellas_Artes": {
+      "name": "Palacio de Bellas Artes",
+      "description": "The most important cultural center in Mexico City",
+      "statistics_text_present": "-Style: Art Nouveau exterior, Art Deco interior\n-Murals: Rivera, Siqueiros, Orozco\n-Status: National Theater of Mexico\n-Material: White marble from Carrara\n-Problem: Sinking slowly into the soft subsoil",
+      "statistics_text_past": "-Started: 1904 (Porfirio Díaz era)\n-Architect: Adamo Boari\n-Halt: Mexican Revolution (delayed 20 years)\n-Completion: 1934\n-Feature: Crystal curtain made by Tiffany",
+      "past_comparison_summary": "A stunning marble temple of art that survived the revolution to become Mexico's cultural soul."
+    },
+    "Chapultepec_Castle": {
+      "name": "Chapultepec Castle",
+      "description": "Hilltop castle in the middle of Chapultepec Park",
+      "statistics_text_present": "-Function: National Museum of History\n-Location: Top of Chapultepec Hill (Sacred place)\n-Visitors: High cultural importance\n-Status: Only royal castle in North America\n-Views: Overlooking Paseo de la Reforma",
+      "statistics_text_past": "-Built: 1785 (Viceroyalty of New Spain)\n-History: Military Academy (Battle of Chapultepec 1847)\n-Imperial: Home of Emperor Maximilian I (1864)\n-Presidential: Official residence until 1939\n-Architecture: Neoclassical and Neo-romantic",
+      "past_comparison_summary": "From a viceregal palace to an imperial residence and now a guardian of Mexico's history."
+    },
+    "Palenque": {
+      "name": "Palenque",
+      "description": "Maya city state in southern Mexico that flourished in the 7th century",
+      "statistics_text_present": "-UNESCO Site since: 1987\n-Location: Chiapas jungle\n-Highlight: Temple of the Inscriptions\n-Status: Famed for architectural elegance\n-Excavation: Only ~10% of the city is visible",
+      "statistics_text_past": "-Peak: 226 BC – 799 AD\n-King: Pakal the Great (ruled 68 years)\n-Discovery: Pakal's tomb found in 1952\n-Art: Most sophisticated Mayan bas-reliefs\n-Water: Sophisticated aqueduct system",
+      "past_comparison_summary": "A jungle-enshrouded masterpiece of Mayan architecture and historical records."
+    }
+  },
+  "Peru": {
+    "Machu_Picchu": {
+      "name": "Machu Picchu",
+      "description": "15th-century Inca citadel located in the Eastern Cordillera",
+      "statistics_text_present": "-Elevation: 2,430 m\n-Visitors: ~1.5 million/year\n-UNESCO Site since: 1983\n-Status: New 7 Wonders of the World\n-Access: Train to Aguas Calientes",
+      "statistics_text_past": "-Built: ~1450 (Inca Empire)\n-Purpose: Estate for Emperor Pachacuti\n-Technique: Ashlar (dry stone walls)\n-Abandonment: 1572 (post-Spanish conquest)\n-Rediscovery: Hiram Bingham (1911)",
+      "past_comparison_summary": "The 'Lost City of the Incas', a stunning display of mountain engineering and astronomical alignment."
+    },
+    "Sacsayhuaman": {
+      "name": "Sacsayhuaman",
+      "description": "Citadel on the northern outskirts of the city of Cusco",
+      "statistics_text_present": "-Location: 3,700 m elevation\n-Main attraction: Gigantic zigzag walls\n-Stones: Largest weighs over 120 tons\n-Status: Symbol of Inca military architecture\n-Event: Inti Raymi festival (June 24)",
+      "statistics_text_past": "-Started: 15th century (Pachacuti expansion)\n-Function: Fortress and ceremonial center\n-Construction: Precise interlocking stones without mortar\n-Siege: Site of bloody battle in 1536\n-Destruction: Spanish used it as a stone quarry",
+      "past_comparison_summary": "A colossal stone mystery where huge boulders fit together with surgical precision."
+    },
+    "Nazca_Lines": {
+      "name": "Nazca Lines",
+      "description": "Group of very large geoglyphs formed in the soil of the Nazca Desert",
+      "statistics_text_present": "-UNESCO Site since: 1994\n-Figures: Hummingbird, Monkey, Spider, Condor\n-Length: Up to 370 m per figure\n-Access: Best seen from small plane tours\n-Area: 450 km²",
+      "statistics_text_past": "-Created: 500 BC – 500 AD\n-Method: Removing reddish pebbles to reveal gray soil\n-Purpose: Religious or astronomical calendar (theories)\n-Preservation: Hyper-arid climate (no wind/rain)\n-Rediscovery: 1927 by Toribio Mejia Xesspe",
+      "past_comparison_summary": "Giant ancient drawings in the desert that can only be fully appreciated from the sky."
+    },
+    "Plaza_de_Armas_Cusco": {
+      "name": "Plaza de Armas (Cusco)",
+      "description": "The central square in the historic center of Cusco",
+      "statistics_text_present": "-Highlight: Cusco Cathedral and Church of La Compañía\n-Activity: Social heart of the city\n-Architecture: Spanish colonial over Inca foundations\n-Status: UNESCO World Heritage site (city-wide)",
+      "statistics_text_past": "-Inca era: Known as Huacaypata (Place of Mourning)\n-Significance: Religious and administrative center of Empire\n-Spanish era: Built churches over Inca palaces\n-History: Execution site of Tupac Amaru II (1781)\n-Evolution: From sacred Inca field to colonial plaza",
+      "past_comparison_summary": "The epicenter of the Inca Empire, where colonial cathedrals now stand on the bones of sun temples."
+    },
+    "Huaca_Pucllana": {
+      "name": "Huaca Pucllana",
+      "description": "Adobe and clay pyramid located in the Miraflores district of Lima",
+      "statistics_text_present": "-Structure: Great Pyramid of 7 staggered levels\n-Location: Modern urban center of Lima\n-Material: Millions of 'book-shelf' style adobe bricks\n-Status: Important ceremonial center\n-Feature: High-end restaurant overlooking ruins",
+      "statistics_text_past": "-Period: 200 AD – 700 AD (Lima Culture)\n-Technique: Vertical brick placement (earthquake resistant)\n-Function: Religious rituals and administration\n-Succession: Later used by Wari and Ychsma cultures\n-Burials: Mummies found in the upper levels",
+      "past_comparison_summary": "An ancient earthen pyramid standing in startling contrast to the modern skyscrapers of Lima."
+    },
+    "Chan_Chan": {
+      "name": "Chan Chan",
+      "description": "Largest adobe city in the world",
+      "statistics_text_present": "-UNESCO Site since: 1986 (List in Danger)\n-Area: 20 km²\n-Location: Near Trujillo\n-Feature: Intricate relief carvings of fish and birds\n-Climate: Arid coastal desert",
+      "statistics_text_past": "-Capital: Chimú Kingdom\n-Peak: ~850 AD to 1470 AD\n-Population: ~30,000–60,000\n-Conquest: Captured by Incas in 1470\n-Water: Sophisticated system of wells and canals",
+      "past_comparison_summary": "The vast golden-hued capital of the Chimú, slowly weathering away in the desert wind."
+    }
+  },
+  "Canada": {
+    "CN_Tower": {
+      "name": "CN Tower",
+      "description": "Concrete communications and observation tower in downtown Toronto",
+      "statistics_text_present": "-Height: 553.3 m\n-Visitors: 1.5 million/year\n-Feature: Glass floor and EdgeWalk\n-Lighting: Programmable LED system\n-Status: One of the modern Seven Wonders of the World",
+      "statistics_text_past": "-Built: 1973–1976\n-Commissioned: Canadian National Railway\n-Purpose: Solving signal issues due to skyscrapers\n-Record: Tallest free-standing structure for 32 years\n-Engineering: Slipform construction method",
+      "past_comparison_summary": "A 1970s engineering marvel that defines the Toronto skyline and Canadian pride."
+    },
+    "Banff_National_Park": {
+      "name": "Banff National Park",
+      "description": "Canada's oldest national park, located in the Rocky Mountains",
+      "statistics_text_present": "-Area: 6,641 km²\n-Highlights: Lake Louise, Moraine Lake\n-Visitors: 4 million/year\n-UNESCO Site since: 1984\n-Town: Banff (highest town in Canada)",
+      "statistics_text_past": "-Established: 1885\n-Origins: Discovery of Cave and Basin Hot Springs\n-Railway: Developed by Canadian Pacific Railway\n-Conservation: First major North American park\n-Wildlife: Haven for grizzlies, elk, and wolves",
+      "past_comparison_summary": "A mountain paradise preserved since the 19th century as Canada's flagship wilderness."
+    },
+    "Chateau_Frontenac": {
+      "name": "Château Frontenac",
+      "description": "Grand hotel in Quebec City",
+      "statistics_text_present": "-Style: Châteauesque\n-Rooms: 610\n-Status: Most photographed hotel in the world\n-Location: Old Quebec (Upper Town)\n-Recognition: National Historic Site of Canada",
+      "statistics_text_past": "-Opened: 1893\n-Architect: Bruce Price\n-Client: Canadian Pacific Railway\n-History: Site of Quebec Conferences (WWII)\n-Design: Inspired by French Renaissance châteaus",
+      "past_comparison_summary": "A majestic castle-like hotel that anchors the historic skyline of French Canada."
+    },
+    "Peggy's_Cove": {
+      "name": "Peggy's Cove",
+      "description": "Small rural community and lighthouse in Nova Scotia",
+      "statistics_text_present": "-Highlight: Peggy's Point Lighthouse\n-Geology: Massive granite outcrops\n-Population: ~30 year-round residents\n-Activity: Fishing and tourism\n-Status: Iconic Atlantic Canadian scenery",
+      "statistics_text_past": "-Founded: 1811 (as a fishing village)\n-Lighthouse: Current structure built in 1914\n-Legend: Named after a survivor of a shipwreck\n-Life: Centered on lobster fishing\n-Tradition: One of the most painted villages in Canada",
+      "past_comparison_summary": "A rugged, wind-swept fishing village that has become the face of the Canadian Maritimes."
+    },
+    "Parliament_Hill": {
+      "name": "Parliament Hill",
+      "description": "The political and cultural heart of Ottawa",
+      "statistics_text_present": "-Main building: Centre Block (currently renovating)\n-Tower: Peace Tower (92 m)\n-Events: Canada Day celebrations\n-Style: Gothic Revival\n-Recognition: National Historic Site",
+      "statistics_text_past": "-Origins: Barrack Hill (military base)\n-Construction: Started 1859\n-Tragedy: Great Fire of 1916 (destroyed original building)\n-Rebuilding: Completed 1927\n-Symbolism: The Library was the only part saved from fire",
+      "past_comparison_summary": "The dignified seat of Canadian democracy, rising from the ashes of a 1916 fire."
+    },
+    "Niagara_Falls": {
+      "name": "Niagara Falls",
+      "description": "Group of three waterfalls at the southern end of Niagara Gorge",
+      "statistics_text_present": "-Main Fall: Horseshoe Falls (Canadian side)\n-Height: 51 m\n-Power: Major source of hydroelectricity\n-Tourism: Maid of the Mist / City Cruises\n-Visitors: 12 million/year (Canadian side)",
+      "statistics_text_past": "-Formation: ~12,000 years ago (glacier retreat)\n-History: Strategic site in War of 1812\n-Stunts: First barrel ride (Annie Edson Taylor, 1901)\n-Erosion: Moving upstream by ~1 m per year (natural)\n-Conservation: International park efforts since 1885",
+      "past_comparison_summary": "A thunderous natural force that has captivated explorers and daredevils for centuries."
     }
   }
 }

@@ -57,6 +57,18 @@ class DatabaseHelper {
       Country(name: 'Italy', flag: '🇮🇹'),
       Country(name: 'France', flag: '🇫🇷'),
       Country(name: 'Spain', flag: '🇪🇸'),
+      Country(name: 'United Kingdom', flag: '🇬🇧'),
+      Country(name: 'Germany', flag: '🇩🇪'),
+      Country(name: 'Greece', flag: '🇬🇷'),
+      Country(name: 'Egypt', flag: '🇪🇬'),
+      Country(name: 'China', flag: '🇨🇳'),
+      Country(name: 'Japan', flag: '🇯🇵'),
+      Country(name: 'India', flag: '🇮🇳'),
+      Country(name: 'Brazil', flag: '🇧🇷'),
+      Country(name: 'Australia', flag: '🇦🇺'),
+      Country(name: 'Mexico', flag: '🇲🇽'),
+      Country(name: 'Peru', flag: '🇵🇪'),
+      Country(name: 'Canada', flag: '🇨🇦'),
     ];
 
     for (var country in initialCountries) {

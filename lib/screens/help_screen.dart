@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/language_manager.dart';
 
 class HelpScreen extends StatelessWidget {
   final bool isConnected;
@@ -7,6 +8,8 @@ class HelpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isTablet = MediaQuery.of(context).size.width >= 600;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -18,30 +21,46 @@ class HelpScreen extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              _buildHeader(context),
+              _buildHeader(context, isTablet),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHelpItem(
-                        'How does the app work?',
-                        'This app allows you to control a Liquid Galaxy system and explore different places through time (Past, Present, and Future).',
+                  child: Center(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: isTablet ? 800 : double.infinity,
                       ),
-                      _buildHelpItem(
-                        'How to connect?',
-                        'Go to the Connection tab, enter your Liquid Galaxy user, password, IP, port, and number of screens, then press CONNECT.',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHelpItem(
+                            LanguageManager.instance.translate('help_q1'),
+                            LanguageManager.instance.translate('help_a1'),
+                            isTablet,
+                          ),
+                          _buildHelpItem(
+                            LanguageManager.instance.translate('help_q2'),
+                            LanguageManager.instance.translate('help_a2'),
+                            isTablet,
+                          ),
+                          _buildHelpItem(
+                            LanguageManager.instance.translate('help_q3'),
+                            LanguageManager.instance.translate('help_a3'),
+                            isTablet,
+                          ),
+                          _buildHelpItem(
+                            LanguageManager.instance.translate('help_q4'),
+                            LanguageManager.instance.translate('help_a4'),
+                            isTablet,
+                          ),
+                          _buildHelpItem(
+                            LanguageManager.instance.translate('help_q5'),
+                            LanguageManager.instance.translate('help_a5'),
+                            isTablet,
+                          ),
+                        ],
                       ),
-                      _buildHelpItem(
-                        'What is the Timeline?',
-                        'The timeline lets you select different countries and see their most famous Points of Interest across different eras.',
-                      ),
-                      _buildHelpItem(
-                        'Languages',
-                        'You can change the app language in the Settings tab. We support English, Spanish, and Catalan.',
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -52,7 +71,7 @@ class HelpScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHelpItem(String question, String answer) {
+  Widget _buildHelpItem(String question, String answer, bool isTablet) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 24.0),
       child: Column(
@@ -60,9 +79,9 @@ class HelpScreen extends StatelessWidget {
         children: [
           Text(
             question,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.blueAccent,
-              fontSize: 20,
+              fontSize: isTablet ? 24 : 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -71,7 +90,7 @@ class HelpScreen extends StatelessWidget {
             answer,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.8),
-              fontSize: 16,
+              fontSize: isTablet ? 18 : 16,
               height: 1.5,
             ),
           ),
@@ -80,7 +99,7 @@ class HelpScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, bool isTablet) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Column(
@@ -88,7 +107,7 @@ class HelpScreen extends StatelessWidget {
           Image.asset(
             'assets/images/Timeline/LogoApp_Menu.png',
             width: double.infinity,
-            height: 100,
+            height: isTablet ? 150 : 100,
             fit: BoxFit.contain,
           ),
           Row(
@@ -140,3 +159,4 @@ class HelpScreen extends StatelessWidget {
     );
   }
 }
+

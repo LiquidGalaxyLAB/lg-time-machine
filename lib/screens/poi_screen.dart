@@ -29,14 +29,22 @@ class _POIScreenState extends State<POIScreen> {
   @override
   void initState() {
     super.initState();
+    POIService.clearCache();
     _loadPOIs();
     _searchController.addListener(_filterPOIs);
+    LanguageManager.instance.languageNotifier.addListener(_onLanguageChanged);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    LanguageManager.instance.languageNotifier.removeListener(_onLanguageChanged);
     super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    POIService.clearCache();
+    _loadPOIs();
   }
 
   Future<void> _loadPOIs() async {
@@ -73,6 +81,9 @@ class _POIScreenState extends State<POIScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isTablet = size.width > 600;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -84,10 +95,10 @@ class _POIScreenState extends State<POIScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              _buildHeader(context),
-              _buildSearchBar(),
-              _buildCountryTitle(),
-              Expanded(child: _buildPOIList()),
+              _buildHeader(context, isTablet),
+              _buildSearchBar(isTablet),
+              _buildCountryTitle(isTablet),
+              Expanded(child: _buildPOIList(isTablet)),
             ],
           ),
         ),
@@ -95,7 +106,7 @@ class _POIScreenState extends State<POIScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, bool isTablet) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Column(
@@ -103,7 +114,7 @@ class _POIScreenState extends State<POIScreen> {
           Image.asset(
             'assets/images/Timeline/LogoApp_Menu.png',
             width: double.infinity,
-            height: 100,
+            height: isTablet ? 120 : 100,
             fit: BoxFit.contain,
           ),
           Row(
@@ -130,21 +141,24 @@ class _POIScreenState extends State<POIScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: widget.isConnected
-                      ? const Color(0xFF8AFF8A).withValues(alpha: 0.2)
-                      : const Color(0xFFFF8A8A).withValues(alpha: 0.2),
+                  color:
+                      widget.isConnected
+                          ? const Color(0xFF8AFF8A).withValues(alpha: 0.2)
+                          : const Color(0xFFFF8A8A).withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: widget.isConnected
-                        ? const Color(0xFF8AFF8A).withValues(alpha: 0.4)
-                        : const Color(0xFFFF8A8A).withValues(alpha: 0.4),
+                    color:
+                        widget.isConnected
+                            ? const Color(0xFF8AFF8A).withValues(alpha: 0.4)
+                            : const Color(0xFFFF8A8A).withValues(alpha: 0.4),
                   ),
                 ),
                 child: Icon(
                   Icons.wifi,
-                  color: widget.isConnected
-                      ? const Color(0xFF8AFF8A)
-                      : const Color(0xFFFF8A8A),
+                  color:
+                      widget.isConnected
+                          ? const Color(0xFF8AFF8A)
+                          : const Color(0xFFFF8A8A),
                   size: 24,
                 ),
               ),
@@ -155,45 +169,60 @@ class _POIScreenState extends State<POIScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(bool isTablet) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
-      child: TextField(
-        controller: _searchController,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          hintText: 'Search places...',
-          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
-          prefixIcon: const Icon(Icons.search, color: Colors.white70),
-          filled: true,
-          fillColor: Colors.white.withValues(alpha: 0.1),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 60.0 : 24.0,
+        vertical: 10.0,
+      ),
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: TextField(
+            controller: _searchController,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: LanguageManager.instance.translate('search_places'),
+              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+              prefixIcon: const Icon(Icons.search, color: Colors.white70),
+              filled: true,
+              fillColor: Colors.white.withValues(alpha: 0.1),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.2),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.1),
+                ),
+              ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 0),
+            ),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-          ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 0),
         ),
       ),
     );
   }
 
-  Widget _buildCountryTitle() {
+  Widget _buildCountryTitle(bool isTablet) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
+      padding: EdgeInsets.symmetric(
+        horizontal: isTablet ? 60.0 : 24.0,
+        vertical: 10.0,
+      ),
       child: Row(
         children: [
-          Container(width: 3, height: 24, color: Colors.white),
+          Container(width: 3, height: isTablet ? 32 : 24, color: Colors.white),
           const SizedBox(width: 10),
           Text(
-            widget.country.name.toUpperCase(),
-            style: const TextStyle(
+            LanguageManager.instance.translate(widget.country.name.toLowerCase().replaceAll(' ', '_')).toUpperCase(),
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 28,
+              fontSize: isTablet ? 36 : 28,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,
             ),
@@ -203,7 +232,7 @@ class _POIScreenState extends State<POIScreen> {
     );
   }
 
-  Widget _buildPOIList() {
+  Widget _buildPOIList(bool isTablet) {
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(color: Colors.white),
@@ -212,103 +241,135 @@ class _POIScreenState extends State<POIScreen> {
     if (_filteredPois.isEmpty) {
       return Center(
         child: Text(
-          'No places found',
+          LanguageManager.instance.translate('no_places_found'),
           style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
         ),
       );
     }
+
+    if (isTablet) {
+      return GridView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 10),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 3.5,
+          crossAxisSpacing: 20,
+          mainAxisSpacing: 20,
+        ),
+        itemCount: _filteredPois.length,
+        itemBuilder: (context, index) {
+          return _buildPOIItem(_filteredPois[index], isTablet);
+        },
+      );
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
       itemCount: _filteredPois.length,
       itemBuilder: (context, index) {
-        final poi = _filteredPois[index];
+        return _buildPOIItem(_filteredPois[index], isTablet);
+      },
+    );
+  }
 
-        return ValueListenableBuilder<String>(
-          valueListenable: LanguageManager.instance.languageNotifier,
-          builder: (context, currentLang, child) {
-            return ValueListenableBuilder<double>(
-              valueListenable: TimeManager.instance.timeNotifier,
-              builder: (context, timeValue, child) {
-                final String thumbnailPath = poi.getCurrentImage(timeValue);
+  Widget _buildPOIItem(POI poi, bool isTablet) {
+    return ValueListenableBuilder<String>(
+      valueListenable: LanguageManager.instance.languageNotifier,
+      builder: (context, currentLang, child) {
+        return ValueListenableBuilder<double>(
+          valueListenable: TimeManager.instance.timeNotifier,
+          builder: (context, timeValue, child) {
+            final String thumbnailPath = poi.getCurrentImage(timeValue);
 
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => POIDetailScreen(
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => POIDetailScreen(
                           poi: poi,
                           isConnected: widget.isConnected,
                         ),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 20),
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: thumbnailPath.isNotEmpty
-                              ? Image.asset(
-                                  thumbnailPath,
-                                  width: 100,
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    print(
-                                      'Error loading image asset: $thumbnailPath',
-                                    );
-                                    return Container(
-                                      width: 100,
-                                      height: 80,
-                                      color: Colors.white10,
-                                      child: const Icon(
-                                        Icons.image_not_supported,
-                                        color: Colors.white24,
-                                      ),
-                                    );
-                                  },
-                                )
-                              : Container(
-                                  width: 100,
-                                  height: 80,
-                                  color: Colors.white10,
-                                  child: const Icon(
-                                    Icons.image_not_supported,
-                                    color: Colors.white24,
-                                  ),
-                                ),
-                        ),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                poi.name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                poi.description,
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.6),
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 );
               },
+              child: Container(
+                margin: EdgeInsets.only(bottom: isTablet ? 0 : 20),
+                decoration:
+                    isTablet
+                        ? BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.1),
+                          ),
+                        )
+                        : null,
+                padding: isTablet ? const EdgeInsets.all(10) : null,
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child:
+                          thumbnailPath.isNotEmpty
+                              ? Image.asset(
+                                thumbnailPath,
+                                width: isTablet ? 120 : 100,
+                                height: isTablet ? 90 : 80,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: isTablet ? 120 : 100,
+                                    height: isTablet ? 90 : 80,
+                                    color: Colors.white10,
+                                    child: const Icon(
+                                      Icons.image_not_supported,
+                                      color: Colors.white24,
+                                    ),
+                                  );
+                                },
+                              )
+                              : Container(
+                                width: isTablet ? 120 : 100,
+                                height: isTablet ? 90 : 80,
+                                color: Colors.white10,
+                                child: const Icon(
+                                  Icons.image_not_supported,
+                                  color: Colors.white24,
+                                ),
+                              ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            poi.name,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isTablet ? 20 : 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            poi.description,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.6),
+                              fontSize: isTablet ? 16 : 14,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             );
           },
         );
