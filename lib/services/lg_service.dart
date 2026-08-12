@@ -2,11 +2,17 @@ import 'package:dartssh2/dartssh2.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class LGService extends ChangeNotifier {
   static final LGService instance = LGService._init();
+
+  // LG3 es el slave reservado para el balloon HTML/KML.
+  // En la configuración de 3 pantallas es la pantalla derecha; en la
+  // configuración de 5 pantallas se mantiene independiente de la comparación.
+  static const int _balloonSlave = 3;
   LGService._init();
 
   SSHClient? _client;
@@ -16,6 +22,10 @@ class LGService extends ChangeNotifier {
   String? _lastKml;
   String? _lastTimeKml;
   final Map<int, String> _lastSlaveKml = {};
+  String? _poiBoundaryKml;
+  String? _balloonKml;
+  double _poiBoundaryLatitude = 0;
+  double _poiBoundaryLongitude = 0;
   int get screens => _screens;
   String? _host;
   String? get host => _host;
@@ -154,6 +164,144 @@ class LGService extends ChangeNotifier {
     await _setKmlTxt();
   }
 
+  String generatePOIBoundaryKML({
+    required double latitude,
+    required double longitude,
+    double sizeMeters = 200.0,
+    double heightMeters = 15.0,
+  }) {
+    final halfSize = sizeMeters / 2.0;
+    const metersPerDegree = 111320.0;
+
+    final latOffset = halfSize / metersPerDegree;
+    final cosLat = math.cos(latitude * math.pi / 180.0).abs();
+    final lonOffset =
+        halfSize / (metersPerDegree * math.max(cosLat, 0.01));
+
+    final north = latitude + latOffset;
+    final south = latitude - latOffset;
+    final east = longitude + lonOffset;
+    final west = longitude - lonOffset;
+
+    // KML uses AABBGGRR. 99 = 60% opacity, 0000ff = blue.
+    const blueFill = '990000ff';
+    const blueLine = 'ff0000ff';
+
+    String wall(
+        double lon1,
+        double lat1,
+        double lon2,
+        double lat2,
+        ) {
+      return '''
+    <Placemark>
+      <name>POI Boundary Wall</name>
+      <Style>
+        <PolyStyle>
+          <color>$blueFill</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+        <LineStyle>
+          <color>$blueLine</color>
+          <width>4</width>
+        </LineStyle>
+      </Style>
+      <Polygon>
+        <extrude>1</extrude>
+        <tessellate>1</tessellate>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              $lon1,$lat1,0
+              $lon2,$lat2,0
+              $lon2,$lat2,$heightMeters
+              $lon1,$lat1,$heightMeters
+              $lon1,$lat1,0
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>''';
+    }
+
+    return '''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>POI 3D Boundary</name>
+${wall(west, north, east, north)}
+${wall(east, north, east, south)}
+${wall(east, south, west, south)}
+${wall(west, south, west, north)}
+  </Document>
+</kml>''';
+  }
+
+  Future<String?> sendPOIBoundaryKML({
+    required double latitude,
+    required double longitude,
+    double sizeMeters = 200.0,
+    double heightMeters = 15.0,
+  }) async {
+    if (!_isConnected) {
+      debugPrint('LGService: Cannot send POI boundary: not connected');
+      return 'not_connected';
+    }
+
+    try {
+      final kml = generatePOIBoundaryKML(
+        latitude: latitude,
+        longitude: longitude,
+        sizeMeters: sizeMeters,
+        heightMeters: heightMeters,
+      );
+
+      _poiBoundaryKml = kml;
+      _poiBoundaryLatitude = latitude;
+      _poiBoundaryLongitude = longitude;
+
+      debugPrint(
+        'LGService: Writing 3D POI boundary into slave KMLs '
+            '(lat=$latitude, lon=$longitude, size=${sizeMeters}m, height=${heightMeters}m)',
+      );
+
+      // La barrera utiliza el mismo canal slave_X.kml.
+      // IMPORTANTE: slave 3 NO se excluye. En él conviven la barrera 3D
+      // y el balloon. El balloon se añade al final del mismo Document KML,
+      // por lo que el 3D queda como elemento de fondo y no lo sobrescribe.
+      for (int slaveNo = 1; slaveNo <= _screens; slaveNo++) {
+        await _writeSlaveKML(slaveNo);
+      }
+
+      // Forzamos un nuevo wrapper/URL para que Google Earth recargue
+      // inmediatamente cada slave. LG3 conserva 3D + balloon.
+      for (int slaveNo = 1; slaveNo <= _screens; slaveNo++) {
+        await _refreshSlaveKML(slaveNo);
+      }
+
+      debugPrint('LGService: 3D POI boundary sent through slave KML path');
+      return null;
+    } catch (e) {
+      debugPrint('LGService: Error sending POI boundary: $e');
+      return 'boundary_error';
+    }
+  }
+
+  Future<void> clearPOIBoundary() async {
+    _poiBoundaryKml = null;
+
+    // Quitamos únicamente la geometría 3D. El balloon de LG3
+    // permanece y se vuelve a escribir en el mismo KML.
+    for (int slaveNo = 1; slaveNo <= _screens; slaveNo++) {
+      await _writeSlaveKML(slaveNo);
+    }
+
+    debugPrint(
+      'LGService: 3D POI boundary cleared; balloon slave 3 preserved.',
+    );
+  }
+
   Future<void> sendTimeKML(String kml) async {
     if (_lastTimeKml == kml) return;
     _lastTimeKml = kml;
@@ -162,12 +310,111 @@ class LGService extends ChangeNotifier {
   }
 
   Future<void> sendSlaveKML(int slaveNo, String kml) async {
-    if (_lastSlaveKml[slaveNo] == kml) return;
+    if (_lastSlaveKml[slaveNo] == kml && _poiBoundaryKml == null) {
+      return;
+    }
+
     _lastSlaveKml[slaveNo] = kml;
+    await _writeSlaveKML(slaveNo);
+  }
+
+  /// El balloon de estadísticas/comparación siempre vive en LG3.
+  ///
+  /// LG3 se mantiene independiente de los browsers usados por la
+  /// comparación. El KML de LG3 contiene simultáneamente la barrera 3D
+  /// y el balloon, por lo que ninguno de los dos sobrescribe al otro.
+  Future<void> sendBalloonKML(String kml) async {
+    if (_screens < _balloonSlave) {
+      debugPrint(
+        'LGService: No hay LG3 disponible para el balloon '
+            '(_screens=$_screens).',
+      );
+      return;
+    }
+
+    _balloonKml = kml;
+
+    // No usamos un return cuando el contenido es idéntico. El fichero
+    // slave_3.kml puede haber sido actualizado por otra operación y
+    // necesitamos garantizar que el NetworkLink se vuelva a refrescar.
+    await _writeSlaveKML(_balloonSlave);
+    await _refreshSlaveKML(_balloonSlave);
+
+    debugPrint(
+      'LGService: Balloon enviado/refrescado en LG3 junto con la barrera 3D.',
+    );
+  }
+
+  /// Elimina únicamente el balloon. La barrera 3D, si existe, permanece.
+  Future<void> clearBalloonKML() async {
+    if (_screens < _balloonSlave) return;
+
+    _balloonKml = null;
+    await _writeSlaveKML(_balloonSlave);
+    await _refreshSlaveKML(_balloonSlave);
+
+    debugPrint(
+      'LGService: Balloon de LG3 eliminado; barrera 3D conservada.',
+    );
+  }
+
+  Future<void> _writeSlaveKML(int slaveNo) async {
+    final baseKml = _lastSlaveKml[slaveNo] ?? '';
+    final boundary = _poiBoundaryKml ?? '';
+    final balloon = slaveNo == _balloonSlave ? (_balloonKml ?? '') : '';
+
+    final kml = _composeSlaveKML(
+      baseKml: baseKml,
+      boundaryKml: boundary,
+      balloonKml: balloon,
+    );
+
     await execute(
       "cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.kml\n$kml\nEOF",
     );
     await _setSlaveKmlTxt(slaveNo);
+  }
+
+  String _composeSlaveKML({
+    required String baseKml,
+    required String boundaryKml,
+    required String balloonKml,
+  }) {
+    final baseBody = _extractKmlDocumentBody(baseKml);
+    final boundaryBody = _extractKmlDocumentBody(boundaryKml);
+    final balloonBody = _extractKmlDocumentBody(balloonKml);
+
+    if (baseBody.isEmpty && boundaryBody.isEmpty && balloonBody.isEmpty) {
+      return '''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document></Document>
+</kml>''';
+    }
+
+    // ORDEN IMPORTANTE:
+    // base -> barrera 3D -> balloon.
+    // El balloon queda en el mismo Document y no reemplaza la geometría 3D.
+    return '''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+$baseBody
+$boundaryBody
+$balloonBody
+  </Document>
+</kml>''';
+  }
+
+  String _extractKmlDocumentBody(String kml) {
+    final documentStart = kml.indexOf('<Document');
+    if (documentStart == -1) return '';
+
+    final openEnd = kml.indexOf('>', documentStart);
+    if (openEnd == -1) return '';
+
+    final closeStart = kml.lastIndexOf('</Document>');
+    if (closeStart == -1 || closeStart <= openEnd) return '';
+
+    return kml.substring(openEnd + 1, closeStart).trim();
   }
 
   Future<void> _setSlaveKmlTxt(int slaveNo) async {
@@ -178,6 +425,8 @@ class LGService extends ChangeNotifier {
     <NetworkLink>
       <Link>
         <href>http://lg1:81/kml/slave_$slaveNo.kml?v=$version</href>
+        <refreshMode>onInterval</refreshMode>
+        <refreshInterval>1</refreshInterval>
       </Link>
     </NetworkLink>
   </Document>
@@ -185,9 +434,16 @@ class LGService extends ChangeNotifier {
     await execute("cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.txt\n$kmlContent\nEOF");
   }
 
+  Future<void> _refreshSlaveKML(int slaveNo) async {
+    // Reescribe el wrapper completo en vez de depender de sed. Esto evita
+    // problemas de caché y garantiza un nuevo query-string en cada cambio.
+    await _setSlaveKmlTxt(slaveNo);
+  }
+
   Future<void> sendLogoKML(String kml) async {
     int slaveNo = _screens == 5 ? 4 : 2;
     await sendSlaveKML(slaveNo, kml);
+    // sendSlaveKML already composes the current boundary, if one exists.
   }
 
   Future<void> uploadLogos() async {
@@ -482,7 +738,7 @@ class LGService extends ChangeNotifier {
       await stopBrowser(4);
       await stopBrowser(5);
     }
-    await clearSlaveKML(3);
+    await clearBalloonKML();
   }
 
   Future<void> clearComparison() async {
@@ -490,7 +746,7 @@ class LGService extends ChangeNotifier {
     await stopBrowser(2);
     await stopBrowser(4);
     await stopBrowser(5);
-    await clearSlaveKML(3);
+    await clearBalloonKML();
   }
 
   Future<void> clearSlaveKML(int slaveNo) async {
@@ -692,6 +948,8 @@ class LGService extends ChangeNotifier {
     _lastKml = null;
     _lastTimeKml = null;
     _lastSlaveKml.clear();
+    _poiBoundaryKml = null;
+    _balloonKml = null;
 
     if (_orbitPlaying) {
       orbitStop();
@@ -859,3 +1117,4 @@ fi
     }
   }
 }
+

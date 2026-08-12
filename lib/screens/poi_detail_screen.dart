@@ -10,7 +10,6 @@ import '../kmls/logo_kml.dart';
 import '../kmls/look_at_kml.dart';
 import '../kmls/statistics_overlay_kml.dart';
 import '../kmls/comparison_overlay_kml.dart';
-import '../kmls/Pois_Circle.dart';
 
 class POIDetailScreen extends StatefulWidget {
   final POI poi;
@@ -57,8 +56,23 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
       final logosKml = LogoKML.generate();
       await LGService.instance.sendLogoKML(logosKml);
 
-      final circleKml = PoisCircleKML.generate(widget.poi);
-      await LGService.instance.sendKML(circleKml);
+      // La barrera 3D usa el canal slave_X.kml que ya funciona.
+      // La pantalla derecha queda reservada para el balloon.
+      final boundaryResult = await LGService.instance.sendPOIBoundaryKML(
+        latitude: widget.poi.latitude,
+        longitude: widget.poi.longitude,
+        sizeMeters: 200.0,
+        heightMeters: 15.0,
+      );
+
+      if (boundaryResult != null) {
+        debugPrint(
+          'POIDetailScreen: error enviando barrera 3D: $boundaryResult',
+        );
+      }
+
+      // Dejamos que Liquid Galaxy reciba el KML antes del FlyTo.
+      await Future.delayed(const Duration(milliseconds: 250));
 
       final lookAt = LookAtKML.generate(
         widget.poi,
@@ -66,6 +80,9 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
       );
       await LGService.instance.sendQuery('flytoview=$lookAt');
 
+      // El balloon se envía después del FlyTo y directamente al slave
+      // reservado para balloons.
+      await Future.delayed(const Duration(milliseconds: 250));
       await _showBalloonOnly();
     }
   }
@@ -97,7 +114,10 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
       statisticsText: statsText,
       viewType: viewType,
     );
-    await LGService.instance.sendSlaveKML(3, balloonKml);
+
+    // El balloon vive en LG3, que es el slave reservado para la
+    // información HTML/KML. LGService lo compone con la barrera 3D.
+    await LGService.instance.sendBalloonKML(balloonKml);
   }
 
   void _startStatisticsCooldown() {
@@ -749,32 +769,36 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                                   futureStats: _cachedFutureText,
                                   isFuture: isFuture,
                                 );
-                                await LGService.instance.sendSlaveKML(
-                                  3,
-                                  balloonKml,
-                                );
+                                // Primero mostramos la comparación en las pantallas
+                                // que corresponden a las imágenes. LG3 queda libre
+                                // para el balloon.
+                                if (LGService.instance.screens == 5) {
+                                  // Orden: lg4, lg5 (PAST) | lg1, lg2 (PRESENT)
+                                  await LGService.instance.openBrowser(
+                                    4,
+                                    'http://lg1:81/comparison.html?mode=past&side=left',
+                                  );
+                                  await LGService.instance.openBrowser(
+                                    5,
+                                    'http://lg1:81/comparison.html?mode=past&side=right',
+                                  );
+                                }
 
-                                // Orden: lg4, lg5 (PAST) | lg1, lg2 (PRESENT)
-                                // lg4: Left half of Past
-                                await LGService.instance.openBrowser(
-                                  4,
-                                  'http://lg1:81/comparison.html?mode=past&side=left',
-                                );
-                                // lg5: Right half of Past
-                                await LGService.instance.openBrowser(
-                                  5,
-                                  'http://lg1:81/comparison.html?mode=past&side=right',
-                                );
-                                // lg1: Left half of Present
                                 await LGService.instance.openBrowser(
                                   1,
                                   'http://lg1:81/comparison.html?mode=present&side=left',
                                 );
-                                // lg2: Right half of Present
                                 await LGService.instance.openBrowser(
                                   2,
                                   'http://lg1:81/comparison.html?mode=present&side=right',
                                 );
+
+                                // Enviamos/refrescamos el balloon DESPUÉS de abrir
+                                // los browsers para que LG3 termine mostrando el
+                                // contenido del balloon y no quede una versión
+                                // anterior en caché.
+                                await Future.delayed(const Duration(milliseconds: 300));
+                                await LGService.instance.sendBalloonKML(balloonKml);
 
                                 if (mounted) {
                                   setState(() {
@@ -1283,3 +1307,4 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
     );
   }
 }
+
