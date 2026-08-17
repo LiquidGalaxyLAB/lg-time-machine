@@ -37,14 +37,6 @@ class LGService extends ChangeNotifier {
   bool _isPreCaching = false;
   Future<void>? _reconnectFuture;
 
-  // Sesión SFTP reutilizada para todas las subidas. dartssh2 abre un canal
-  // SSH nuevo en cada sftp() y SftpClient.close() no cierra el canal: abrir
-  // una sesión por subida fuga canales hasta agotar MaxSessions de OpenSSH,
-  // momento en el que SFTP y execute() empiezan a fallar en silencio y la
-  // comparación/estadísticas dejan de mostrarse.
-  SSHClient? _sftpOwner;
-  Future<SftpClient?>? _sftpFuture;
-
   Future<bool> connect({
     required String host,
     required int port,
@@ -113,16 +105,6 @@ class LGService extends ChangeNotifier {
 
   Future<void> _reconnectInternal() async {
     try {
-      // Cerramos el cliente anterior si sigue vivo para no dejar sockets SSH
-      // abiertos después de un fallo de conexión.
-      final oldClient = _client;
-      if (oldClient != null && oldClient.isClosed == false) {
-        try {
-          oldClient.close();
-        } catch (_) {}
-      }
-      _invalidateSftp();
-
       final socket = await SSHSocket.connect(
         _host!,
         _port!,
@@ -151,116 +133,28 @@ class LGService extends ChangeNotifier {
       // Ignore errors during close
     }
     _client = null;
-    _invalidateSftp();
   }
 
-  /// Devuelve la sesión SFTP compartida, creándola la primera vez que se usa.
-  ///
-  /// Reutilizar una única sesión evita abrir un canal SSH por subida, que es
-  /// lo que agotaba los canales disponibles del servidor y rompía la
-  /// comparación/estadísticas después de unos usos.
-  Future<SftpClient?> _getSftpClient() async {
-    final client = _client;
-    if (client == null || client.isClosed || !_isConnected) return null;
-
-    // Si cambió el cliente SSH (reconexión), la sesión SFTP anterior ya no
-    // es válida.
-    if (_sftpFuture != null && _sftpOwner != client) {
-      _invalidateSftp();
-    }
-    if (_sftpFuture == null) {
-      _sftpFuture = () async {
-        try {
-          final sftp = await client.sftp();
-          _sftpOwner = client;
-          return sftp;
-        } catch (e) {
-          debugPrint('LGService: Error abriendo sesión SFTP: $e');
-          _invalidateSftp();
-          return null;
-        }
-      }();
-    }
-    return _sftpFuture;
-  }
-
-  void _invalidateSftp() {
-    _sftpOwner = null;
-    _sftpFuture = null;
-  }
-
-  /// Cadena de futuros que serializa los comandos SSH.
-  ///
-  /// dartssh2 no tolera bien muchos canales simultáneos: el servidor OpenSSH
-  /// limita el número de sesiones por conexión, así que enviar varios comandos
-  /// casi a la vez (p. ej. abrir Chromium en varias pantallas seguidas)
-  /// saturaba el canal, rompía la conexión con un SocketException y dejaba
-  /// _isConnected a false, con lo que todos los botones de la app dejaban de
-  /// responder hasta reconectar a mano.
-  Future<void> _executeChain = Future.value();
-
-  /// Ejecuta un comando remoto por SSH.
-  ///
-  /// Los comandos se encolan y se ejecutan de uno en uno. [timeout] impide
-  /// que un comando colgado (p. ej. un slave apagado que no responde al
-  /// sshpass) bloquee la cola para siempre.
-  Future<String?> execute(
-    String command, {
-    Duration timeout = const Duration(seconds: 30),
-  }) async {
-    final completer = Completer<String?>();
-    _executeChain = _executeChain
-        .then((_) async {
-          try {
-            if (!completer.isCompleted) {
-              completer.complete(await _runCommand(command, timeout: timeout));
-            }
-          } catch (e) {
-            debugPrint(
-              'LGService: Execution failed in queue for "$command": $e',
-            );
-            if (!completer.isCompleted) completer.complete(null);
-          }
-        })
-        .catchError((Object e) {
-          debugPrint('LGService: Execution queue error for "$command": $e');
-          if (!completer.isCompleted) completer.complete(null);
-        });
-    return completer.future;
-  }
-
-  Future<String?> _runCommand(
-    String command, {
-    required Duration timeout,
-  }) async {
-    // Reconecta también cuando _isConnected es false: un SocketException
-    // previo puede dejar la conexión muerta con isClosed a false, y antes eso
-    // hacía que todos los comandos posteriores se descartaran en silencio
-    // hasta que el usuario reconectara a mano.
-    if (_client == null || _client?.isClosed == true || !_isConnected) {
+  Future<String?> execute(String command) async {
+    if (_client == null || _client?.isClosed == true) {
       await reconnect();
     }
     if (!_isConnected || _client == null) return null;
-
-    SSHSession? session;
     try {
-      session = await _client!.execute(command).timeout(timeout);
-      final result = await utf8.decodeStream(session.stdout).timeout(timeout);
-      await session.done.timeout(timeout);
+      final session = await _client!.execute(command);
+      final result = await utf8.decodeStream(session.stdout).timeout(const Duration(seconds: 15));
+      await session.done.timeout(const Duration(seconds: 2));
       return result;
     } catch (e) {
       debugPrint('LGService: Execution error for "$command": $e');
-      // Only disconnect if it's a connection-related error
-      if (e.toString().contains('SocketException') ||
-          e.toString().contains('Connection failed')) {
+      // Reconnect on connection-related errors or timeouts
+      if (e is TimeoutException ||
+          e.toString().contains('SocketException') ||
+          e.toString().contains('Connection failed') ||
+          e.toString().contains('SSHChannelOpenError')) {
         _isConnected = false;
         notifyListeners();
       }
-      // Cerramos la sesión para no dejar canales SSH colgados que puedan
-      // interferir con los siguientes comandos.
-      try {
-        session?.close();
-      } catch (_) {}
       return null;
     }
   }
@@ -272,128 +166,76 @@ class LGService extends ChangeNotifier {
     await _setKmlTxt();
   }
 
-  /// Colores (RGB hex, #RRGGBB) asignados a cada país para la barrera 3D.
-  ///
-  /// La clave es el nombre del país en inglés, igual al campo `country`
-  /// que POIService guarda en cada POI. Si un país no está en la lista se
-  /// usa un teal neutro por defecto.
-  static const Map<String, String> _countryBoundaryColors = {
-    'United States': '0000FF', // azul
-    'Spain': 'FFFF00', // amarillo
-    'United Kingdom': 'FF0000', // rojo
-    'France': '800080', // púrpura
-    'Italy': '00FF00', // verde
-    'Germany': 'FFA500', // naranja
-    'Greece': '00FFFF', // cian
-    'Egypt': 'FFD700', // dorado
-    'China': 'DC143C', // carmesí
-    'Japan': 'FF00FF', // magenta
-    'India': 'FF1493', // rosa intenso
-    'Brazil': '00FF7F', // verde primavera
-    'Australia': '008080', // teal
-    'Mexico': '00CED1', // turquesa
-    'Peru': 'FF4500', // rojo anaranjado
-    'Canada': '4B0082', // índigo
-  };
-
-  /// Convierte un color RGB hex (#RRGGBB) al formato ABGR que usa KML.
-  String _kmlColor(String rgbHex, double opacity) {
-    final alpha = (opacity * 255)
-        .round()
-        .clamp(0, 255)
-        .toRadixString(16)
-        .padLeft(2, '0')
-        .toUpperCase();
-    final rr = rgbHex.substring(0, 2);
-    final gg = rgbHex.substring(2, 4);
-    final bb = rgbHex.substring(4, 6);
-    return '$alpha$bb$gg$rr';
-  }
-
-  /// Diámetro (en metros) de la barrera circular a partir del rango de cámara
-  /// del POI. Los monumentos grandes tienen más rango en el CSV, así que
-  /// reciben un círculo proporcionalmente mayor. Se limita entre 150 m y
-  /// 3 km para que los círculos no resulten invisibles ni desproporcionados.
-  static double boundarySizeMeters(double cameraRange) {
-    return (cameraRange * 0.2).clamp(150.0, 3000.0).toDouble();
-  }
-
-  /// Altura (en metros) del muro circular según el rango de cámara del POI.
-  /// Se limita entre 12 m y 60 m.
-  static double boundaryHeightMeters(double cameraRange) {
-    return (cameraRange * 0.015).clamp(12.0, 60.0).toDouble();
-  }
-
   String generatePOIBoundaryKML({
     required double latitude,
     required double longitude,
     double sizeMeters = 200.0,
     double heightMeters = 15.0,
-    String country = '',
   }) {
-    final radius = sizeMeters / 2.0;
+    final halfSize = sizeMeters / 2.0;
     const metersPerDegree = 111320.0;
 
-    final latOffset = radius / metersPerDegree;
+    final latOffset = halfSize / metersPerDegree;
     final cosLat = math.cos(latitude * math.pi / 180.0).abs();
-    final lonOffset = radius / (metersPerDegree * math.max(cosLat, 0.01));
+    final lonOffset =
+        halfSize / (metersPerDegree * math.max(cosLat, 0.01));
 
-    final rgb = _countryBoundaryColors[country] ?? '008080';
-    // KML usa ABGR: 99 = 60% opacidad para el relleno, FF = opaco para el borde.
-    final fill = _kmlColor(rgb, 0.6);
-    final line = _kmlColor(rgb, 1.0);
+    final north = latitude + latOffset;
+    final south = latitude - latOffset;
+    final east = longitude + lonOffset;
+    final west = longitude - lonOffset;
 
-    // Barrera circular SIN tapa superior: usamos un <LineString> extruido
-    // (la "cortina" de Google Earth, ejemplo oficial "Absolute Extruded").
-    // El LineString dibuja el círculo superior a la altura del muro y el
-    // <extrude>1</extrude> lo extiende hasta el suelo formando la pared,
-    // sin cara superior. Con altitudeMode=relativeToGround cada vértice
-    // sube/baja siguiendo el terreno del lugar.
-    const int segments = 48;
-    final step = 2.0 * math.pi / segments;
-    final ring = StringBuffer();
+    // KML uses AABBGGRR. 99 = 60% opacity, 0000ff = blue.
+    const blueFill = '990000ff';
+    const blueLine = 'ff0000ff';
 
-    for (int i = 0; i < segments; i++) {
-      final a = i * step;
-      final lat = latitude + math.sin(a) * latOffset;
-      final lon = longitude + math.cos(a) * lonOffset;
-      ring.writeln(
-        '          ${lon.toStringAsFixed(7)},${lat.toStringAsFixed(7)},$heightMeters',
-      );
+    String wall(
+        double lon1,
+        double lat1,
+        double lon2,
+        double lat2,
+        ) {
+      return '''
+    <Placemark>
+      <name>POI Boundary Wall</name>
+      <Style>
+        <PolyStyle>
+          <color>$blueFill</color>
+          <fill>1</fill>
+          <outline>1</outline>
+        </PolyStyle>
+        <LineStyle>
+          <color>$blueLine</color>
+          <width>4</width>
+        </LineStyle>
+      </Style>
+      <Polygon>
+        <extrude>1</extrude>
+        <tessellate>1</tessellate>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              $lon1,$lat1,0
+              $lon2,$lat2,0
+              $lon2,$lat2,$heightMeters
+              $lon1,$lat1,$heightMeters
+              $lon1,$lat1,0
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>''';
     }
-
-    // Cerramos el anillo repitiendo el primer punto para que la cortina
-    // quede continua alrededor de todo el círculo.
-    ring.writeln(
-      '          ${(longitude + math.cos(0.0) * lonOffset).toStringAsFixed(7)},'
-      '${(latitude + math.sin(0.0) * latOffset).toStringAsFixed(7)},$heightMeters',
-    );
 
     return '''<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
-    <name>POI 3D Circular Boundary</name>
-    <Placemark>
-      <name>POI Boundary Wall</name>
-      <Style>
-        <LineStyle>
-          <color>$line</color>
-          <width>4</width>
-        </LineStyle>
-        <PolyStyle>
-          <color>$fill</color>
-          <fill>1</fill>
-          <outline>0</outline>
-        </PolyStyle>
-      </Style>
-      <LineString>
-        <extrude>1</extrude>
-        <tessellate>1</tessellate>
-        <altitudeMode>relativeToGround</altitudeMode>
-        <coordinates>
-$ring        </coordinates>
-      </LineString>
-    </Placemark>
+    <name>POI 3D Boundary</name>
+${wall(west, north, east, north)}
+${wall(east, north, east, south)}
+${wall(east, south, west, south)}
+${wall(west, south, west, north)}
   </Document>
 </kml>''';
   }
@@ -403,7 +245,6 @@ $ring        </coordinates>
     required double longitude,
     double sizeMeters = 200.0,
     double heightMeters = 15.0,
-    String country = '',
   }) async {
     if (!_isConnected) {
       debugPrint('LGService: Cannot send POI boundary: not connected');
@@ -416,7 +257,6 @@ $ring        </coordinates>
         longitude: longitude,
         sizeMeters: sizeMeters,
         heightMeters: heightMeters,
-        country: country,
       );
 
       _poiBoundaryKml = kml;
@@ -425,7 +265,7 @@ $ring        </coordinates>
 
       debugPrint(
         'LGService: Writing 3D POI boundary into slave KMLs '
-        '(lat=$latitude, lon=$longitude, size=${sizeMeters}m, height=${heightMeters}m)',
+            '(lat=$latitude, lon=$longitude, size=${sizeMeters}m, height=${heightMeters}m)',
       );
 
       // La barrera utiliza el mismo canal slave_X.kml.
@@ -436,21 +276,13 @@ $ring        </coordinates>
         await _writeSlaveKML(slaveNo);
       }
 
-      // El master (lg1) NO carga slave_1.kml. Su pantalla central se
-      // alimenta del "Solo KML" que referencia myplaces.kml
-      // (kml/master_1.kml o kml/solo.kml). Sin esto, la barrera 3D solo
-      // aparecía en los slaves y nunca en la pantalla central.
-      await _writeMasterSoloKML();
-
       // Forzamos un nuevo wrapper/URL para que Google Earth recargue
       // inmediatamente cada slave. LG3 conserva 3D + balloon.
       for (int slaveNo = 1; slaveNo <= _screens; slaveNo++) {
         await _refreshSlaveKML(slaveNo);
       }
 
-      debugPrint(
-        'LGService: 3D POI boundary sent through slave KML + master solo KML paths',
-      );
+      debugPrint('LGService: 3D POI boundary sent through slave KML path');
       return null;
     } catch (e) {
       debugPrint('LGService: Error sending POI boundary: $e');
@@ -466,9 +298,6 @@ $ring        </coordinates>
     for (int slaveNo = 1; slaveNo <= _screens; slaveNo++) {
       await _writeSlaveKML(slaveNo);
     }
-
-    // Limpiamos también el Solo KML del master (pantalla central).
-    await _writeMasterSoloKML();
 
     debugPrint(
       'LGService: 3D POI boundary cleared; balloon slave 3 preserved.',
@@ -500,7 +329,7 @@ $ring        </coordinates>
     if (_screens < _balloonSlave) {
       debugPrint(
         'LGService: No hay LG3 disponible para el balloon '
-        '(_screens=$_screens).',
+            '(_screens=$_screens).',
       );
       return;
     }
@@ -526,18 +355,14 @@ $ring        </coordinates>
     await _writeSlaveKML(_balloonSlave);
     await _refreshSlaveKML(_balloonSlave);
 
-    debugPrint('LGService: Balloon de LG3 eliminado; barrera 3D conservada.');
+    debugPrint(
+      'LGService: Balloon de LG3 eliminado; barrera 3D conservada.',
+    );
   }
 
   Future<void> _writeSlaveKML(int slaveNo) async {
     final baseKml = _lastSlaveKml[slaveNo] ?? '';
-    // FIX (doble círculo en pantalla central): el master (lg1) no carga
-    // slave_1.kml — su pantalla central se alimenta del "Solo KML"
-    // (solo.kml / master_1.kml), que ya incluye la barrera 3D. Si además
-    // slave_1.kml llevara la barrera, Google Earth dibujaría dos círculos
-    // idénticos superpuestos en el centro (z-fighting: las caras de los
-    // polígonos parpadean al mover la cámara).
-    final boundary = slaveNo == 1 ? '' : (_poiBoundaryKml ?? '');
+    final boundary = _poiBoundaryKml ?? '';
     final balloon = slaveNo == _balloonSlave ? (_balloonKml ?? '') : '';
 
     final kml = _composeSlaveKML(
@@ -552,32 +377,6 @@ $ring        </coordinates>
     await _setSlaveKmlTxt(slaveNo);
   }
 
-  /// Escribe el KML compuesto en el archivo "Solo KML" del master (lg1).
-  ///
-  /// La pantalla central NO carga slave_1.kml como el resto de slaves.
-  /// En una instalación estándar de Liquid Galaxy, el master referencia en
-  /// su myplaces.kml un NetworkLink "Solo KML" hacia:
-  ///   - Liquid Galaxy LAB:  http://lg1:81/kml/master_1.kml
-  ///   - instalaciones clásicas: http://lg1:81/kml/solo.kml
-  ///
-  /// Escribimos la barrera 3D en ambas rutas para cubrir las dos variantes.
-  /// El balloon no se incluye: vive siempre en LG3 (slave reservado).
-  Future<void> _writeMasterSoloKML() async {
-    final kml = _composeSlaveKML(
-      baseKml: _lastSlaveKml[1] ?? '',
-      boundaryKml: _poiBoundaryKml ?? '',
-      balloonKml: '',
-    );
-
-    await execute("cat <<'EOF' > /var/www/html/kml/master_1.kml\n$kml\nEOF");
-    await execute("cat <<'EOF' > /var/www/html/kml/solo.kml\n$kml\nEOF");
-
-    debugPrint(
-      'LGService: KML escrito en el Solo KML del master '
-      '(master_1.kml y solo.kml).',
-    );
-  }
-
   String _composeSlaveKML({
     required String baseKml,
     required String boundaryKml,
@@ -589,7 +388,7 @@ $ring        </coordinates>
 
     if (baseBody.isEmpty && boundaryBody.isEmpty && balloonBody.isEmpty) {
       return '''<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+<kml xmlns="http://www.opengis.net/kml/2.2">
   <Document></Document>
 </kml>''';
     }
@@ -597,17 +396,8 @@ $ring        </coordinates>
     // ORDEN IMPORTANTE:
     // base -> barrera 3D -> balloon.
     // El balloon queda en el mismo Document y no reemplaza la geometría 3D.
-    //
-    // IMPORTANTE (fix balloon invisible): declaramos xmlns:gx aquí porque
-    // _extractKmlDocumentBody descarta el <kml> original de cada fragmento
-    // junto con su propia declaración de xmlns:gx. Si no la repetimos en
-    // este <kml> compuesto, cualquier elemento <gx:...> (por ejemplo
-    // <gx:balloonVisibility> del balloon de estadísticas/comparación) queda
-    // con un prefijo de namespace sin declarar. Eso hace que el XML sea
-    // inválido y Google Earth descarta ese contenido en silencio: el
-    // balloon nunca llega a mostrarse aunque el archivo se cargue bien.
     return '''<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+<kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
 $baseBody
 $boundaryBody
@@ -631,8 +421,7 @@ $balloonBody
 
   Future<void> _setSlaveKmlTxt(int slaveNo) async {
     final version = DateTime.now().millisecondsSinceEpoch;
-    final kmlContent =
-        '''<?xml version="1.0" encoding="UTF-8"?>
+    final kmlContent = '''<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <NetworkLink>
@@ -644,9 +433,7 @@ $balloonBody
     </NetworkLink>
   </Document>
 </kml>''';
-    await execute(
-      "cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.txt\n$kmlContent\nEOF",
-    );
+    await execute("cat <<'EOF' > /var/www/html/kml/slave_$slaveNo.txt\n$kmlContent\nEOF");
   }
 
   Future<void> _refreshSlaveKML(int slaveNo) async {
@@ -665,8 +452,7 @@ $balloonBody
     if (!_isConnected || _client == null || _password == null) return;
 
     try {
-      final sftp = await _getSftpClient();
-      if (sftp == null) return;
+      final sftp = await _client!.sftp();
       await _uploadSftpFile(
         sftp,
         'assets/images/KMLs/Logo/Logos.png',
@@ -678,21 +464,16 @@ $balloonBody
   }
 
   Future<void> preCachePOIImages(List<String> poiAssetPaths) async {
-    if (!_isConnected || _client == null || _password == null || _isPreCaching)
-      return;
+    if (!_isConnected || _client == null || _password == null || _isPreCaching) return;
 
     _isPreCaching = true;
     final currentClient = _client;
 
     try {
-      final sftp = await _getSftpClient();
-      if (sftp == null) return;
+      final sftp = await currentClient!.sftp();
       for (var assetPath in poiAssetPaths) {
         // Verify if we are still connected and using the same client
-        if (!_isConnected ||
-            _client != currentClient ||
-            _client?.isClosed == true)
-          break;
+        if (!_isConnected || _client != currentClient || _client?.isClosed == true) break;
 
         final fileName = assetPath.split('/').last;
         final remotePath = '/var/www/html/logos/$fileName';
@@ -716,35 +497,23 @@ $balloonBody
     }
   }
 
-  Future<void> _uploadSftpFile(
-    SftpClient sftp,
-    String localPath,
-    String remotePath,
-  ) async {
+  Future<void> _uploadSftpFile(dynamic sftp, String localPath, String remotePath) async {
     try {
       final byteData = await rootBundle.load(localPath);
       final bytes = byteData.buffer.asUint8List();
       final file = await sftp.open(
         remotePath,
-        mode:
-            SftpFileOpenMode.create |
-            SftpFileOpenMode.write |
-            SftpFileOpenMode.truncate,
+        mode: SftpFileOpenMode.create | SftpFileOpenMode.write | SftpFileOpenMode.truncate,
       );
       await file.write(Stream.value(bytes));
       await file.close();
       debugPrint('LGService: Uploaded $remotePath');
     } catch (e) {
       debugPrint('LGService: Failed to upload $localPath: $e');
-      _invalidateSftp();
     }
   }
 
-  Future<String?> uploadPOIImage(
-    String assetPath, {
-    String? customName,
-    bool isExternal = false,
-  }) async {
+  Future<String?> uploadPOIImage(String assetPath, {String? customName, bool isExternal = false}) async {
     if (!_isConnected || _client == null || _password == null) return null;
 
     try {
@@ -767,17 +536,16 @@ $balloonBody
       // Combined RM command to save SSH channels and prevent SSHChannelOpenError
       final String rmBase = customName ?? 'statistics';
       await execute(
-        'echo $_password | sudo -S rm -f /var/www/html/logos/$rmBase.jpg /var/www/html/logos/$rmBase.png',
+        'rm -f /var/www/html/logos/$rmBase.jpg /var/www/html/logos/$rmBase.png',
       );
 
-      final sftp = await _getSftpClient();
-      if (sftp == null) return null;
+      final sftp = await _client!.sftp();
       final file = await sftp.open(
         remotePath,
         mode:
-            SftpFileOpenMode.create |
-            SftpFileOpenMode.write |
-            SftpFileOpenMode.truncate,
+        SftpFileOpenMode.create |
+        SftpFileOpenMode.write |
+        SftpFileOpenMode.truncate,
       );
       await file.write(Stream.value(bytes));
       await file.close();
@@ -786,7 +554,6 @@ $balloonBody
       return fileName;
     } catch (e) {
       debugPrint('LGService: Error subiendo POI image: $e');
-      _invalidateSftp();
       return null;
     }
   }
@@ -813,7 +580,7 @@ $balloonBody
       await execute(command);
     } else {
       await execute(
-        "sshpass -p '$_password' ssh -n -o StrictHostKeyChecking=no $user@lg$screenNo \"$command\"",
+        "sshpass -p '$_password' ssh -n -o ConnectTimeout=5 -o StrictHostKeyChecking=no $user@lg$screenNo \"$command\"",
       );
     }
   }
@@ -826,7 +593,7 @@ $balloonBody
       await execute(command);
     } else {
       await execute(
-        "sshpass -p '$_password' ssh -n -o StrictHostKeyChecking=no $user@lg$screenNo \"$command\"",
+        "sshpass -p '$_password' ssh -n -o ConnectTimeout=5 -o StrictHostKeyChecking=no $user@lg$screenNo \"$command\"",
       );
     }
   }
@@ -834,7 +601,7 @@ $balloonBody
   Future<void> createStatisticsHTML(String imageUrl) async {
     final bool isThreeScreen = _screens == 3;
     final htmlContent =
-        '''
+    '''
 <!DOCTYPE html>
 <html>
 <head>
@@ -905,7 +672,7 @@ $balloonBody
 
   Future<void> createComparisonHTML(String pastUrl, String presentUrl) async {
     final htmlContent =
-        '''
+    '''
 <!DOCTYPE html>
 <html>
 <head>
@@ -967,21 +734,25 @@ $balloonBody
   }
 
   Future<void> clearStatistics() async {
-    await stopBrowser(1);
-    await stopBrowser(2);
-    if (_screens == 5) {
-      await stopBrowser(4);
-      await stopBrowser(5);
-    }
-    await clearBalloonKML();
+    await Future.wait([
+      stopBrowser(1),
+      stopBrowser(2),
+      if (_screens == 5) ...[
+        stopBrowser(4),
+        stopBrowser(5),
+      ],
+      clearBalloonKML(),
+    ]);
   }
 
   Future<void> clearComparison() async {
-    await stopBrowser(1);
-    await stopBrowser(2);
-    await stopBrowser(4);
-    await stopBrowser(5);
-    await clearBalloonKML();
+    await Future.wait([
+      stopBrowser(1),
+      stopBrowser(2),
+      stopBrowser(4),
+      stopBrowser(5),
+      clearBalloonKML(),
+    ]);
   }
 
   Future<void> clearSlaveKML(int slaveNo) async {
@@ -997,8 +768,7 @@ $balloonBody
 
   Future<void> _setKmlTxt() async {
     final version = DateTime.now().millisecondsSinceEpoch;
-    final kmlContent =
-        '''<?xml version="1.0" encoding="UTF-8"?>
+    final kmlContent = '''<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <NetworkLink>
@@ -1013,8 +783,7 @@ $balloonBody
 
   Future<void> _setTimeKmlTxt() async {
     final version = DateTime.now().millisecondsSinceEpoch;
-    final kmlContent =
-        '''<?xml version="1.0" encoding="UTF-8"?>
+    final kmlContent = '''<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <NetworkLink>
@@ -1037,17 +806,16 @@ $balloonBody
   Future<void> stopMovement() async {
     await sendQuery('exittour=true');
   }
-
   Timer? _orbitTimer;
   String? _lastOrbitPosition;
 
   String orbitLookAtLinear(
-    double latitude,
-    double longitude,
-    double zoom,
-    double tilt,
-    double bearing,
-  ) {
+      double latitude,
+      double longitude,
+      double zoom,
+      double tilt,
+      double bearing,
+      ) {
     final lookAt =
         '<gx:duration>0.3</gx:duration><gx:flyToMode>smooth</gx:flyToMode><LookAt>'
         '<longitude>$longitude</longitude><latitude>$latitude</latitude>'
@@ -1060,13 +828,13 @@ $balloonBody
   }
 
   Future<void> flyToOrbit(
-    String context,
-    double latitude,
-    double longitude,
-    double zoom,
-    double tilt,
-    double bearing,
-  ) async {
+      String context,
+      double latitude,
+      double longitude,
+      double zoom,
+      double tilt,
+      double bearing,
+      ) async {
     try {
       final String lookAt = orbitLookAtLinear(
         latitude,
@@ -1083,12 +851,12 @@ $balloonBody
   }
 
   Future<bool> orbitPlay(
-    double latitude,
-    double longitude,
-    double zoom,
-    double tilt, {
-    double initialBearing = 0,
-  }) async {
+      double latitude,
+      double longitude,
+      double zoom,
+      double tilt, {
+        double initialBearing = 0,
+      }) async {
     if (_orbitPlaying) {
       return false;
     }
@@ -1103,17 +871,16 @@ $balloonBody
 
     try {
       // First, fly to the initial position to ensure we are at the coordinates
-      final String initialLookAt =
-          orbitLookAtLinear(
-            latitude,
-            longitude,
-            zoom,
-            tilt,
-            initialBearing,
-          ).replaceAll(
-            '<gx:duration>0.3</gx:duration>',
-            '<gx:duration>4.0</gx:duration>',
-          );
+      final String initialLookAt = orbitLookAtLinear(
+        latitude,
+        longitude,
+        zoom,
+        tilt,
+        initialBearing,
+      ).replaceAll(
+        '<gx:duration>0.3</gx:duration>',
+        '<gx:duration>4.0</gx:duration>',
+      );
 
       await sendQuery('flytoview=$initialLookAt');
       // Wait for the flyto to finish before starting the orbit rotation
@@ -1128,8 +895,8 @@ $balloonBody
       bool isMoving = false;
 
       _orbitTimer = Timer.periodic(const Duration(milliseconds: stepDuration), (
-        timer,
-      ) async {
+          timer,
+          ) async {
         if (!_orbitPlaying) {
           timer.cancel();
           return;
@@ -1199,20 +966,16 @@ $balloonBody
     String clearSlavesCmd = "";
     for (int i = 1; i <= _screens; i++) {
       if (i != logoSlave) {
-        clearSlavesCmd +=
-            "echo '<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document></Document></kml>' > /var/www/html/kml/slave_$i.kml; ";
+        clearSlavesCmd += "echo '<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document></Document></kml>' > /var/www/html/kml/slave_$i.kml; ";
       }
     }
 
     await execute(
-      "echo 'exittour=true' > /tmp/query.txt; "
-      "echo '' > /var/www/html/kmls.kml; "
-      "echo '' > /var/www/html/time.kml; "
-      "$clearSlavesCmd",
+        "echo 'exittour=true' > /tmp/query.txt; "
+            "echo '' > /var/www/html/kmls.kml; "
+            "echo '' > /var/www/html/time.kml; "
+            "$clearSlavesCmd"
     );
-
-    // Limpiamos también el Solo KML del master (pantalla central).
-    await _writeMasterSoloKML();
 
     // Refresh the TXT wrappers
     await _setKmlTxt();
@@ -1248,7 +1011,7 @@ $balloonBody
 
     for (var i = _screens; i >= 1; i--) {
       final relaunchCommand =
-          """RELAUNCH_CMD="\\
+      """RELAUNCH_CMD="\\
 if [ -f /etc/init/lxdm.conf ]; then
   export SERVICE=lxdm
 elif [ -f /etc/init/lightdm.conf ]; then
@@ -1264,17 +1027,13 @@ fi
 " && sshpass -p $_password ssh -x -t $user@lg$i "\$RELAUNCH_CMD\"""";
 
       if (i == 1) {
-        await execute(
-          '"/home/$user/bin/lg-relaunch" > /home/$user/log.txt',
-          timeout: const Duration(seconds: 180),
-        );
+        await execute('"/home/$user/bin/lg-relaunch" > /home/$user/log.txt');
       } else {
         await execute(
           'sshpass -p $_password ssh -t lg$i "\"/home/$user/bin/lg-relaunch\" > /home/$user/log.txt"',
-          timeout: const Duration(seconds: 180),
         );
       }
-      await execute(relaunchCommand, timeout: const Duration(seconds: 180));
+      await execute(relaunchCommand);
     }
   }
 
@@ -1284,7 +1043,6 @@ fi
     for (var i = _screens; i >= 1; i--) {
       await execute(
         'sshpass -p $_password ssh -t $user@lg$i "echo $_password | sudo -S poweroff"',
-        timeout: const Duration(seconds: 60),
       );
     }
   }
@@ -1295,7 +1053,6 @@ fi
     for (var i = _screens; i >= 1; i--) {
       await execute(
         'sshpass -p $_password ssh -t $user@lg$i "echo $_password | sudo -S reboot"',
-        timeout: const Duration(seconds: 60),
       );
     }
   }
@@ -1304,39 +1061,20 @@ fi
     if (_password == null) return;
     final user = _username ?? 'lg';
     try {
-      // Rutas ya conocidas por instalaciones estándar de LG. Se combinan
-      // con una búsqueda dinámica (find, más abajo) porque el master (lg1)
-      // no siempre usa la misma estructura de carpetas que los slaves —
-      // eso es justo lo que causaba que en el master no se inyectara
-      // ningún NetworkLink y no apareciera nada en el panel KML.
-      final knownPaths = [
+      final paths = [
         '/home/$user/earth/kml/myplaces.kml',
         '/home/$user/earth/kml/slave/myplaces.kml',
         '/home/$user/.googleearth/instance-1/myplaces.kml',
       ];
 
-      List<Future<String?>> futures = [];
+      List<Future> futures = [];
       for (var i = 1; i <= _screens; i++) {
-        // FIX: antes se usaba 'localhost' para la pantalla master (i==1),
-        // mientras que el resto de la app (openBrowser, uploadPOIImage,
-        // createComparisonHTML, etc.) siempre usa el hostname 'lg1', que es
-        // el ServerName/vhost real configurado en el servidor del puerto 81.
-        // Con 'localhost' el NetworkLink inyectado en el myplaces.kml del
-        // propio master no coincidía con ese vhost.
-        final host = 'lg1';
+        final host = i == 1 ? 'localhost' : 'lg1';
         final globalUrl = 'http://$host:81/kmls.txt';
         final timeUrl = 'http://$host:81/time.txt';
         final slaveUrl = 'http://$host:81/kml/slave_$i.txt';
 
-        // FIX principal: en vez de confiar solo en las 3 rutas fijas de
-        // arriba (que en el master no coincidían con ninguna ruta real,
-        // por eso no aparecía nada en absoluto en su panel KML), buscamos
-        // dinámicamente cualquier myplaces.kml bajo el home del usuario.
-        final findCmd =
-            "find /home/$user -iname 'myplaces.kml' -type f 2>/dev/null";
-
-        String script =
-            "for path in ${knownPaths.join(' ')} \$($findCmd); do "
+        String script = "for path in ${paths.join(' ')}; do "
             "if [ -f \$path ]; then "
             "sed -i '/global_[0-9]/d' \$path; "
             "sed -i '/time_[0-9]/d' \$path; "
@@ -1346,54 +1084,20 @@ fi
             "sed -i '/slave_.*\\.txt/d' \$path; "
             "sed -i '/slave_.*\\.kml/d' \$path; "
             "sed -i '/<\\/Document>/i <NetworkLink><name>global_$i</name><Link><href>$globalUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' \$path; "
-            "sed -i '/<\\/Document>/i <NetworkLink><name>time_$i</name><Link><href>$timeUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' \$path; ";
-
-        // FIX (doble círculo en pantalla central): el master (lg1) no debe
-        // tener un NetworkLink slave_1.txt. Su pantalla central se alimenta
-        // del "Solo KML" (solo.kml / master_1.kml) que ya contiene la misma
-        // barrera 3D; añadir slave_1 haría que Google Earth cargara dos
-        // copias del círculo superpuestas en el centro (z-fighting).
-        if (i != 1) {
-          script +=
-              "sed -i '/<\\/Document>/i <NetworkLink><name>slave_$i</name><Link><href>$slaveUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' \$path; ";
-        }
-
-        script +=
-            "echo MODIFIED:\$path; "
+            "sed -i '/<\\/Document>/i <NetworkLink><name>time_$i</name><Link><href>$timeUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' \$path; "
+            "sed -i '/<\\/Document>/i <NetworkLink><name>slave_$i</name><Link><href>$slaveUrl</href><refreshMode>onInterval</refreshMode><refreshInterval>2</refreshInterval></Link></NetworkLink>' \$path; "
             "fi; done";
 
-        // FIX: antes iba "\$script" (escapado), lo que impedía que Dart
-        // interpolase el contenido real de `script`. El comando remoto
-        // recibía literalmente "$script" y bash lo evaluaba como una
-        // variable de entorno vacía, así que el bloque de arriba nunca
-        // se ejecutaba de verdad en el rig.
-        String execCmd = "echo '$_password' | sudo -S bash -c \"$script\"";
-
+        String execCmd = "echo '$_password' | sudo -S bash -c \"\$script\"";
         if (i == 1) {
           futures.add(execute(execCmd));
         } else {
-          // FIX: se escapan las comillas dobles internas de execCmd antes
-          // de envolverlo en las comillas del comando ssh. Sin este
-          // escapado, el shell del master cortaba el argumento en el
-          // primer " que encontraba dentro de execCmd, y el resto del
-          // script se ejecutaba localmente en el master (o simplemente se
-          // perdía) en lugar de viajar por SSH hasta la pantalla remota.
-          final escapedExecCmd = execCmd.replaceAll('"', '\\"');
-          futures.add(
-            execute(
-              "sshpass -p '$_password' ssh -n -o StrictHostKeyChecking=no $user@lg$i \"$escapedExecCmd\"",
-            ),
-          );
+          futures.add(execute(
+            "sshpass -p '$_password' ssh -n -o StrictHostKeyChecking=no $user@lg$i \"\$execCmd\"",
+          ));
         }
       }
-      final results = await Future.wait(futures);
-      for (var i = 0; i < results.length; i++) {
-        final output = results[i]?.trim() ?? '';
-        debugPrint(
-          'LGService: setRefresh pantalla ${i + 1} -> '
-          '${output.isEmpty ? "(ningún myplaces.kml modificado)" : output}',
-        );
-      }
+      await Future.wait(futures);
       debugPrint('LGService: Refresco configurado e inyectado correctamente.');
     } catch (e) {
       debugPrint('LGService: Error crítico en setRefresh: $e');
@@ -1419,3 +1123,4 @@ fi
     }
   }
 }
+
