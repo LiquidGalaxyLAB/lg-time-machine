@@ -142,14 +142,16 @@ class LGService extends ChangeNotifier {
     if (!_isConnected || _client == null) return null;
     try {
       final session = await _client!.execute(command);
-      final result = await utf8.decodeStream(session.stdout);
-      await session.done;
+      final result = await utf8.decodeStream(session.stdout).timeout(const Duration(seconds: 15));
+      await session.done.timeout(const Duration(seconds: 2));
       return result;
     } catch (e) {
       debugPrint('LGService: Execution error for "$command": $e');
-      // Only disconnect if it's a connection-related error
-      if (e.toString().contains('SocketException') ||
-          e.toString().contains('Connection failed')) {
+      // Reconnect on connection-related errors or timeouts
+      if (e is TimeoutException ||
+          e.toString().contains('SocketException') ||
+          e.toString().contains('Connection failed') ||
+          e.toString().contains('SSHChannelOpenError')) {
         _isConnected = false;
         notifyListeners();
       }
@@ -534,7 +536,7 @@ $balloonBody
       // Combined RM command to save SSH channels and prevent SSHChannelOpenError
       final String rmBase = customName ?? 'statistics';
       await execute(
-        'echo $_password | sudo -S rm -f /var/www/html/logos/$rmBase.jpg /var/www/html/logos/$rmBase.png',
+        'rm -f /var/www/html/logos/$rmBase.jpg /var/www/html/logos/$rmBase.png',
       );
 
       final sftp = await _client!.sftp();
@@ -578,7 +580,7 @@ $balloonBody
       await execute(command);
     } else {
       await execute(
-        "sshpass -p '$_password' ssh -n -o StrictHostKeyChecking=no $user@lg$screenNo \"$command\"",
+        "sshpass -p '$_password' ssh -n -o ConnectTimeout=5 -o StrictHostKeyChecking=no $user@lg$screenNo \"$command\"",
       );
     }
   }
@@ -591,7 +593,7 @@ $balloonBody
       await execute(command);
     } else {
       await execute(
-        "sshpass -p '$_password' ssh -n -o StrictHostKeyChecking=no $user@lg$screenNo \"$command\"",
+        "sshpass -p '$_password' ssh -n -o ConnectTimeout=5 -o StrictHostKeyChecking=no $user@lg$screenNo \"$command\"",
       );
     }
   }
@@ -732,21 +734,25 @@ $balloonBody
   }
 
   Future<void> clearStatistics() async {
-    await stopBrowser(1);
-    await stopBrowser(2);
-    if (_screens == 5) {
-      await stopBrowser(4);
-      await stopBrowser(5);
-    }
-    await clearBalloonKML();
+    await Future.wait([
+      stopBrowser(1),
+      stopBrowser(2),
+      if (_screens == 5) ...[
+        stopBrowser(4),
+        stopBrowser(5),
+      ],
+      clearBalloonKML(),
+    ]);
   }
 
   Future<void> clearComparison() async {
-    await stopBrowser(1);
-    await stopBrowser(2);
-    await stopBrowser(4);
-    await stopBrowser(5);
-    await clearBalloonKML();
+    await Future.wait([
+      stopBrowser(1),
+      stopBrowser(2),
+      stopBrowser(4),
+      stopBrowser(5),
+      clearBalloonKML(),
+    ]);
   }
 
   Future<void> clearSlaveKML(int slaveNo) async {

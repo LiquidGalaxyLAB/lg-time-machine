@@ -149,94 +149,98 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
       _isLoadingStatistics = true;
     });
 
-    if (_showingStatistics && !forceShow) {
-      // Hide Chromium photo but KEEP balloon
-      await LGService.instance.stopBrowser(1);
-      await LGService.instance.stopBrowser(2);
-      if (LGService.instance.screens == 5) {
-        await LGService.instance.stopBrowser(4);
-        await LGService.instance.stopBrowser(5);
-      }
+    try {
+      if (_showingStatistics && !forceShow) {
+        // Hide Chromium photo but KEEP balloon
+        await Future.wait([
+          LGService.instance.stopBrowser(1),
+          LGService.instance.stopBrowser(2),
+          if (LGService.instance.screens == 5) ...[
+            LGService.instance.stopBrowser(4),
+            LGService.instance.stopBrowser(5),
+          ],
+        ]);
 
+        if (mounted) {
+          setState(() {
+            _showingStatistics = false;
+          });
+        }
+      } else {
+        String? assetPath;
+        if (isPast) {
+          assetPath =
+          widget.poi.pastImages.isNotEmpty ? widget.poi.pastImages.first : null;
+        } else if (isPresent) {
+          assetPath =
+          widget.poi.presentImages.isNotEmpty
+              ? widget.poi.presentImages.first
+              : null;
+        } else if (isFuture) {
+          assetPath = _cachedFutureImagePath;
+        }
+
+        if (assetPath != null) {
+          final fileName = await LGService.instance.uploadPOIImage(
+            assetPath,
+            isExternal: isFuture,
+          );
+          if (fileName != null) {
+            final timestamp = DateTime.now().millisecondsSinceEpoch;
+            final imageUrl = 'http://lg1:81/logos/$fileName?v=$timestamp';
+            final int totalScreens = LGService.instance.screens;
+
+            await LGService.instance.createStatisticsHTML(imageUrl);
+
+            if (totalScreens == 5) {
+              await Future.wait([
+                LGService.instance.openBrowser(
+                  5,
+                  'http://lg1:81/statistics.html?screen=left&v=$timestamp',
+                ),
+                LGService.instance.openBrowser(
+                  1,
+                  'http://lg1:81/statistics.html?screen=center&v=$timestamp',
+                ),
+                LGService.instance.openBrowser(
+                  2,
+                  'http://lg1:81/statistics.html?screen=right&v=$timestamp',
+                ),
+              ]);
+            } else if (totalScreens == 3) {
+              await Future.wait([
+                LGService.instance.openBrowser(
+                  1,
+                  'http://lg1:81/statistics.html?screen=center&v=$timestamp',
+                ),
+                LGService.instance.openBrowser(
+                  2,
+                  'http://lg1:81/statistics.html?screen=right&v=$timestamp',
+                ),
+              ]);
+            } else {
+              await LGService.instance.openBrowser(
+                1,
+                'http://lg1:81/statistics.html?screen=center&v=$timestamp',
+              );
+            }
+
+            if (mounted) {
+              setState(() {
+                _showingStatistics = true;
+              });
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error toggling statistics: $e');
+    } finally {
       if (mounted) {
         setState(() {
-          _showingStatistics = false;
           _isLoadingStatistics = false;
         });
         _startStatisticsCooldown();
-      }
-    } else {
-      String? assetPath;
-      if (isPast) {
-        assetPath =
-        widget.poi.pastImages.isNotEmpty ? widget.poi.pastImages.first : null;
-      } else if (isPresent) {
-        assetPath =
-        widget.poi.presentImages.isNotEmpty
-            ? widget.poi.presentImages.first
-            : null;
-      } else if (isFuture) {
-        assetPath = _cachedFutureImagePath;
-      }
-
-      if (assetPath != null) {
-        final fileName = await LGService.instance.uploadPOIImage(
-          assetPath,
-          isExternal: isFuture,
-        );
-        if (fileName != null) {
-          final imageUrl = 'http://lg1:81/logos/$fileName';
-          final int totalScreens = LGService.instance.screens;
-
-          await LGService.instance.createStatisticsHTML(imageUrl);
-
-          if (totalScreens == 5) {
-            await LGService.instance.openBrowser(
-              5,
-              'http://lg1:81/statistics.html?screen=left',
-            );
-            await LGService.instance.openBrowser(
-              1,
-              'http://lg1:81/statistics.html?screen=center',
-            );
-            await LGService.instance.openBrowser(
-              2,
-              'http://lg1:81/statistics.html?screen=right',
-            );
-          } else if (totalScreens == 3) {
-            await LGService.instance.openBrowser(
-              1,
-              'http://lg1:81/statistics.html?screen=center',
-            );
-            await LGService.instance.openBrowser(
-              2,
-              'http://lg1:81/statistics.html?screen=right',
-            );
-          } else {
-            await LGService.instance.openBrowser(
-              1,
-              'http://lg1:81/statistics.html?screen=center',
-            );
-          }
-
-          if (mounted) {
-            setState(() {
-              _showingStatistics = true;
-              _isLoadingStatistics = false;
-            });
-            _startStatisticsCooldown();
-          }
-        } else {
-          if (mounted) {
-            setState(() => _isLoadingStatistics = false);
-            _startStatisticsCooldown();
-          }
-        }
-      } else {
-        if (mounted) {
-          setState(() => _isLoadingStatistics = false);
-          _startStatisticsCooldown();
-        }
       }
     }
   }
@@ -681,7 +685,7 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                         isLoading: _isLoadingComparison,
                         isTablet: isTablet,
                         onTap:
-                        (!isConnected ||
+                          (!isConnected ||
                             _isLoadingComparison ||
                             _showingStatistics ||
                             _cooldownComparison ||
@@ -692,149 +696,153 @@ class _POIDetailScreenState extends State<POIDetailScreen> {
                             _isLoadingComparison = true;
                           });
 
-                          if (_showingComparison) {
-                            await LGService.instance.clearComparison();
-                            await LGService.instance.sendLogoKML(
-                              LogoKML.generate(),
-                            );
-                            await _showBalloonOnly();
+                          try {
+                            if (_showingComparison) {
+                              await LGService.instance.clearComparison();
+                              await LGService.instance.sendLogoKML(
+                                LogoKML.generate(),
+                              );
+                              await _showBalloonOnly();
+                              if (mounted) {
+                                setState(() {
+                                  _showingComparison = false;
+                                });
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      LanguageManager.instance.translate(
+                                        'comparison_hidden',
+                                      ),
+                                    ),
+                                    backgroundColor: Colors.blueAccent,
+                                  ),
+                                );
+                              }
+                            } else {
+                              String? pastPath;
+                              if (isPast) {
+                                pastPath =
+                                widget.poi.pastImages.isNotEmpty
+                                    ? widget.poi.pastImages.first
+                                    : null;
+                              } else if (isFuture) {
+                                pastPath = _cachedFutureImagePath;
+                              }
+
+                              final presentPath =
+                              widget.poi.presentImages.isNotEmpty
+                                  ? widget.poi.presentImages.first
+                                  : null;
+
+                              if (pastPath != null &&
+                                  presentPath != null) {
+                                final results = await Future.wait([
+                                  LGService.instance.uploadPOIImage(
+                                    pastPath,
+                                    customName: isFuture
+                                        ? 'comparison_future'
+                                        : 'comparison_past',
+                                    isExternal: isFuture,
+                                  ),
+                                  LGService.instance.uploadPOIImage(
+                                    presentPath,
+                                    customName: 'comparison_present',
+                                  ),
+                                ]);
+
+                                final pastName = results[0];
+                                final presentName = results[1];
+
+                                if (pastName != null &&
+                                    presentName != null) {
+                                  final timestamp =
+                                      DateTime.now().millisecondsSinceEpoch;
+                                  final pastUrl =
+                                      'http://lg1:81/logos/$pastName?v=$timestamp';
+                                  final presentUrl =
+                                      'http://lg1:81/logos/$presentName?v=$timestamp';
+
+                                  await LGService.instance.clearComparison();
+                                  await LGService.instance.createComparisonHTML(
+                                    pastUrl,
+                                    presentUrl,
+                                  );
+
+                                  final balloonKml = ComparisonOverlayKML.generate(
+                                    poi: widget.poi,
+                                    futureStats: _cachedFutureText,
+                                    isFuture: isFuture,
+                                  );
+
+                                  // Parallel browser opening
+                                  final List<Future> browserFutures = [];
+                                  if (LGService.instance.screens == 5) {
+                                    browserFutures.add(
+                                      LGService.instance.openBrowser(
+                                        4,
+                                        'http://lg1:81/comparison.html?mode=past&side=left&v=$timestamp',
+                                      ),
+                                    );
+                                    browserFutures.add(
+                                      LGService.instance.openBrowser(
+                                        5,
+                                        'http://lg1:81/comparison.html?mode=past&side=right&v=$timestamp',
+                                      ),
+                                    );
+                                  }
+
+                                  browserFutures.add(
+                                    LGService.instance.openBrowser(
+                                      1,
+                                      'http://lg1:81/comparison.html?mode=present&side=left&v=$timestamp',
+                                    ),
+                                  );
+                                  browserFutures.add(
+                                    LGService.instance.openBrowser(
+                                      2,
+                                      'http://lg1:81/comparison.html?mode=present&side=right&v=$timestamp',
+                                    ),
+                                  );
+
+                                  await Future.wait(browserFutures);
+
+                                  await Future.delayed(
+                                    const Duration(milliseconds: 300),
+                                  );
+                                  await LGService.instance.sendBalloonKML(
+                                    balloonKml,
+                                  );
+
+                                  if (mounted) {
+                                    setState(() {
+                                      _showingComparison = true;
+                                    });
+                                    ScaffoldMessenger.of(
+                                      context,
+                                    ).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          LanguageManager.instance.translate(
+                                            'comparison_success',
+                                          ),
+                                        ),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  }
+                                }
+                              }
+                            }
+                          } catch (e) {
+                            debugPrint('Error in comparison process: $e');
+                          } finally {
                             if (mounted) {
                               setState(() {
-                                _showingComparison = false;
                                 _isLoadingComparison = false;
                               });
                               _startComparisonCooldown();
-                              ScaffoldMessenger.of(
-                                context,
-                              ).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    LanguageManager.instance.translate(
-                                      'comparison_hidden',
-                                    ),
-                                  ),
-                                  backgroundColor: Colors.blueAccent,
-                                ),
-                              );
-                            }
-                          } else {
-                            String? pastPath;
-                            if (isPast) {
-                              pastPath =
-                              widget.poi.pastImages.isNotEmpty
-                                  ? widget.poi.pastImages.first
-                                  : null;
-                            } else if (isFuture) {
-                              pastPath = _cachedFutureImagePath;
-                            }
-
-                            final presentPath =
-                            widget.poi.presentImages.isNotEmpty
-                                ? widget.poi.presentImages.first
-                                : null;
-
-                            if (pastPath != null &&
-                                presentPath != null) {
-                              final pastName = await LGService.instance
-                                  .uploadPOIImage(
-                                pastPath,
-                                customName: isFuture ? 'comparison_future' : 'comparison_past',
-                                isExternal: isFuture,
-                              );
-                              final presentName = await LGService
-                                  .instance
-                                  .uploadPOIImage(
-                                presentPath,
-                                customName: 'comparison_present',
-                              );
-
-                              if (pastName != null &&
-                                  presentName != null) {
-                                final pastUrl =
-                                    'http://lg1:81/logos/$pastName';
-                                final presentUrl =
-                                    'http://lg1:81/logos/$presentName';
-
-                                await LGService.instance
-                                    .clearComparison();
-                                await LGService.instance
-                                    .createComparisonHTML(
-                                  pastUrl,
-                                  presentUrl,
-                                );
-
-                                final balloonKml = ComparisonOverlayKML
-                                    .generate(
-                                  poi: widget.poi,
-                                  futureStats: _cachedFutureText,
-                                  isFuture: isFuture,
-                                );
-                                // Primero mostramos la comparación en las pantallas
-                                // que corresponden a las imágenes. LG3 queda libre
-                                // para el balloon.
-                                if (LGService.instance.screens == 5) {
-                                  // Orden: lg4, lg5 (PAST) | lg1, lg2 (PRESENT)
-                                  await LGService.instance.openBrowser(
-                                    4,
-                                    'http://lg1:81/comparison.html?mode=past&side=left',
-                                  );
-                                  await LGService.instance.openBrowser(
-                                    5,
-                                    'http://lg1:81/comparison.html?mode=past&side=right',
-                                  );
-                                }
-
-                                await LGService.instance.openBrowser(
-                                  1,
-                                  'http://lg1:81/comparison.html?mode=present&side=left',
-                                );
-                                await LGService.instance.openBrowser(
-                                  2,
-                                  'http://lg1:81/comparison.html?mode=present&side=right',
-                                );
-
-                                // Enviamos/refrescamos el balloon DESPUÉS de abrir
-                                // los browsers para que LG3 termine mostrando el
-                                // contenido del balloon y no quede una versión
-                                // anterior en caché.
-                                await Future.delayed(const Duration(milliseconds: 300));
-                                await LGService.instance.sendBalloonKML(balloonKml);
-
-                                if (mounted) {
-                                  setState(() {
-                                    _showingComparison = true;
-                                    _isLoadingComparison = false;
-                                  });
-                                  _startComparisonCooldown();
-                                  ScaffoldMessenger.of(
-                                    context,
-                                  ).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        LanguageManager.instance
-                                            .translate(
-                                          'comparison_success',
-                                        ),
-                                      ),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
-                                }
-                              } else {
-                                if (mounted) {
-                                  setState(
-                                        () => _isLoadingComparison = false,
-                                  );
-                                  _startComparisonCooldown();
-                                }
-                              }
-                            } else {
-                              if (mounted) {
-                                setState(
-                                      () => _isLoadingComparison = false,
-                                );
-                                _startComparisonCooldown();
-                              }
                             }
                           }
                         },
