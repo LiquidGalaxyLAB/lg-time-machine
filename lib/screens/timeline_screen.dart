@@ -53,9 +53,9 @@ class _TimelineScreenState extends State<TimelineScreen> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredCountries = _countries.where((country) {
-        final translatedName = LanguageManager.instance.translate(
-          country.name.toLowerCase().replaceAll(' ', '_'),
-        ).toLowerCase();
+        final translatedName = LanguageManager.instance
+            .translate(country.name.toLowerCase().replaceAll(' ', '_'))
+            .toLowerCase();
         return translatedName.contains(query);
       }).toList();
     });
@@ -148,29 +148,28 @@ class _TimelineScreenState extends State<TimelineScreen> {
             const SizedBox(height: 10),
             // Country Grid/List
             Expanded(
-              child:
-                  isTablet
-                      ? GridView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 4,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                            ),
-                        itemCount: _filteredCountries.length,
-                        itemBuilder: (context, index) {
-                          return _buildCountryItem(_filteredCountries[index]);
-                        },
-                      )
-                      : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: _filteredCountries.length,
-                        itemBuilder: (context, index) {
-                          return _buildCountryItem(_filteredCountries[index]);
-                        },
-                      ),
+              child: isTablet
+                  ? GridView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 4,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                          ),
+                      itemCount: _filteredCountries.length,
+                      itemBuilder: (context, index) {
+                        return _buildCountryItem(_filteredCountries[index]);
+                      },
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: _filteredCountries.length,
+                      itemBuilder: (context, index) {
+                        return _buildCountryItem(_filteredCountries[index]);
+                      },
+                    ),
             ),
             // Timeline Slider
             ValueListenableBuilder<double>(
@@ -306,23 +305,26 @@ class _TimelineScreenState extends State<TimelineScreen> {
           child: Text(country.flag, style: const TextStyle(fontSize: 16)),
         ),
         title: Text(
-          LanguageManager.instance.translate(country.name.toLowerCase().replaceAll(' ', '_')),
+          LanguageManager.instance.translate(
+            country.name.toLowerCase().replaceAll(' ', '_'),
+          ),
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 14,
           ),
         ),
-        trailing: const Icon(Icons.chevron_right, color: Colors.white70, size: 20),
+        trailing: const Icon(
+          Icons.chevron_right,
+          color: Colors.white70,
+          size: 20,
+        ),
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder:
-                  (context) => POIScreen(
-                    country: country,
-                    isConnected: widget.isConnected,
-                  ),
+              builder: (context) =>
+                  POIScreen(country: country, isConnected: widget.isConnected),
             ),
           );
         },

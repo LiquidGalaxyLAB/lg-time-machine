@@ -46,9 +46,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _loadSettings() async {
     final showLogos = await DatabaseHelper.instance.getSetting('showLogos');
-    final apiKey = await DatabaseHelper.instance.getSetting('imageGenerationApiKey');
-    final model = await DatabaseHelper.instance.getSetting('imageGenerationModel');
-    
+    final apiKey = await DatabaseHelper.instance.getSetting(
+      'imageGenerationApiKey',
+    );
+    final model = await DatabaseHelper.instance.getSetting(
+      'imageGenerationModel',
+    );
+
     setState(() {
       if (showLogos != null) {
         _showLogos = showLogos == 'true';
@@ -127,13 +131,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return ValueListenableBuilder<double>(
       valueListenable: FontManager.instance.fontScaleNotifier,
       builder: (context, currentScale, child) {
-        String displaySize = LanguageManager.instance.translate(
-          currentScale < 1.0
-              ? 'small'
-              : currentScale > 1.0
+        String displaySize = LanguageManager.instance
+            .translate(
+              currentScale < 1.0
+                  ? 'small'
+                  : currentScale > 1.0
                   ? 'large'
                   : 'medium',
-        ).toUpperCase();
+            )
+            .toUpperCase();
 
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -149,18 +155,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
             GestureDetector(
               onTap: _showFontSizeDialog,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       displaySize,
-                      style: const TextStyle(color: Colors.white70, fontSize: 14),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
                     ),
                     const SizedBox(width: 8),
                     const Icon(
@@ -208,9 +222,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _fontSizeOption(LanguageManager.instance.translate('small').toUpperCase(), 0.8),
-                  _fontSizeOption(LanguageManager.instance.translate('medium').toUpperCase(), 1.0),
-                  _fontSizeOption(LanguageManager.instance.translate('large').toUpperCase(), 1.2),
+                  _fontSizeOption(
+                    LanguageManager.instance.translate('small').toUpperCase(),
+                    0.8,
+                  ),
+                  _fontSizeOption(
+                    LanguageManager.instance.translate('medium').toUpperCase(),
+                    1.0,
+                  ),
+                  _fontSizeOption(
+                    LanguageManager.instance.translate('large').toUpperCase(),
+                    1.2,
+                  ),
                 ],
               ),
             ),
@@ -239,13 +262,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildLanguageRow() {
     String currentLang = LanguageManager.instance.currentLanguage;
-    String displayLang = LanguageManager.instance.translate(
-      currentLang == 'en'
-          ? 'english'
-          : currentLang == 'es'
+    String displayLang = LanguageManager.instance
+        .translate(
+          currentLang == 'en'
+              ? 'english'
+              : currentLang == 'es'
               ? 'spanish'
               : 'catalan',
-    ).toUpperCase();
+        )
+        .toUpperCase();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -318,9 +343,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _languageOption(LanguageManager.instance.translate('english').toUpperCase(), 'en'),
-                  _languageOption(LanguageManager.instance.translate('spanish').toUpperCase(), 'es'),
-                  _languageOption(LanguageManager.instance.translate('catalan').toUpperCase(), 'ca'),
+                  _languageOption(
+                    LanguageManager.instance.translate('english').toUpperCase(),
+                    'en',
+                  ),
+                  _languageOption(
+                    LanguageManager.instance.translate('spanish').toUpperCase(),
+                    'es',
+                  ),
+                  _languageOption(
+                    LanguageManager.instance.translate('catalan').toUpperCase(),
+                    'ca',
+                  ),
                 ],
               ),
             ),
@@ -545,7 +579,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          _buildTextField(_apiKeyController, LanguageManager.instance.translate('api_key')),
+          _buildTextField(
+            _apiKeyController,
+            LanguageManager.instance.translate('api_key'),
+          ),
           const SizedBox(height: 20),
           Text(
             LanguageManager.instance.translate('model').toUpperCase(),
@@ -556,7 +593,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          _buildTextField(_modelController, LanguageManager.instance.translate('model')),
+          _buildTextField(
+            _modelController,
+            LanguageManager.instance.translate('model'),
+          ),
           const SizedBox(height: 20),
           Center(
             child: SizedBox(
@@ -576,8 +616,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(LanguageManager.instance
-                              .translate('api_saved_success')),
+                          content: Text(
+                            LanguageManager.instance.translate(
+                              'api_saved_success',
+                            ),
+                          ),
                           backgroundColor: Colors.green,
                         ),
                       );
@@ -586,8 +629,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(LanguageManager.instance
-                              .translate('api_saved_error')),
+                          content: Text(
+                            LanguageManager.instance.translate(
+                              'api_saved_error',
+                            ),
+                          ),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -610,12 +656,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           _buildStepText("1. Enter https://pollinations.ai/"),
           _buildStepText("2. Click Register and enter with your account."),
-          _buildStepText("3. On Pollinations side menu, on section Docs, click API."),
-          _buildStepText("4. Inside API click \"Get your API Key\" and when created copy it."),
-          _buildStepText("5. Introduce this Api key in the text input above \"IMAGE GENERATION API\"."),
-          _buildStepText("6. Go to Pollination.ai and click on section \"Models\"."),
-          _buildStepText("7. Use any of the models that are free to use, but have limited image generation."),
-          _buildStepText("8. Click on the model title and the model code will be pasted, introduce it on your model input."),
+          _buildStepText(
+            "3. On Pollinations side menu, on section Docs, click API.",
+          ),
+          _buildStepText(
+            "4. Inside API click \"Get your API Key\" and when created copy it.",
+          ),
+          _buildStepText(
+            "5. Introduce this Api key in the text input above \"IMAGE GENERATION API\".",
+          ),
+          _buildStepText(
+            "6. Go to Pollination.ai and click on section \"Models\".",
+          ),
+          _buildStepText(
+            "7. Use any of the models that are free to use, but have limited image generation.",
+          ),
+          _buildStepText(
+            "8. Click on the model title and the model code will be pasted, introduce it on your model input.",
+          ),
         ],
       ),
     );
@@ -626,11 +684,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 14,
-          height: 1.4,
-        ),
+        style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.4),
       ),
     );
   }
@@ -644,7 +698,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.05),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 15,
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),

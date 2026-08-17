@@ -220,7 +220,10 @@ class _MainScreenState extends State<MainScreen>
           label: Text(LanguageManager.instance.translate('timeline')),
         ),
         NavigationRailDestination(
-          icon: Icon(Icons.settings, color: Colors.white.withValues(alpha: 0.5)),
+          icon: Icon(
+            Icons.settings,
+            color: Colors.white.withValues(alpha: 0.5),
+          ),
           selectedIcon: const Icon(Icons.settings, color: Colors.white),
           label: Text(LanguageManager.instance.translate('settings')),
         ),

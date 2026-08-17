@@ -4,14 +4,17 @@ class StatisticsOverlayKML {
   static String generate({
     required POI poi,
     required String statisticsText,
-    required String viewType, // e.g., "PRESENT VIEW", "PAST VIEW", "FUTURE VIEW"
+    required String
+    viewType, // e.g., "PRESENT VIEW", "PAST VIEW", "FUTURE VIEW"
   }) {
     // Ensure space after hyphens and handle newlines for HTML
     final String formattedStats = statisticsText
         .split('\n')
-        .map((line) => line.trim().startsWith('-')
-            ? '- ${line.trim().substring(1).trim()}'
-            : line)
+        .map(
+          (line) => line.trim().startsWith('-')
+              ? '- ${line.trim().substring(1).trim()}'
+              : line,
+        )
         .join('<br/>');
 
     return '''<?xml version="1.0" encoding="UTF-8"?>

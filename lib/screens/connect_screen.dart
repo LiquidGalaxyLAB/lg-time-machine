@@ -4,8 +4,8 @@ import '../services/lg_service.dart';
 import '../kmls/logo_kml.dart';
 import '../utils/notifications.dart';
 import '../database/db_helper.dart';
+import '../models/poi.dart';
 import '../services/poi_service.dart';
-
 
 class ConnectScreen extends StatefulWidget {
   final bool isConnected;
@@ -170,7 +170,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
       );
 
       // Load all POIs to get their asset paths and pre-cache them in background
-      POIService().loadPOIs().then((pois) {
+      POIService().loadPOIs().catchError((_) => <POI>[]).then((pois) {
         final List<String> allAssetPaths = [];
         for (var poi in pois) {
           allAssetPaths.addAll(poi.pastImages);
@@ -213,7 +213,11 @@ class _ConnectScreenState extends State<ConnectScreen> {
                         color: Colors.white.withValues(alpha: 0.2),
                       ),
                     ),
-                    child: const Icon(Icons.menu, color: Colors.white, size: 28),
+                    child: const Icon(
+                      Icons.menu,
+                      color: Colors.white,
+                      size: 28,
+                    ),
                   ),
                 ),
               const SizedBox(height: 20),

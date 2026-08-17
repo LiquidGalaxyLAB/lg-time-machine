@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:csv/csv.dart';
 import '../models/poi.dart';
@@ -7,10 +9,25 @@ import 'language_manager.dart';
 class POIService {
   static List<POI>? _cachedPois;
 
+  /// Máximo tiempo de espera para cargar un asset desde el bundle.
+  ///
+  /// En algunos dispositivos la carga del asset puede quedarse colgada (el
+  /// engine nunca responde). Con este timeout garantizamos que la carga
+  /// siempre termina y nunca dejamos la pantalla con el spinner infinito.
+  static const Duration _assetLoadTimeout = Duration(seconds: 8);
+
+  static Future<String> _loadAsset(String path) async {
+    try {
+      return await rootBundle.loadString(path).timeout(_assetLoadTimeout);
+    } on TimeoutException {
+      throw Exception('Tiempo de espera agotado cargando el asset: $path');
+    }
+  }
+
   /// Carga los POIs combinando la metadata de Pois.json y las coordenadas de PointsOfInterestCords.csv
   Future<List<POI>> loadPOIs() async {
     final String lang = LanguageManager.instance.currentLanguage;
-    
+
     // Si ya tenemos cache, devolverla
     if (_cachedPois != null) {
       return _cachedPois!;
@@ -18,19 +35,23 @@ class POIService {
 
     try {
       // 1. Cargar y parsear el archivo CSV de coordenadas local
-      final String csvString = await rootBundle.loadString(
+      final String csvString = await _loadAsset(
         'lib/services/PointsOfInterestCords.csv',
       );
-      
-      List<List<dynamic>> csvRows = const CsvToListConverter().convert(csvString);
+
+      List<List<dynamic>> csvRows = const CsvToListConverter().convert(
+        csvString,
+      );
       if (csvRows.isEmpty) return [];
 
       // Create a map for faster lookup: ID -> Row
       final Map<String, List<dynamic>> csvMap = {};
-      
+
       // El ID siempre está en la primera columna según el formato observado
-      final dataRows = csvRows.length > 1 ? csvRows.sublist(1) : <List<dynamic>>[];
-      
+      final dataRows = csvRows.length > 1
+          ? csvRows.sublist(1)
+          : <List<dynamic>>[];
+
       for (var row in dataRows) {
         if (row.isNotEmpty && row[0] != null && row[0].toString().isNotEmpty) {
           final String id = row[0].toString().trim().toLowerCase();
@@ -39,7 +60,7 @@ class POIService {
       }
 
       // 2. Cargar metadata maestra (English) para estructura y datos base
-      final String masterJsonString = await rootBundle.loadString(
+      final String masterJsonString = await _loadAsset(
         'lib/services/Pois.json',
       );
       final Map<String, dynamic> masterMetadata = json.decode(masterJsonString);
@@ -49,12 +70,14 @@ class POIService {
       if (lang != 'en') {
         try {
           String localizedFileName = 'Pois_$lang.json';
-          final String localizedJsonString = await rootBundle.loadString(
+          final String localizedJsonString = await _loadAsset(
             'lib/services/$localizedFileName',
           );
           localizedMetadata = json.decode(localizedJsonString);
         } catch (e) {
-          print('Localized POI file not found for $lang, using English strings.');
+          debugPrint(
+            'Localized POI file not found for $lang, using English strings.',
+          );
         }
       }
 
@@ -68,29 +91,38 @@ class POIService {
           for (var poiEntry in poiMap.entries) {
             final backendId = poiEntry.key; // e.g., Statue_of_Liberty
             final masterPoiData = poiEntry.value as Map<String, dynamic>;
-            
+
             // Intentar obtener datos localizados (solo name y description)
             Map<String, dynamic>? localizedPoiData;
             if (localizedMetadata != null) {
               var localizedCountryMap = localizedMetadata[englishCountryName];
               if (localizedCountryMap is Map) {
-                localizedPoiData = localizedCountryMap[backendId] as Map<String, dynamic>?;
+                localizedPoiData =
+                    localizedCountryMap[backendId] as Map<String, dynamic>?;
               }
             }
 
-            final displayName = localizedPoiData?['name'] ?? masterPoiData['name'] ?? backendId;
-            final description = localizedPoiData?['description'] ?? masterPoiData['description'] ?? '';
+            final displayName =
+                localizedPoiData?['name'] ?? masterPoiData['name'] ?? backendId;
+            final description =
+                localizedPoiData?['description'] ??
+                masterPoiData['description'] ??
+                '';
 
             // 4. Buscar la fila en el CSV que coincida con este POI
             final lookupKey = backendId.trim().toLowerCase();
             final alternateKey1 = lookupKey.replaceAll('_', ' ');
             final alternateKey2 = displayName.toString().trim().toLowerCase();
-            final alternateKey3 = (masterPoiData['name'] ?? '').toString().trim().toLowerCase();
+            final alternateKey3 = (masterPoiData['name'] ?? '')
+                .toString()
+                .trim()
+                .toLowerCase();
 
-            List<dynamic>? csvRow = csvMap[lookupKey] ?? 
-                                    csvMap[alternateKey1] ?? 
-                                    csvMap[alternateKey2] ??
-                                    csvMap[alternateKey3];
+            List<dynamic>? csvRow =
+                csvMap[lookupKey] ??
+                csvMap[alternateKey1] ??
+                csvMap[alternateKey2] ??
+                csvMap[alternateKey3];
 
             if (csvRow != null) {
               final String fileNameBase = backendId.trim();
@@ -106,30 +138,55 @@ class POIService {
               double parseCsvNumber(dynamic value, double defaultValue) {
                 if (value == null) return defaultValue;
                 if (value is num) return value.toDouble();
-                String cleanValue = value.toString().replaceAll(',', '.').trim();
+                String cleanValue = value
+                    .toString()
+                    .replaceAll(',', '.')
+                    .trim();
                 return double.tryParse(cleanValue) ?? defaultValue;
               }
 
               // Basado en el CSV: ID=0, Lon=1, Lat=2, Alt=3, Head=4, Tilt=5, Range=6, Mode=7
               Map<String, dynamic> combinedData = {
                 'name': displayName,
-                'longitude': parseCsvNumber(csvRow.length > 1 ? csvRow[1] : 0.0, 0.0),
-                'latitude': parseCsvNumber(csvRow.length > 2 ? csvRow[2] : 0.0, 0.0),
-                'altitude': parseCsvNumber(csvRow.length > 3 ? csvRow[3] : 0.0, 0.0),
-                'heading': parseCsvNumber(csvRow.length > 4 ? csvRow[4] : 0.0, 0.0),
-                'tilt': parseCsvNumber(csvRow.length > 5 ? csvRow[5] : 0.0, 0.0),
-                'range': parseCsvNumber(csvRow.length > 6 ? csvRow[6] : 1000.0, 1000.0),
+                'longitude': parseCsvNumber(
+                  csvRow.length > 1 ? csvRow[1] : 0.0,
+                  0.0,
+                ),
+                'latitude': parseCsvNumber(
+                  csvRow.length > 2 ? csvRow[2] : 0.0,
+                  0.0,
+                ),
+                'altitude': parseCsvNumber(
+                  csvRow.length > 3 ? csvRow[3] : 0.0,
+                  0.0,
+                ),
+                'heading': parseCsvNumber(
+                  csvRow.length > 4 ? csvRow[4] : 0.0,
+                  0.0,
+                ),
+                'tilt': parseCsvNumber(
+                  csvRow.length > 5 ? csvRow[5] : 0.0,
+                  0.0,
+                ),
+                'range': parseCsvNumber(
+                  csvRow.length > 6 ? csvRow[6] : 1000.0,
+                  1000.0,
+                ),
                 'altitudeMode': csvRow.length > 7
                     ? csvRow[7].toString().trim()
                     : 'relativeToGround',
               };
 
               final metadata = {
-                'country': englishCountryName, // Siempre usamos el nombre en inglés para lógica interna
+                'country':
+                    englishCountryName, // Siempre usamos el nombre en inglés para lógica interna
                 'description': description,
-                'statistics_text_present': masterPoiData['statistics_text_present'] ?? '',
-                'statistics_text_past': masterPoiData['statistics_text_past'] ?? '',
-                'past_comparison_summary': masterPoiData['past_comparison_summary'] ?? '',
+                'statistics_text_present':
+                    masterPoiData['statistics_text_present'] ?? '',
+                'statistics_text_past':
+                    masterPoiData['statistics_text_past'] ?? '',
+                'past_comparison_summary':
+                    masterPoiData['past_comparison_summary'] ?? '',
               };
 
               pois.add(
@@ -142,9 +199,10 @@ class POIService {
 
       _cachedPois = pois;
       return pois;
-    } catch (e) {
-      print('Error loading POIs in POIService: $e');
-      return [];
+    } catch (e, stack) {
+      debugPrint('Error loading POIs in POIService: $e');
+      debugPrint('$stack');
+      rethrow;
     }
   }
 

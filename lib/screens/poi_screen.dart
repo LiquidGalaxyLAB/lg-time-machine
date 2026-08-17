@@ -24,6 +24,7 @@ class _POIScreenState extends State<POIScreen> {
   List<POI> _allPois = [];
   List<POI> _filteredPois = [];
   bool _isLoading = true;
+  String? _loadError;
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -38,7 +39,9 @@ class _POIScreenState extends State<POIScreen> {
   @override
   void dispose() {
     _searchController.dispose();
-    LanguageManager.instance.languageNotifier.removeListener(_onLanguageChanged);
+    LanguageManager.instance.languageNotifier.removeListener(
+      _onLanguageChanged,
+    );
     super.dispose();
   }
 
@@ -48,7 +51,12 @@ class _POIScreenState extends State<POIScreen> {
   }
 
   Future<void> _loadPOIs() async {
-    setState(() => _isLoading = true);
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _loadError = null;
+      });
+    }
     try {
       final pois = await POIService().loadPOIs();
       // Use case-insensitive comparison for country matching
@@ -59,14 +67,21 @@ class _POIScreenState extends State<POIScreen> {
                 widget.country.name.toLowerCase().trim(),
           )
           .toList();
-      setState(() {
-        _allPois = countryPois;
-        _filteredPois = countryPois;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _allPois = countryPois;
+          _filteredPois = countryPois;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      print('Error loading POIs in screen: $e');
-      setState(() => _isLoading = false);
+      debugPrint('Error loading POIs in screen: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _loadError = e.toString();
+        });
+      }
     }
   }
 
@@ -141,24 +156,21 @@ class _POIScreenState extends State<POIScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color:
-                      widget.isConnected
-                          ? const Color(0xFF8AFF8A).withValues(alpha: 0.2)
-                          : const Color(0xFFFF8A8A).withValues(alpha: 0.2),
+                  color: widget.isConnected
+                      ? const Color(0xFF8AFF8A).withValues(alpha: 0.2)
+                      : const Color(0xFFFF8A8A).withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color:
-                        widget.isConnected
-                            ? const Color(0xFF8AFF8A).withValues(alpha: 0.4)
-                            : const Color(0xFFFF8A8A).withValues(alpha: 0.4),
+                    color: widget.isConnected
+                        ? const Color(0xFF8AFF8A).withValues(alpha: 0.4)
+                        : const Color(0xFFFF8A8A).withValues(alpha: 0.4),
                   ),
                 ),
                 child: Icon(
                   Icons.wifi,
-                  color:
-                      widget.isConnected
-                          ? const Color(0xFF8AFF8A)
-                          : const Color(0xFFFF8A8A),
+                  color: widget.isConnected
+                      ? const Color(0xFF8AFF8A)
+                      : const Color(0xFFFF8A8A),
                   size: 24,
                 ),
               ),
@@ -219,7 +231,11 @@ class _POIScreenState extends State<POIScreen> {
           Container(width: 3, height: isTablet ? 32 : 24, color: Colors.white),
           const SizedBox(width: 10),
           Text(
-            LanguageManager.instance.translate(widget.country.name.toLowerCase().replaceAll(' ', '_')).toUpperCase(),
+            LanguageManager.instance
+                .translate(
+                  widget.country.name.toLowerCase().replaceAll(' ', '_'),
+                )
+                .toUpperCase(),
             style: TextStyle(
               color: Colors.white,
               fontSize: isTablet ? 36 : 28,
@@ -237,6 +253,9 @@ class _POIScreenState extends State<POIScreen> {
       return const Center(
         child: CircularProgressIndicator(color: Colors.white),
       );
+    }
+    if (_loadError != null) {
+      return _buildError(isTablet);
     }
     if (_filteredPois.isEmpty) {
       return Center(
@@ -272,6 +291,70 @@ class _POIScreenState extends State<POIScreen> {
     );
   }
 
+  Widget _buildError(bool isTablet) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: Colors.white.withValues(alpha: 0.7),
+              size: isTablet ? 64 : 48,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              LanguageManager.instance.translate('error_loading_pois'),
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.7),
+                fontSize: isTablet ? 18 : 15,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: _loadPOIs,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.blue.withValues(alpha: 0.6),
+                      Colors.blue.withValues(alpha: 0.3),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.refresh, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      LanguageManager.instance.translate('retry'),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPOIItem(POI poi, bool isTablet) {
     return ValueListenableBuilder<String>(
       valueListenable: LanguageManager.instance.languageNotifier,
@@ -286,59 +369,56 @@ class _POIScreenState extends State<POIScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder:
-                        (context) => POIDetailScreen(
-                          poi: poi,
-                          isConnected: widget.isConnected,
-                        ),
+                    builder: (context) => POIDetailScreen(
+                      poi: poi,
+                      isConnected: widget.isConnected,
+                    ),
                   ),
                 );
               },
               child: Container(
                 margin: EdgeInsets.only(bottom: isTablet ? 0 : 20),
-                decoration:
-                    isTablet
-                        ? BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.1),
-                          ),
-                        )
-                        : null,
+                decoration: isTablet
+                    ? BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.1),
+                        ),
+                      )
+                    : null,
                 padding: isTablet ? const EdgeInsets.all(10) : null,
                 child: Row(
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(15),
-                      child:
-                          thumbnailPath.isNotEmpty
-                              ? Image.asset(
-                                thumbnailPath,
-                                width: isTablet ? 120 : 100,
-                                height: isTablet ? 90 : 80,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: isTablet ? 120 : 100,
-                                    height: isTablet ? 90 : 80,
-                                    color: Colors.white10,
-                                    child: const Icon(
-                                      Icons.image_not_supported,
-                                      color: Colors.white24,
-                                    ),
-                                  );
-                                },
-                              )
-                              : Container(
-                                width: isTablet ? 120 : 100,
-                                height: isTablet ? 90 : 80,
-                                color: Colors.white10,
-                                child: const Icon(
-                                  Icons.image_not_supported,
-                                  color: Colors.white24,
-                                ),
+                      child: thumbnailPath.isNotEmpty
+                          ? Image.asset(
+                              thumbnailPath,
+                              width: isTablet ? 120 : 100,
+                              height: isTablet ? 90 : 80,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: isTablet ? 120 : 100,
+                                  height: isTablet ? 90 : 80,
+                                  color: Colors.white10,
+                                  child: const Icon(
+                                    Icons.image_not_supported,
+                                    color: Colors.white24,
+                                  ),
+                                );
+                              },
+                            )
+                          : Container(
+                              width: isTablet ? 120 : 100,
+                              height: isTablet ? 90 : 80,
+                              color: Colors.white10,
+                              child: const Icon(
+                                Icons.image_not_supported,
+                                color: Colors.white24,
                               ),
+                            ),
                     ),
                     const SizedBox(width: 15),
                     Expanded(

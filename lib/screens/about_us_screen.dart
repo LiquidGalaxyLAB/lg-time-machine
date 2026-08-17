@@ -33,39 +33,61 @@ class AboutUsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 24.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24.0,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 20),
                                 _buildSectionTitle(
-                                  LanguageManager.instance
-                                      .translate('app_description_title'),
+                                  LanguageManager.instance.translate(
+                                    'app_description_title',
+                                  ),
                                 ),
                                 const SizedBox(height: 10),
                                 _buildSectionText(
-                                  LanguageManager.instance
-                                      .translate('app_description_text'),
+                                  LanguageManager.instance.translate(
+                                    'app_description_text',
+                                  ),
                                 ),
                                 const SizedBox(height: 30),
                                 _buildSectionTitle(
-                                  LanguageManager.instance
-                                      .translate('mentions_title'),
+                                  LanguageManager.instance.translate(
+                                    'mentions_title',
+                                  ),
                                 ),
                                 const SizedBox(height: 10),
-                                _buildMentionItem(LanguageManager.instance
-                                    .translate('mention_jan')),
-                                _buildMentionItem(LanguageManager.instance
-                                    .translate('mention_alfredo')),
-                                _buildMentionItem(LanguageManager.instance
-                                    .translate('mention_andreu')),
-                                _buildMentionItem(LanguageManager.instance
-                                    .translate('mention_lg')),
-                                _buildMentionItem(LanguageManager.instance
-                                    .translate('mention_parc')),
-                                _buildMentionItem(LanguageManager.instance
-                                    .translate('mention_laboratoris')),
+                                _buildMentionItem(
+                                  LanguageManager.instance.translate(
+                                    'mention_jan',
+                                  ),
+                                ),
+                                _buildMentionItem(
+                                  LanguageManager.instance.translate(
+                                    'mention_alfredo',
+                                  ),
+                                ),
+                                _buildMentionItem(
+                                  LanguageManager.instance.translate(
+                                    'mention_andreu',
+                                  ),
+                                ),
+                                _buildMentionItem(
+                                  LanguageManager.instance.translate(
+                                    'mention_lg',
+                                  ),
+                                ),
+                                _buildMentionItem(
+                                  LanguageManager.instance.translate(
+                                    'mention_parc',
+                                  ),
+                                ),
+                                _buildMentionItem(
+                                  LanguageManager.instance.translate(
+                                    'mention_laboratoris',
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -84,7 +106,7 @@ class AboutUsScreen extends StatelessWidget {
                                       end: Alignment.bottomCenter,
                                       colors: [
                                         Colors.transparent,
-                                        Colors.white
+                                        Colors.white,
                                       ],
                                     ),
                                   ),
@@ -213,4 +235,3 @@ class AboutUsScreen extends StatelessWidget {
     );
   }
 }
-

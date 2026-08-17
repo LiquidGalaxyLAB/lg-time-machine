@@ -10,22 +10,27 @@ class ComparisonOverlayKML {
     final String pastStatsLabel = isFuture
         ? LanguageManager.instance.translate('estimation_in_2100').toUpperCase()
         : LanguageManager.instance.translate('past').toUpperCase();
-    final String presentLabel =
-        LanguageManager.instance.translate('present').toUpperCase();
-    final String summaryLabel =
-        LanguageManager.instance.translate('summary').toUpperCase();
+    final String presentLabel = LanguageManager.instance
+        .translate('present')
+        .toUpperCase();
+    final String summaryLabel = LanguageManager.instance
+        .translate('summary')
+        .toUpperCase();
 
     String formatList(String text) {
       return text
           .split('\n')
-          .map((line) => line.trim().startsWith('-')
-              ? '- ${line.trim().substring(1).trim()}'
-              : line)
+          .map(
+            (line) => line.trim().startsWith('-')
+                ? '- ${line.trim().substring(1).trim()}'
+                : line,
+          )
           .join('<br/>');
     }
 
-    final String escapedPastStats =
-        formatList(isFuture ? (futureStats ?? '') : poi.statisticsTextPast);
+    final String escapedPastStats = formatList(
+      isFuture ? (futureStats ?? '') : poi.statisticsTextPast,
+    );
     final String escapedPresentStats = formatList(poi.statisticsTextPresent);
     final String summary = formatList(poi.comparisonSummary);
 

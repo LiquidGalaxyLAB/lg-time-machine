@@ -78,20 +78,27 @@ class LanguageManager {
       'comparison_success': 'Comparison loaded successfully!',
       'orbit_stopped': 'Orbit stopped',
       'orbit_starting': 'Starting orbit around',
-      'ai_disclaimer': 'The estimation image will be different depending on the AI model that you use in your configuration',
-      'additive_prompt_hint': 'Add an additive prompt (e.g. "more trees", "cyberpunk style")...',
+      'ai_disclaimer':
+          'The estimation image will be different depending on the AI model that you use in your configuration',
+      'additive_prompt_hint':
+          'Add an additive prompt (e.g. "more trees", "cyberpunk style")...',
       'help_q1': 'How does the app work?',
-      'help_a1': 'This app allows you to control a Liquid Galaxy system and explore different places through time (Past, Present, and Future).',
+      'help_a1':
+          'This app allows you to control a Liquid Galaxy system and explore different places through time (Past, Present, and Future).',
       'help_q2': 'How to connect?',
-      'help_a2': 'Go to the Connection tab, enter your Liquid Galaxy user, password, IP, port, and number of screens, then press CONNECT.',
+      'help_a2':
+          'Go to the Connection tab, enter your Liquid Galaxy user, password, IP, port, and number of screens, then press CONNECT.',
       'help_q3': 'What is the Timeline?',
-      'help_a3': 'The timeline lets you select different countries and see their most famous Points of Interest across different eras.',
+      'help_a3':
+          'The timeline lets you select different countries and see their most famous Points of Interest across different eras.',
       'help_q4': 'Languages',
-      'help_a4': 'You can change the app language in the Settings tab. We support English, Spanish, and Catalan.',
+      'help_a4':
+          'You can change the app language in the Settings tab. We support English, Spanish, and Catalan.',
       'no_narration': 'No text available to narrate',
       'loading': 'LOADING...',
       'app_description_title': 'APP DESCRIPTION',
-      'app_description_text': 'Liquid Galaxy Time Machine is an interactive application designed to visualize the evolution of historical landmarks over time. Using the power of Liquid Galaxy, users can travel through past, present, and future eras, exploring how architecture and landscapes have transformed through immersive 3D visualizations and historical data.',
+      'app_description_text':
+          'Liquid Galaxy Time Machine is an interactive application designed to visualize the evolution of historical landmarks over time. Using the power of Liquid Galaxy, users can travel through past, present, and future eras, exploring how architecture and landscapes have transformed through immersive 3D visualizations and historical data.',
       'mentions_title': 'MENTIONS',
       'mention_jan': 'Jan Sánchez - App Creator',
       'mention_alfredo': 'Alfredo Bautista - Mentor',
@@ -104,6 +111,9 @@ class LanguageManager {
       'connection_failed_error': 'Connection failed. Check your data.',
       'search_places': 'Search places...',
       'no_places_found': 'No places found',
+      'error_loading_pois':
+          'Unable to load places. Check the connection and try again.',
+      'retry': 'TRY AGAIN',
       'error_prefix': 'Error',
       'english': 'English',
       'spanish': 'Spanish',
@@ -132,7 +142,8 @@ class LanguageManager {
       'medium': 'MEDIUM',
       'large': 'LARGE',
       'help_q5': 'AI Generation',
-      'help_a5': 'To generate future estimations, you need to configure an API Key from pollinations.ai in the Settings tab. Follow the instructions in the "API OBTAINMENT" section.',
+      'help_a5':
+          'To generate future estimations, you need to configure an API Key from pollinations.ai in the Settings tab. Follow the instructions in the "API OBTAINMENT" section.',
       'kml_appearing': 'Checking 3D visualization...',
       'kml_success': '3D visualization loaded successfully!',
       'error_kml_ssh': 'SSH connection error during 3D generation',
@@ -207,20 +218,27 @@ class LanguageManager {
       'comparison_success': '¡Comparativa cargada con éxito!',
       'orbit_stopped': 'Órbita detenida',
       'orbit_starting': 'Iniciando órbita alrededor de',
-      'ai_disclaimer': 'La imagen de estimación variará según el modelo de IA que utilices en tu configuración',
-      'additive_prompt_hint': 'Añade un prompt adicional (ej. "más árboles", "estilo cyberpunk")...',
+      'ai_disclaimer':
+          'La imagen de estimación variará según el modelo de IA que utilices en tu configuración',
+      'additive_prompt_hint':
+          'Añade un prompt adicional (ej. "más árboles", "estilo cyberpunk")...',
       'help_q1': '¿Cómo funciona la aplicación?',
-      'help_a1': 'Esta aplicación te permite controlar un sistema Liquid Galaxy y explorar diferentes lugares a través del tiempo (Pasado, Presente y Futuro).',
+      'help_a1':
+          'Esta aplicación te permite controlar un sistema Liquid Galaxy y explorar diferentes lugares a través del tiempo (Pasado, Presente y Futuro).',
       'help_q2': '¿Cómo conectarse?',
-      'help_a2': 'Ve a la pestaña Conexión, introduce tu usuario de Liquid Galaxy, contraseña, IP, puerto y número de pantallas, luego pulsa CONECTAR.',
+      'help_a2':
+          'Ve a la pestaña Conexión, introduce tu usuario de Liquid Galaxy, contraseña, IP, puerto y número de pantallas, luego pulsa CONECTAR.',
       'help_q3': '¿Qué es la Línea de Tiempo?',
-      'help_a3': 'La línea de tiempo te permite seleccionar diferentes países y ver sus Puntos de Interés más famosos a través de diferentes épocas.',
+      'help_a3':
+          'La línea de tiempo te permite seleccionar diferentes países y ver sus Puntos de Interés más famosos a través de diferentes épocas.',
       'help_q4': 'Idiomas',
-      'help_a4': 'Puedes cambiar el idioma de la aplicación en la pestaña Ajustes. Soportamos inglés, español y catalán.',
+      'help_a4':
+          'Puedes cambiar el idioma de la aplicación en la pestaña Ajustes. Soportamos inglés, español y catalán.',
       'no_narration': 'No hay texto disponible para narrar',
       'loading': 'CARGANDO...',
       'app_description_title': 'DESCRIPCIÓ DE LA APP',
-      'app_description_text': 'Liquid Galaxy Time Machine es una aplicación interactiva diseñada para visualizar la evolución de monumentos históricos a lo largo del tiempo. Utilizando el poder de Liquid Galaxy, los usuarios pueden viajar a través de las eras pasada, presente y futura, explorando cómo la arquitectura y los paisajes se han transformado a través de visualizaciones 3D inmersivas y datos históricos.',
+      'app_description_text':
+          'Liquid Galaxy Time Machine es una aplicación interactiva diseñada para visualizar la evolución de monumentos históricos a lo largo del tiempo. Utilizando el poder de Liquid Galaxy, los usuarios pueden viajar a través de las eras pasada, presente y futura, explorando cómo la arquitectura y los paisajes se han transformado a través de visualizaciones 3D inmersivas y datos históricos.',
       'mentions_title': 'MENCIONES',
       'mention_jan': 'Jan Sánchez - Creador de la App',
       'mention_alfredo': 'Alfredo Bautista - Mentor',
@@ -233,6 +251,9 @@ class LanguageManager {
       'connection_failed_error': 'Error de conexión. Comprueba tus datos.',
       'search_places': 'Buscar lugares...',
       'no_places_found': 'No se han encontrado lugares',
+      'error_loading_pois':
+          'No se han podido cargar los lugares. Comprueba la conexión e inténtalo de nuevo.',
+      'retry': 'REINTENTAR',
       'error_prefix': 'Error',
       'english': 'Inglés',
       'spanish': 'Español',
@@ -261,7 +282,8 @@ class LanguageManager {
       'medium': 'MEDIANO',
       'large': 'GRANDE',
       'help_q5': 'Generación por IA',
-      'help_a5': 'Para generar estimaciones futuras, necesitas configurar una API Key de pollinations.ai en la pestaña de Ajustes. Sigue las instrucciones en la sección "OBTENCIÓN DE API".',
+      'help_a5':
+          'Para generar estimaciones futuras, necesitas configurar una API Key de pollinations.ai en la pestaña de Ajustes. Sigue las instrucciones en la sección "OBTENCIÓN DE API".',
       'kml_appearing': 'Comprobando visualización 3D...',
       'kml_success': '¡Visualización 3D cargada correctamente!',
       'error_kml_ssh': 'Error de conexión SSH durante la generación 3D',
@@ -336,20 +358,27 @@ class LanguageManager {
       'comparison_success': 'Comparativa carregada correctament!',
       'orbit_stopped': 'Òrbita aturada',
       'orbit_starting': 'Iniciant òrbita al voltant de',
-      'ai_disclaimer': 'La imatge d\'estimació serà diferent depenent del model d\'IA que utilitzis a la teva configuració',
-      'additive_prompt_hint': 'Afegeix un prompt addicional (ex. "més arbres", "estil cyberpunk")...',
+      'ai_disclaimer':
+          'La imatge d\'estimació serà diferent depenent del model d\'IA que utilitzis a la teva configuració',
+      'additive_prompt_hint':
+          'Afegeix un prompt addicional (ex. "més arbres", "estil cyberpunk")...',
       'help_q1': 'Com funciona l\'aplicació?',
-      'help_a1': 'Aquesta aplicació et permet controlar un sistema Liquid Galaxy i explorar diferents llocs a través del temps (Passat, Present i Futur).',
+      'help_a1':
+          'Aquesta aplicació et permet controlar un sistema Liquid Galaxy i explorar diferents llocs a través del temps (Passat, Present i Futur).',
       'help_q2': 'Com connectar-se?',
-      'help_a2': 'Ves a la pestanya Connexió, introdueix el teu usuari de Liquid Galaxy, contrasenya, IP, port i nombre de pantalles, després prem CONNECTAR.',
+      'help_a2':
+          'Ves a la pestanya Connexió, introdueix el teu usuari de Liquid Galaxy, contrasenya, IP, port i nombre de pantalles, després prem CONNECTAR.',
       'help_q3': 'Què és la Línia de Temps?',
-      'help_a3': 'La línia de temps et permet seleccionar diferents països i veure els seus Punts d\'Interès més famosos a través de diferents èpoques.',
+      'help_a3':
+          'La línia de temps et permet seleccionar diferents països i veure els seus Punts d\'Interès més famosos a través de diferents èpoques.',
       'help_q4': 'Idiomes',
-      'help_a4': 'Pots canviar l\'idioma de l\'aplicació a la pestanya Configuració. Suportem anglès, espanyol i català.',
+      'help_a4':
+          'Pots canviar l\'idioma de l\'aplicació a la pestanya Configuració. Suportem anglès, espanyol i català.',
       'no_narration': 'No hi ha text disponible per narrar',
       'loading': 'CARREGANT...',
       'app_description_title': 'DESCRIPCIÓ DE L\'APP',
-      'app_description_text': 'Liquid Galaxy Time Machine és una aplicació interactiva dissenyada per visualitzar l\'evolució de monuments històrics al llarg del temps. Utilitzant el poder de Liquid Galaxy, els usuaris poden viatjar a través de les eres passada, present i futura, explorant com l\'arquitectura i els paisatges s\'han transformat a través de visualitzacions 3D immersives i dades històriques.',
+      'app_description_text':
+          'Liquid Galaxy Time Machine és una aplicació interactiva dissenyada per visualitzar l\'evolució de monuments històrics al llarg del temps. Utilitzant el poder de Liquid Galaxy, els usuaris poden viatjar a través de les eres passada, present i futura, explorant com l\'arquitectura i els paisatges s\'han transformat a través de visualitzacions 3D immersives i dades històriques.',
       'mentions_title': 'MENCIONS',
       'mention_jan': 'Jan Sánchez - Creador de l\'App',
       'mention_alfredo': 'Alfredo Bautista - Mentor',
@@ -362,6 +391,9 @@ class LanguageManager {
       'connection_failed_error': 'Error de connexió. Comprova les teves dades.',
       'search_places': 'Cercar llocs...',
       'no_places_found': 'No s\'han trobat llocs',
+      'error_loading_pois':
+          'No s\'han pogut carregar els llocs. Comprova la connexió i torna-ho a provar.',
+      'retry': 'REPROVAR',
       'error_prefix': 'Error',
       'english': 'Anglès',
       'spanish': 'Espanyol',
@@ -390,7 +422,8 @@ class LanguageManager {
       'medium': 'MITJÀ',
       'large': 'GRAN',
       'help_q5': 'Generació per IA',
-      'help_a5': 'Per generar estimacions futures, necessites configurar una API Key de pollinations.ai a la pestanya de Configuració. Segueix les instruccions a la secció "OBTENCIÓ D\'API".',
+      'help_a5':
+          'Per generar estimacions futures, necessites configurar una API Key de pollinations.ai a la pestanya de Configuració. Segueix les instruccions a la secció "OBTENCIÓ D\'API".',
       'kml_appearing': 'Comprovant visualització 3D...',
       'kml_success': 'Visualització 3D carregada correctament!',
       'error_kml_ssh': 'Error de connexió SSH durant la generació 3D',
