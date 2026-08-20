@@ -64,3 +64,6 @@ You can customize the AI behavior by changing the model:
 
 
 6. When viewing a POI, select the **Future** era and tap **"GENERATE FUTURE ESTIMATION"**. The app will use your chosen model to envision the landmark in 2100.
+
+## License
+Liquid Galaxy Time Machine is licensed under the [MIT License](https://opensource.org/license/MIT)
